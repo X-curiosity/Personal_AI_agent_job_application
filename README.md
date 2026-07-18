@@ -127,6 +127,148 @@ src/tau_job_application/
 └── evals/                   # fixtures, scenarios, graders, regression reports
 ```
 
+#### How to start: use Tau as a dependency
+
+Do **not** reimplement the agent loop, copy Tau's source into this repository, or fork Tau as the starting point. Install a pinned Tau release and build only the job-application layer here:
+
+```text
+Installed dependency             Code owned by this project
+────────────────────             ──────────────────────────
+tau_ai                       ←──  provider configuration
+tau_agent                    ←──  agent harness and domain-tool registration
+                                 tau_job_application
+```
+
+The names are easy to confuse:
+
+```text
+Distribution installed from PyPI:  tau-ai==0.2.0
+Python packages imported in code:  tau_ai, tau_agent
+Package built in this repository:   tau_job_application
+```
+
+For the three-weekend MVP, consume Tau as a library. Clone the upstream repository separately only if reading it locally is more convenient; do not vendor it into this project. Keep Tau behind the small adapter in `agent.py` so a later upgrade does not spread framework-specific code through the domain.
+
+##### Step 1 — Create the minimal environment
+
+From this repository, initialize a Python 3.12 package and install only what is needed for the first integration test:
+
+```bash
+uv init --package --name tau-job-application
+uv python pin 3.12
+uv add "tau-ai==0.2.0" pydantic
+uv add --dev pytest pytest-asyncio
+```
+
+If a `pyproject.toml` already exists when implementation begins, do not run `uv init` again; update the existing project instead. Add Streamlit, database migrations, document parsers, ESCO clients, and embedding libraries only when the vertical slice needs them.
+
+The first local files should stay small:
+
+```text
+src/tau_job_application/
+├── __init__.py
+├── agent.py
+├── models.py
+└── tools.py
+tests/
+└── test_agent_spike.py
+```
+
+##### Step 2 — Build one Tau integration spike
+
+Before building the product pipeline, prove that the framework boundary works:
+
+1. Configure one model provider through `tau_ai`.
+2. Construct `tau_agent.AgentHarness` with a short system policy and a strict turn limit.
+3. Register one custom typed tool.
+4. Send one prompt through `AgentHarness.prompt()`.
+5. Consume and print the streamed `AgentEvent` objects.
+6. Test the tool call with a fake provider so the basic test does not depend on network access or model variability.
+
+Use a deliberately small first tool:
+
+```text
+compare_candidate_to_job(candidate_text, job_description) -> MatchPreview
+```
+
+Its initial result may be deterministic or fixture-based:
+
+```json
+{
+  "matching_skills": ["Python", "SQL"],
+  "missing_skills": ["Docker"],
+  "eligible": true,
+  "evidence_ids": ["candidate:1", "job:3"]
+}
+```
+
+The spike succeeds when Tau selects the tool, the arguments validate, the result returns through the agent loop, the events are observable, and the run stops within the configured limit. Do not proceed if tool calls or event behavior are still unclear.
+
+##### Step 3 — Establish the evidence model
+
+Create these four Pydantic models before adding APIs or a graphical interface:
+
+```text
+CandidateProfile
+JobPosting
+EvidenceItem
+MatchResult
+```
+
+Every material candidate fact and job requirement must reference an `EvidenceItem`. An evidence item records a stable ID, source type, source location or quoted span, capture time, and confirmation status. For example:
+
+```text
+Fact:       Candidate demonstrates Python
+Evidence:   “Developed a Python forecasting pipeline”
+Source:     CV, work-experience paragraph 2
+Status:     confirmed by user
+```
+
+This provenance model is the shared foundation for matching, skill status, project recommendations, application drafts, and fabrication checks. Correct structured data rather than rewriting the raw evidence, and retain versions of confirmed changes.
+
+##### Step 4 — Complete the first vertical slice
+
+Build the smallest useful workflow before adding discovery integrations:
+
+```mermaid
+flowchart LR
+    A["Paste candidate profile"] --> B["Paste one job description"]
+    B --> C["Extract typed records and evidence"]
+    C --> D{"User confirms or corrects"}
+    D --> E["Run deterministic eligibility and match logic"]
+    E --> F["Display evidence, gaps, score components, and uncertainty"]
+```
+
+The Weekend 1 exit criterion is:
+
+> Given one manually entered candidate profile and one job description, Tau calls our job-domain tools and produces a structured, evidence-linked comparison without inventing candidate facts.
+
+Use plain text inputs and a console output for this milestone. Once it passes, add SQLite persistence, then a simple Streamlit interface, and only afterward add permitted job-board sources.
+
+##### What comes from Tau and what we build
+
+| Tau supplies | `tau_job_application` supplies |
+|---|---|
+| Provider-neutral model access | Candidate, job, evidence, skill, project, and application models |
+| Messages and agent loop | Job ingestion and requirement extraction |
+| Typed-tool protocol | Eligibility rules and deterministic match scoring |
+| Agent events and streaming | ESCO normalization and skill/project graphs |
+| Harness, cancellation, and lifecycle hooks | Claim validation and approval policies |
+| Conversation/session primitives | SQLite domain state, Streamlit UI, exports, and evaluations |
+
+##### Do not start with these
+
+- Forking or changing Tau internals.
+- Multiple agents or agent-to-agent delegation.
+- LinkedIn scraping, browser automation, or automatic applications.
+- Greenhouse, Lever, or general web discovery before manual input works.
+- A vector database, embeddings, or RAG infrastructure before evidence IDs work.
+- CV PDF/DOCX parsing before the editable profile schema is stable.
+- The full skill tree, project tree, and application-document generator at once.
+- Styling or deployment before the saved ten-job evaluation set passes.
+
+The implementation order is therefore: **Tau spike → evidence models → one-job vertical slice → deterministic scoring tests → SQLite → Streamlit → skill/project trees → application workspace → permitted job sources**.
+
 #### Tau files to read, in order
 
 All files are from Hugging Face's Tau repository and were accessed 18 July 2026.
