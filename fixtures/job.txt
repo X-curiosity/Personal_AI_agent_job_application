@@ -1,0 +1,5 @@
+Title: Junior Backend Engineer
+Company: Example Systems
+Location: Zurich or remote
+Required skills: Python, SQL, Docker
+Preferred skills: FastAPI, AWS

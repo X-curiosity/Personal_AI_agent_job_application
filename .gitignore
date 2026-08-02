@@ -1,0 +1,17 @@
+.DS_Store
+.env
+.venv/
+__pycache__/
+.pytest_cache/
+.ruff_cache/
+*.py[cod]
+*.db
+*.sqlite3
+coverage.xml
+htmlcov/
+output/
+uploads/
+
+# Keep real candidate and application data out of Git.
+private/
+data/

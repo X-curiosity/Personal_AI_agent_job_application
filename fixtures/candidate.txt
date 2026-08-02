@@ -1,0 +1,4 @@
+Name: Alex Example
+Headline: Python developer building reliable data and API products
+Skills: Python, SQL, FastAPI, Git, pytest
+Experience: Built and tested small Python services and analytical workflows.

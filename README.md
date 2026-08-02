@@ -1,6 +1,46 @@
 # Personal_AI_agent_job_application
 The goal of this project is to build a personal AI agent in order to enable people to get more interviews with targeted companies. This agent will help you focus on concrete project that you can build on your own and give you all the ressources to actually learn during the process. 
 
+## Runnable starter template
+
+The repository now contains a deliberately small implementation template. It is not the finished MVP: it proves the package structure, deterministic candidate/job pipeline, Tau tool boundary, CLI, fixtures, and tests so you can iterate safely.
+
+```bash
+# Install Python dependencies in the project environment
+uv sync
+
+# Run without an API key
+uv run tau-job-application demo
+
+# Run the tests
+uv run pytest
+```
+
+The optional live-agent spike requires a model provider:
+
+```bash
+export OPENAI_API_KEY="your-key"
+export MODEL_NAME="your-model-name"
+uv run tau-job-application agent fixtures/candidate.txt fixtures/job.txt
+```
+
+If macOS reports that it cannot import `tau_job_application` even after a successful `uv sync`, clear the Finder hidden flag from the editable-install pointer and retry:
+
+```bash
+chflags nohidden .venv/lib/python3.12/site-packages/tau_job_application.pth
+uv run tau-job-application demo
+```
+
+Start your own implementation in this order:
+
+1. Extend `models.py` with the fields you actually need.
+2. Replace the simple fixture parser in `parsing.py` with evidence-grounded extraction.
+3. Refine and test the deterministic scoring rules in `matching.py`.
+4. Improve `planning.py` so prerequisites and project plans are role-specific.
+5. Add new narrow Tau tools only after the underlying Python functions are tested.
+
+Do not put a real CV, API key, application document, or private database in Git.
+
 <!-- PROJECT_RESEARCH_BRIEF_START -->
 
 ## Project Research Brief

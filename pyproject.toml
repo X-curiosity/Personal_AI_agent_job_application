@@ -1,0 +1,30 @@
+[project]
+name = "tau-job-application"
+version = "0.1.0"
+description = "A minimal Tau-based personal job-application assistant template"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "pydantic>=2.13,<3",
+    "pypdf>=6,<7",
+    "tau-ai==0.2.0",
+]
+
+[project.scripts]
+tau-job-application = "tau_job_application.cli:main"
+
+[build-system]
+requires = ["uv_build>=0.11.29,<0.12.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "pytest>=9.1,<10",
+    "pytest-asyncio>=1.4,<2",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra"
+pythonpath = ["src"]
+asyncio_mode = "auto"
