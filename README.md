@@ -1,184 +1,543 @@
-# Personal AI Agent — Job Application Assistant
+# Personal AI Agent — Job Readiness and Learning Assistant
 
-A local-first, evidence-first AI agent that helps students and job seekers prepare stronger, truthful applications for European and international roles.
+**Goal: help applicants become stronger candidates, not just produce better-looking applications.**
 
-The agent does **not** apply to jobs, message recruiters, scrape LinkedIn/X, or invent CV facts. Instead it scores your CV against a role, identifies skill gaps, builds a learning and portfolio roadmap, tailors your CV safely, checks its authenticity, helps you find jobs through permitted sources, plans contact research, and runs mock interviews.
+The intended product connects a target role to the knowledge, projects, evidence, and interview practice needed to pursue it. Its initial audience is students and early-career applicants targeting Europe.
 
----
+**Status: local prototype, not a production hiring platform or validated tutor.** The current application implements a deterministic assessment workflow, a Streamlit interface, source connectors, and optional model access. Several important capabilities remain templates or heuristics. The research-based learning system below is a proposed next stage, not a description of features already shipped.
 
-## What is implemented
+## Contents
 
-### Core pipeline
-- **CV intake**: text, Markdown, PDF (selectable text), DOCX.
-- **Profile links**: GitHub, portfolio, LinkedIn, X — stored as references, never auto-scraped.
-- **Job intake**: pasted descriptions, plus public adapters.
-- **Evidence model**: every skill, requirement, and claim links to a source quote.
-- **Deterministic scoring**: role-evidence match + CV readiness score with transparent components.
-- **Skill tree**: missing required/preferred skills mapped to prerequisites and learning resources.
-- **Portfolio project roadmap**: up to 3 sequenced projects with milestones, deliverables, and acceptance tests.
-- **Truthful CV tailoring**: rewrites only what is supported by supplied evidence; suggests edits, not invented claims.
-- **Authenticity review**: flags generic phrasing, unsupported claims, and missing observable outcomes; never tries to evade AI detectors.
+- [1. Run locally](#1-run-locally)
+- [2. What works today](#2-what-works-today)
+- [3. How to use the interface](#3-how-to-use-the-interface)
+- [4. Scores, evidence, and known limitations](#4-scores-evidence-and-known-limitations)
+- [5. Architecture and data flow](#5-architecture-and-data-flow)
+- [6. Job sources and European coverage](#6-job-sources-and-european-coverage)
+- [7. Privacy and review boundaries](#7-privacy-and-review-boundaries)
+- [8. Proposed learning system](#8-proposed-learning-system)
+- [9. Research papers and implementation ideas](#9-research-papers-and-implementation-ideas)
+- [10. Experiments and evaluation](#10-experiments-and-evaluation)
+- [11. Implementation roadmap](#11-implementation-roadmap)
+- [12. Testing and troubleshooting](#12-testing-and-troubleshooting)
 
-### Job discovery and monitoring
-- **Permitted public career-board APIs**: Greenhouse, Lever, Recruitee.
-- **Official API connectors**: LinkedIn (authorized identity check only), SmartRecruiters (authorized Posting API token), X API v2 recent-search for hiring/product signals.
-- **User-provided lawful exports**: CSV/JSON contact and job imports.
-- **Local monitoring**: user-triggered refreshes record snapshots and report newly observed jobs; no hidden background polling or stored credentials.
+## 1. Run locally
 
-### Interview practice
-- Role-specific technical, behavioural, and motivation questions.
-- Optional OpenAI audio transcription.
-- Structured feedback on answer evidence, not technical correctness.
-
-### UI
-- Minimalist **Streamlit** interface with drag-and-drop CV upload.
-- Three-tab layout: Quick start, Opportunities & contacts, Interview practice.
-- Local SQLite history and audit under `.job_assistant/`.
-
----
-
-## Run it
+Requirements: Python 3.12+, [uv](https://docs.astral.sh/uv/), and a browser. No API key is needed for local CV analysis, template plans, or typed interview practice.
 
 ```bash
-cd /Users/magbi/Desktop/Personal_AI_agent_job_application
+git clone https://github.com/X-curiosity/Personal_AI_agent_job_application.git
+cd Personal_AI_agent_job_application
 
-# Install dependencies
+# Regular install avoids an editable-install pointer issue seen on macOS.
 uv sync --no-editable --reinstall-package tau-job-application
 
-# Launch the minimalist UI
+# Launch the UI from the repository directory.
 uv run --no-sync tau-job-application ui
 
-# Or run the fixture demo in the terminal
+# Other entry points:
 uv run --no-sync tau-job-application demo
-
-# Run the regression tests
+uv run --no-sync tau-job-application analyze fixtures/candidate.txt fixtures/job.txt
 uv run --no-sync pytest -q
 ```
 
-If macOS hides the editable-install pointer, the `--no-editable` install above avoids import issues.
+After changing source code, repeat the install command: a regular installation does not automatically pick up source edits. Run from the repository so the demo can find `fixtures/` and the UI uses the intended local data directory.
 
-### Optional model credentials
+### Optional credentials and network access
 
-Only the chat agent and audio transcription need a model provider:
+| Setting | Purpose | Required for basic analysis? |
+|---|---|---|
+| `OPENAI_API_KEY` | Optional Tau provider and explicitly requested audio transcription | No |
+| `MODEL_NAME` | Model used by the optional Tau CLI command | No |
+| `LINKEDIN_ACCESS_TOKEN` | Official identity endpoint for the authorized LinkedIn account | No |
+| `X_BEARER_TOKEN` | Official X recent-post search, subject to account access and limits | No |
+| SmartRecruiters token | Entered in the UI for the current connector | No |
 
 ```bash
 export OPENAI_API_KEY="your-key"
-export MODEL_NAME="gpt-4o-mini"
+export MODEL_NAME="a-model-supported-by-your-provider"
 uv run --no-sync tau-job-application agent fixtures/candidate.txt fixtures/job.txt
 ```
 
-Optional official-platform credentials:
+`.env.example` documents configuration; the application does **not** automatically load a `.env` file. Export variables in the shell that launches the app. Never commit real credentials. External API access may require approval, an eligible plan, or payment.
 
-```bash
-export LINKEDIN_ACCESS_TOKEN="..."
-export X_BEARER_TOKEN="..."
+## 2. What works today
+
+| Area | Implemented behavior | Important boundary |
+|---|---|---|
+| CV intake | TXT, Markdown, selectable-text PDF, and DOCX extraction | No OCR; ordinary CV extraction uses a small English-oriented skill vocabulary |
+| Profile links | GitHub, portfolio, LinkedIn, and X fields | Portfolio/social links alone do not retrieve or validate a person's work |
+| GitHub enrichment | Optional public API lookup of profile/repository language signals | No repository code review; languages are unconfirmed signals, not proof of proficiency |
+| Job intake | Pasted descriptions, company-board connectors, CSV/JSON imports | Adapters need broader provider-contract and live validation |
+| Role comparison | Deterministic required/preferred skill coverage | Not a probability of being hired; no comprehensive European eligibility filtering |
+| CV readiness | Heuristic structure/contact/outcome checks plus role coverage | Not a validated ATS score or assessment of intelligence/ability |
+| CV tailoring | Summary, relevant skill ordering, and section-editing advice | **Not a complete rewritten résumé or PDF/DOCX export** |
+| Authenticity review | Generic-phrase and claim/outcome heuristics | Cannot establish authorship or factual truth; known false-acceptance cases exist |
+| Learning plan | Missing-skill list, selected prerequisites, small static resource catalog | Not yet an adaptive knowledge model or interactive dependency graph |
+| Project plan | Up to three generic briefs with milestones, deliverables, and acceptance checks | No live project research or company-specific project design |
+| Job monitoring | Manual refresh, local snapshots, newly observed fingerprints | No scheduled alerts, reliable closure detection, or cross-source deduplication |
+| Networking | Research queries, manually entered/imported contacts | No verified referral network or automatic outreach |
+| Interview practice | Role-named questions, typed responses, keyword-based feedback | Measures answer structure heuristically, not technical correctness |
+| Voice input | Recording plus explicitly requested OpenAI transcription | Audio leaves the machine when transcription is requested |
+| Optional agent | Bounded Tau CLI harness with domain tools | Quick start does not invoke an LLM; no autonomous research subagents in the product |
+| Persistence | SQLite analysis snapshots, audit events, and source-watch records | Not a full application tracker, résumé version editor, or multi-user service |
+
+The [Jobright comparison](docs/JOBRIGHT_IMPROVEMENT_REPORT.md) contains the detailed code review and product backlog. It distinguishes Jobright's advertised features from independently verified behavior; marketing performance claims are not benchmarks for this project.
+
+## 3. How to use the interface
+
+### Quick start
+
+1. Drag in a CV or paste text. **An uploaded file takes precedence** if both are supplied.
+2. Add optional links. GitHub enrichment runs only when its checkbox is selected; the other profile links remain references.
+3. Paste a target job description. Title/company can be entered separately. A job URL alone does not fetch its description.
+4. Select **Build my plan**.
+5. Review the three result columns:
+   - **Tailored CV:** draft summary, skill ordering, and editing suggestions.
+   - **Improvements:** score components, next actions, and heuristic review findings.
+   - **Roadmap:** skill gaps, resources, and project briefs displayed in expanders.
+6. Download the Markdown planning report. The current UI blocks this download when the heuristic authenticity status is `blocked`; this is a prototype behavior, not a reliable factual-verification gate.
+
+A simple synthetic input for testing:
+
+```text
+Name: Alex Example
+Headline: Junior backend developer
+Skills: Python, SQL
+Experience: Built a Python service with automated tests.
 ```
 
-Never commit real tokens.
+```text
+Title: Backend Engineer
+Company: Example Systems
+Required skills: Python, Docker
+Preferred skills: SQL
+```
 
----
+For now, inspect the extracted skills yourself. There is no structured confirmation editor. Updating input fields also does not automatically recompute the existing result: select **Build my plan** again.
 
-## Quick-start UI flow
+### Opportunities & contacts
 
-1. **Drop or paste your CV** in the Quick start tab.
-2. **Add your links**: GitHub, portfolio, LinkedIn, X.
-3. **Paste the job description** (title, company, and description).
-4. Click **Build my plan**.
-5. Review the three output columns:
-   - **Tailored CV**: safe summary, relevant skills, section-by-section suggestions.
-   - **Improvements**: CV readiness score, next actions, authenticity review.
-   - **Roadmap**: skill gaps + sequenced portfolio projects with learning resources and acceptance tests.
-6. Download the full `.md` report when authenticity status is **ready** or **needs_review**.
+- Enter a real employer's board identifier for Greenhouse, Lever, or Recruitee.
+- Fetch and monitor jobs manually. “New” means newly observed by this local database, not necessarily newly published.
+- Use official-platform connectors only with appropriate access.
+- Import contacts/jobs obtained with permission as CSV or JSON; up to 500 records and 5 MB are processed. Rows that cannot be parsed can currently be skipped without detailed feedback.
+- Imported jobs are listed separately; selecting one does not yet automatically populate Quick start.
 
----
+Example CSV schemas:
 
-## Project architecture
+```csv
+name,role,profile_url,public_email,evidence
+Alex Example,Engineering Lead,https://example.com/team/alex,,User-provided company team page
+```
+
+```csv
+title,company,required_skills,preferred_skills,url
+Backend Engineer,Example Systems,"Python, Docker",SQL,https://example.com/careers/backend
+```
+
+JSON accepts a list of objects with equivalent fields, or an object containing a `data` or `items` list. Preserve provenance; an imported email is not independently verified just because it is present.
+
+### Interview practice
+
+Complete an assessment first, select a question, and type an answer. Recording is optional. Selecting transcription sends the recording to OpenAI. Feedback currently checks expressions associated with context, action, validation, and reflection. It does not assess whether an engineering explanation is correct.
+
+## 4. Scores, evidence, and known limitations
+
+### Current scoring rules
+
+`matching.py` calculates:
+
+```text
+role coverage = round(100 × (0.8 × required coverage + 0.2 × preferred coverage))
+```
+
+A requirement matches when a skill mapping resolves to evidence marked `confirmed`. That flag currently reflects parser rules, not an independent fact check.
+
+`career.py` combines four heuristic components:
+
+| Component | Weight |
+|---|---:|
+| Target-role coverage | 55% |
+| CV structure | 20% |
+| Contact/portfolio presence | 10% |
+| Outcome wording/numbers | 15% |
+
+These weights are design choices, not scientifically calibrated hiring predictors. A 90/100 score is neither a promise of interviews nor proof that the candidate understands a subject.
+
+### Known issues to fix first
+
+1. **Absent requirements receive automatic credit.** An empty preferred list contributes full preferred credit: a candidate with no matching skills can receive 20/100. Normalize weights over groups actually present.
+2. **Confirmation is inconsistent.** An explicit `Skills:` list is marked confirmed automatically; keywords extracted from prose are not. Introduce explicit user confirmation and distinguish self-report from demonstrated competence.
+3. **Skill aliases can overstate evidence.** `unit testing` currently maps to `pytest`, although the former does not imply experience with that specific tool.
+4. **Authenticity is not verified.** Numbers or overlapping skill words can exempt unsupported statements. A diagnostic claim, “Managed 200 hospitals worldwide,” returned `ready` without supporting evidence. Generic wording cannot reveal whether AI wrote a CV.
+5. **Source provenance is incomplete.** Some evidence quotes are summaries or clipped document text, not exact claim spans. Evidence IDs alone do not establish entailment.
+6. **Final-draft review is missing.** The authenticity module checks the source CV, not a complete final résumé against approved claims. Disclosure suggestions should depend on actual AI assistance, not a style heuristic.
+7. **Monitoring confuses identity with content.** Its fingerprint includes requirements, so an edited role can appear new. A failed/partial fetch must not be interpreted as closure.
+8. **Adapters and imports can silently omit data.** Add schema fixtures, pagination/detail retrieval where needed, source completeness indicators, and explicit error reporting.
+
+Treat `ready`, `needs_review`, and `blocked` as current heuristic labels, not certifications. Do not inflate metrics to satisfy the checks. Qualitative outcomes, reproducible tests, and a truthful account of personal contribution can all be useful evidence.
+
+## 5. Architecture and data flow
+
+```mermaid
+flowchart TD
+    CV[CV text or document] --> Parse[Deterministic parsing]
+    Job[Target job text] --> Parse
+    Parse --> Models[Candidate and job models]
+    Models --> Match[Skill coverage and CV heuristics]
+    Match --> Plan[Static learning and project templates]
+    Models --> Draft[CV editing suggestions]
+    Models --> Review[Source-CV review heuristics]
+    Plan --> UI[Streamlit results and Markdown report]
+    Draft --> UI
+    Review --> UI
+    UI --> DB[Local SQLite snapshots]
+    CLI[Optional Tau CLI agent] --> Tools[Domain tools]
+    Tools --> Parse
+```
 
 ```text
 src/tau_job_application/
-├── __init__.py              # package version
-├── agent.py                 # optional Tau harness with safety policy
-├── authenticity.py          # detector-neutral CV authenticity review
-├── career.py                # CV scoring, tailoring, contact research plan
-├── cli.py                   # CLI entry points
-├── interview.py             # interview questions and feedback
-├── matching.py              # deterministic role-evidence matching
-├── models.py                # Pydantic contracts for evidence, jobs, plans, reports
-├── monitoring.py            # local job-source snapshot and deduplication
-├── official_sources.py      # LinkedIn, SmartRecruiters, X official APIs; export imports
-├── parsing.py               # CV and job text/document parsing
-├── pipeline.py              # end-to-end analysis workflow
-├── planning.py              # skill tree and portfolio project plans
-├── sources.py               # Greenhouse, Lever, Recruitee, GitHub enrichment
-├── storage.py               # SQLite history and audit
-└── ui.py                    # Streamlit frontend
+├── agent.py             # optional Tau harness, instructions, turn limit
+├── tools.py             # typed tool adapters for domain functions
+├── models.py            # Pydantic candidate/job/evidence/report contracts
+├── parsing.py           # local file extraction and heuristic text parsing
+├── matching.py          # deterministic skill coverage
+├── career.py            # CV heuristics, template tailoring, contact queries
+├── authenticity.py      # source-CV wording/claim heuristics
+├── planning.py          # static skill resources and project templates
+├── sources.py           # company-board APIs and GitHub signals
+├── official_sources.py  # official-platform reads and CSV/JSON imports
+├── monitoring.py        # local source/job snapshots
+├── interview.py         # questions, structure checks, audio transcription
+├── pipeline.py          # analysis orchestration and Markdown rendering
+├── storage.py           # analysis/audit SQLite storage
+├── cli.py               # demo, analyze, agent, ui commands
+└── ui.py                # Streamlit interface
 ```
 
----
+Dependencies are pinned/bounded in `pyproject.toml` and resolved in `uv.lock`. The `tau-ai` distribution supplies both `tau_ai` and `tau_agent`; the application does not modify Tau internals.
 
-## European job-source strategy
+## 6. Job sources and European coverage
 
-The full decision log is in [`docs/EU_JOB_SOURCE_STRATEGY.md`](docs/EU_JOB_SOURCE_STRATEGY.md).
+Source adapters are present, but this is **not** a comprehensive European job index. Coverage depends on which employers/boards the user supplies. Multilingual parsing, work authorization, salary normalization, and country-specific remote eligibility remain future work.
 
-Implemented sources:
-
-| Source | Type | Access |
+| Connector | Current scope | Reference |
 |---|---|---|
-| Greenhouse | Public career-board API | Board token |
-| Lever | Public postings API | Site handle |
-| Recruitee | Public Careers Site API | Company slug |
-| SmartRecruiters | Official Posting API | Company-provided token |
-| X | Official API v2 recent search | User bearer token |
-| LinkedIn | Official OIDC identity endpoint | User access token |
-| User exports | CSV/JSON import | User-owned data |
+| Greenhouse | Company public job board | [Job Board API](https://developers.greenhouse.io/job-board.html) |
+| Lever | Company public postings | [Postings API](https://github.com/lever/postings-api) |
+| Recruitee | Company careers-site offers | [Careers Site API](https://docs.recruitee.com/reference/intro-to-careers-site-api) |
+| SmartRecruiters | Current adapter accepts a company token and reads listings; detail mapping needs validation | [Posting API](https://developers.smartrecruiters.com/docs/posting-api) |
+| LinkedIn | Authorized user's OIDC identity only, not résumé extraction or people search | [OIDC integration](https://learn.microsoft.com/en-us/linkedin/consumer/integrations/self-serve/sign-in-with-linkedin-v2) |
+| X | Explicit recent-post search; posts are signals, not verified vacancies | [X API documentation](https://docs.x.com/) |
+| CSV/JSON | User-provided job/contact records | Import formats above |
 
-Deferred/partnership-only: EURES, Welcome to the Jungle, XING, StepStone, national public employment services.
+EURES, Welcome to the Jungle, XING, StepStone, and national employment-service integrations are **not implemented**. Their current access/usage terms need individual review; this is not a claim that all require the same commercial arrangement.
 
----
+See [European source strategy](docs/EU_JOB_SOURCE_STRATEGY.md) for research context. Validate its assumptions against current official documentation before adding a connector. A funding round or product release can motivate research but does not prove hiring.
 
-## Safety and data boundaries
+## 7. Privacy and review boundaries
 
-- **Evidence first**: candidate facts, job requirements, match explanations, and application claims carry stable evidence IDs.
-- **No fabrication**: the agent never invents skills, experience, metrics, projects, contacts, or email addresses.
-- **No scraping or automation on LinkedIn/X**: URLs are stored as references only; official APIs are used only for explicit user actions.
-- **No contact guessing**: contact research is manual and user-reviewed; email patterns are recorded but never used to generate individual addresses.
-- **No automatic applications or messages**.
-- **Credentials are never stored**: API tokens are used for the current request only.
-- **Local data**: analysis snapshots live under `.job_assistant/`, which is ignored by Git.
+- The product has no application-submission or messaging tools. Its current social-platform integrations are explicit official API reads, not browser scraping.
+- Analysis snapshots contain CV text and personal data in `.job_assistant/assistant.sqlite`. Git ignores this directory, but **Git exclusion is not encryption**.
+- The UI is a local prototype without multi-user authentication/isolation. Do not expose it publicly without additional security work.
+- API tokens are not deliberately written to SQLite. However, password widgets can retain values in server-side session memory; “used once and immediately erased” is not a guarantee.
+- The optional Tau CLI sends supplied CV/job text to the configured provider. Transcription sends audio to OpenAI. Public-source requests send the identifiers/queries required by those services.
+- Portfolio/social URLs, imported contact details, and generated text must be reviewed. A URL's presence or an email's format does not verify a person's role or address.
+- Data-retention, selective deletion, consent records, credential clearing, and error-redaction tests remain necessary improvements.
+- No AI-authorship percentage, ATS-pass guarantee, hiring probability, or independently verified CV claim is produced by the current system.
 
----
+## 8. Proposed learning system
 
-## Testing
+**Everything in this section is a proposed design.** The current resource list and interview prompts are only starting points.
 
-Run the full test suite:
+### Separate three things
+
+| Record | What it means | What it does not mean |
+|---|---|---|
+| Job requirement | An employer requests a capability | The requirement is necessarily essential or correctly extracted |
+| Learner state | Evidence from attempts, explanations, hints, and later tests | A CV keyword proves mastery |
+| Application evidence | A reviewable project, contribution, or achievement | Completing a course automatically creates work experience |
+
+The product should track these separately. Better writing can improve clarity without improving knowledge; studying can improve knowledge before it creates publishable project evidence.
+
+### Learning loop
+
+```mermaid
+flowchart TD
+    Goal[Target role and learner goals] --> Map[Concepts and prerequisite graph]
+    Map --> Diagnose[Short diagnostic and practical task]
+    Diagnose --> Teach[Targeted explanation or worked example]
+    Teach --> Attempt[Independent attempt with optional hints]
+    Attempt --> Feedback[Specific feedback and self-explanation]
+    Feedback --> Project[Small realistic project]
+    Project --> Transfer[Unseen task and delayed retest without AI]
+    Transfer --> State[Update evidence and uncertainty]
+    State --> Diagnose
+    State --> CV[Candidate-reviewed application evidence]
+```
+
+For each concept, record its definition, prerequisites, example, common misconceptions, assessment rubric, source resources, and review history. Attempts should store whether assistance was used; assisted success and independent success must not be treated as equivalent.
+
+### Example: preparing for a backend role requiring Docker
+
+1. **Diagnose:** ask the learner to distinguish images, containers, processes, ports, and persistent storage; include a small debugging task.
+2. **Explain:** use one worked example, with an explanation of why each configuration choice is necessary.
+3. **Practice:** let the learner containerize a small API. Offer hints before a complete solution, without trapping them in endless questioning.
+4. **Explain back:** ask why an application binding to localhost inside a container may not be reachable through a published port.
+5. **Transfer:** give a different application's broken container/network configuration to diagnose without AI help.
+6. **Retain:** revisit the concept later with a different task, not the same memorized answer.
+7. **Publish evidence:** retain the repository, tests, reproducible run instructions, limitations, and the candidate's actual contribution.
+8. **Update the application:** only after review, describe the completed project accurately. Do not turn it into invented employment experience.
+
+The same structure can serve other fields: an analyst can critique a model on a new dataset; a designer can defend a decision under changed constraints. Field-specific tasks and rubrics need domain-expert review.
+
+### Resource selection
+
+For each gap, recommend a small sequence: prerequisite explanation → official reference or textbook chapter → practice task → applied project → deeper paper. Record the author's/source authority, assumed prerequisites, language, access cost, estimated effort, and why the material is relevant. Avoid assigning an advanced research paper before the learner has its foundations. A link list is not a curriculum.
+
+## 9. Research papers and implementation ideas
+
+The references below separate **published findings** from **our proposed application**. They do not establish that this product improves hiring outcomes. Findings from prose recall, programming tutors, or school mathematics must be tested before being generalized to European job applicants.
+
+Suggested first reads: **Dunlosky → Roediger & Karpicke → Chi → Bastani → RAG → τ-bench**. Add the others when implementing the corresponding feature.
+
+### A. Helping applicants actually learn
+
+#### 1. Dunlosky et al. (2013) — learning techniques
+
+**John Dunlosky, Katherine A. Rawson, Elizabeth J. Marsh, Mitchell J. Nathan, and Daniel T. Willingham.** *Improving Students' Learning With Effective Learning Techniques: Promising Directions From Cognitive and Educational Psychology.* Psychological Science in the Public Interest.
+
+[Paper / DOI](https://doi.org/10.1177/1529100612453266) · [Accessible overview](https://www.psychologicalscience.org/publications/journals/pspi/learning-techniques.html)
+
+- **Read for:** evidence comparing techniques, especially practice testing and distributed practice, rather than relying on rereading/highlighting alone.
+- **Proposed change:** add retrieval tasks and spaced reviews to `planning.py`; record responses instead of checking off “read this resource.”
+- **Experiment:** equal study time with a resource list versus a resource list plus spaced retrieval; measure delayed independent performance.
+- **Boundary:** a review of learning techniques does not specify the best schedule or curriculum for every learner and field.
+
+#### 2. Roediger & Karpicke (2006) — retrieval practice
+
+**Henry L. Roediger III and Jeffrey D. Karpicke.** *Test-Enhanced Learning: Taking Memory Tests Improves Long-Term Retention.* Psychological Science.
+
+[Paper / DOI](https://doi.org/10.1111/j.1467-9280.2006.01693.x)
+
+- **Read for:** the difference between immediate familiarity and later recall; retrieval can contribute to learning, not merely measure it.
+- **Proposed change:** ask for an explanation or solution before revealing the reference answer; revisit concepts using new prompts.
+- **Experiment:** compare rereading with retrieval practice on a delayed, no-AI assessment.
+- **Boundary:** the experiments used prose-learning tasks; do not assume recall gains alone demonstrate engineering competence or transfer.
+
+#### 3. Chi et al. (1989) — self-explanation
+
+**Michelene T. H. Chi, Miriam Bassok, Matthew W. Lewis, Peter Reimann, and Robert Glaser.** *Self-Explanations: How Students Study and Use Examples in Learning to Solve Problems.* Cognitive Science.
+
+[Paper / DOI](https://doi.org/10.1207/s15516709cog1302_1) · [Author-hosted PDF](https://education.asu.edu/sites/g/files/litvpz656/files/lcl/chibassoklewisreimannglaser_0.pdf)
+
+- **Read for:** how learners connect example steps to principles and identify gaps in their own understanding.
+- **Proposed change:** add “why does this step work?”, “what assumption is necessary?”, and “what changes if this condition changes?” prompts after worked examples and projects.
+- **Experiment:** grade novel transfer tasks after example-only versus example-plus-explanation practice.
+- **Boundary:** fluent explanations can be wrong. Grade their reasoning against a domain rubric, not word count or confidence.
+
+#### 4. Collins, Brown & Newman (1987 technical report) — cognitive apprenticeship
+
+**Allan Collins, John Seely Brown, and Susan E. Newman.** *Cognitive Apprenticeship: Teaching the Craft of Reading, Writing, and Mathematics.* Technical Report No. 403.
+
+[ERIC record and full-text access](https://eric.ed.gov/?id=ED284181)
+
+- **Read for:** modeling, coaching, scaffolding, articulation, reflection, and exploration. This is a design framework, not a randomized evaluation of our workflow.
+- **Proposed change:** sequence projects from a worked example to a partly supported task and then an independent task. Gradually remove assistance; ask learners to explain decisions and compare alternatives.
+- **Experiment:** compare scaffolding that fades with constant answer assistance, using a new independent project as the outcome.
+- **Boundary:** software that completes every project for the learner may improve artifacts without improving the learner's ability.
+
+#### 5. Corbett & Anderson (1994) — knowledge tracing
+
+**Albert T. Corbett and John R. Anderson.** *Knowledge Tracing: Modeling the Acquisition of Procedural Knowledge.* User Modeling and User-Adapted Interaction.
+
+[Paper / DOI](https://doi.org/10.1007/BF01099821)
+
+- **Read for:** estimating a learner's changing skill state from sequences of responses, including uncertainty about guesses and slips.
+- **Proposed change:** add a separate learner-state store; begin with transparent rules, then compare a Bayesian knowledge-tracing model when enough concept-labeled response data exists.
+- **Experiment:** predict later independent answers and evaluate calibration on held-out learners. Compare with a simple recent-performance baseline.
+- **Boundary:** inferred mastery depends on task labels and model assumptions. It is neither a CV score nor proof of broad professional competence.
+
+#### 6. Bastani et al. (2025) — AI assistance versus learning
+
+**Hamsa Bastani, Osbert Bastani, Alp Sungu, Haosen Ge, Özge Kabakcı, and Rei Mariman.** *Generative AI without guardrails can harm learning: Evidence from high school mathematics.* PNAS.
+
+[Paper / DOI](https://doi.org/10.1073/pnas.2422633122) · [Data and code](https://github.com/obastani/GenAICanHarmLearning)
+
+- **Read for:** the distinction between doing well while using AI and learning to perform after the assistance is removed; tutor design matters.
+- **Proposed change:** separate practice mode from independent assessment. Use graduated hints, record assistance, and include no-AI follow-up tasks.
+- **Experiment:** compare answer-first and hint-first tutoring, measuring later unaided performance rather than only supported task completion.
+- **Boundary:** the field experiment concerns high-school mathematics, not CV preparation or professional hiring. It motivates local evaluation, not a universal claim that AI harms learning.
+
+#### 7. Wang et al. (2024; revised 2025) — Tutor CoPilot
+
+**Rose E. Wang et al.** *Tutor CoPilot: A Human-AI Approach for Scaling Real-Time Expertise.* Research preprint.
+
+[Paper, arXiv:2410.03017](https://arxiv.org/abs/2410.03017) · [Demonstration code](https://github.com/rosewang2008/tutor-copilot/)
+
+- **Read for:** supporting human tutors with pedagogical suggestions instead of replacing them with unrestricted answer generation.
+- **Proposed change:** prototype a mentor view where a human can review suggested questions, hints, and feedback before the learner receives them.
+- **Experiment:** compare mentor-only and mentor-plus-assistant sessions, tracking independently assessed learning and mentor workload.
+- **Boundary:** this is evidence about a human–AI tutoring system in a specific educational setting, not evidence for fully autonomous career coaching. Results vary by paper version; do not mix reported samples.
+
+### B. Improving the agent's technical reliability
+
+#### 8. Lewis et al. (2020) — retrieval-augmented generation
+
+**Patrick Lewis et al.** *Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks.* NeurIPS.
+
+[Paper, arXiv:2005.11401](https://arxiv.org/abs/2005.11401)
+
+- **Read for:** conditioning generation on retrieved material instead of relying only on model parameters.
+- **Proposed change:** give explanations and résumé drafts a bounded evidence pack containing approved CV spans, role requirements, and vetted educational sources. Require source references for material claims.
+- **Experiment:** compare generation without retrieval against retrieval-assisted drafting on unsupported-claim rate, citation correctness, and human usefulness.
+- **Boundary:** retrieval and citations do not guarantee entailment or truth. Start with exact evidence lookup; a vector database is not automatically necessary. Our adapter would borrow the pattern, not reproduce the paper's trained architecture.
+
+#### 9. Reimers & Gurevych (2019) — semantic matching
+
+**Nils Reimers and Iryna Gurevych.** *Sentence-BERT: Sentence Embeddings using Siamese BERT-Networks.* EMNLP-IJCNLP.
+
+[Paper, arXiv:1908.10084](https://arxiv.org/abs/1908.10084)
+
+- **Read for:** efficient sentence representations for similarity and retrieval.
+- **Proposed change:** compare explicit skill aliases with embedding-based candidate mappings for differently worded job requirements; keep original text and require review for uncertain mappings.
+- **Experiment:** evaluate precision/recall on human-labeled equivalents and deliberately related-but-not-equivalent pairs; test relevant languages separately.
+- **Boundary:** similarity is not proof of competency or semantic equivalence. “Studied cloud computing” must not automatically become “operated AWS infrastructure.” European languages require appropriate models and evaluation data.
+
+#### 10. Yao et al. (2022 preprint; ICLR 2023) — ReAct
+
+**Shunyu Yao et al.** *ReAct: Synergizing Reasoning and Acting in Language Models.*
+
+[Paper, arXiv:2210.03629](https://arxiv.org/abs/2210.03629)
+
+- **Read for:** interleaving model decisions with tool observations rather than generating an entire plan without checking external state.
+- **Proposed change:** extend the existing Tau harness with narrow tools for approved evidence retrieval, diagnostic tasks, and learning-plan updates. Keep scores, permissions, and canonical state changes in application code.
+- **Experiment:** compare a fixed workflow with a bounded tool-using agent on missing information, source failures, and invalid tool inputs. Measure correctness, cost, and latency.
+- **Boundary:** additional agent turns do not guarantee better output. Expose concise action/results logs, not private internal reasoning; keep tool and cost limits.
+
+#### 11. Yao et al. (2024) — τ-bench
+
+**Shunyu Yao et al.** *τ-bench: A Benchmark for Tool-Agent-User Interaction in Real-World Domains.*
+
+[Paper, arXiv:2406.12045](https://arxiv.org/abs/2406.12045)
+
+- **Read for:** evaluating stateful agent tasks, policy compliance, and consistency over repeated runs rather than judging only plausible prose.
+- **Proposed change:** build scenario tests such as “candidate rejects a CV claim,” “job source is unavailable,” and “a learner's project is incomplete.” Check final records and allowed actions.
+- **Experiment:** repeat tasks with fake and live providers, measuring correct final state, unauthorized actions, and consistency across runs.
+- **Boundary:** original benchmark domains are not this application. Borrow the evaluation method and create our own domain fixtures. The benchmark and the installed Tau library are distinct projects.
+
+### Reading notes template
+
+For each paper, write a short engineering note:
+
+1. What problem did the authors study, with which participants/data/tasks?
+2. What did they actually measure, and what remains uncertain?
+3. Which single product change does this suggest?
+4. What simple baseline should it beat?
+5. What would count as failure or negative evidence?
+6. What domain/language differences make direct transfer uncertain?
+
+Read methods and limitations, not just abstracts. These links identify the source papers; the proposed implementations are our design hypotheses, not author endorsements.
+
+## 10. Experiments and evaluation
+
+### Compare approaches before adding complexity
+
+| Approach | Suitable starting point | Compare against | Main outcome |
+|---|---|---|---|
+| Static prerequisite map + retrieval practice | Low-data MVP | Existing resource list | Delayed recall and task performance |
+| Worked examples + self-explanation + fading hints | Project preparation | Complete-solution assistance | Independent transfer task |
+| Retrieval-grounded adaptive tutor | Vetted source library available | Same tutor without retrieval | Correct feedback and supported explanations |
+| Bayesian knowledge tracing | Enough reliable concept-labeled attempts | Simple recent-performance rules | Calibration on later independent attempts |
+| Human mentor + AI suggestions | High-stakes or ambiguous topics | Mentor alone | Learning improvement and mentor effort |
+| Multi-agent research | Only after a single workflow shows a measurable bottleneck | One bounded agent | Evidence quality, latency, cost, and failure rate |
+
+Do not assume multiple agents are better. The product currently has none; splitting a workflow adds coordination and error-propagation risks.
+
+### Small pilot protocol
+
+1. Choose one field and a narrow concept set, such as backend fundamentals. Have a domain expert review tasks and rubrics.
+2. Give participants a baseline task and collect prior experience; keep learning data separate from application claims.
+3. Randomly assign comparable practice conditions where feasible, with equal time/resources and informed consent. Offer delayed access to useful materials to comparison participants.
+4. Use unseen assessment tasks without AI assistance immediately after practice and again after a delay. A one-week retest is a practical starting choice, not a universal optimum.
+5. Score with a fixed rubric, preferably blinded to condition. Combine automated checks with human review of explanations and trade-offs.
+6. Report sample size, attrition, assistance usage, uncertainty, and negative results. A small pilot tests feasibility; it does not prove broad effectiveness. Choose a larger study's sample size using a power analysis.
+
+### What to measure
+
+- **Knowledge:** delayed retrieval and correctness of explanations.
+- **Understanding:** ability to justify decisions, identify assumptions, and diagnose misconceptions.
+- **Transfer:** performance on a new problem, not a memorized example.
+- **Independence:** attempts solved without assistance and hints needed during practice.
+- **Project evidence:** reproducibility, tests, limitations, and attributable personal contribution.
+- **Agent reliability:** supported draft claims, citation accuracy, correct final state, adapter completeness, cost, and latency.
+- **Application usefulness:** user-rated shortlist relevance, correction burden, and time to a reviewed application.
+
+Course completions, time spent chatting, polished explanations, and higher CV scores are not sufficient learning outcomes. Hiring/interview outcomes can be tracked with consent, but market conditions and selection effects prevent simple causal attribution to the app.
+
+## 11. Implementation roadmap
+
+Detailed product comparison: [Jobright improvement report](docs/JOBRIGHT_IMPROVEMENT_REPORT.md).
+
+| Order | Deliverable | Acceptance condition |
+|---|---|---|
+| 1 — Correctness | Explicit claim review, confirmation editor, score fixes, adapter fixtures | Numbers/keywords cannot verify a new claim; zero matches yield zero coverage; partial fetches are visible |
+| 2 — Application workflow | Europe-aware shortlist, complete résumé editor, reviewed export, application tracker | Select a role, edit and approve a full résumé, download it, and restore application history after restart |
+| 3 — Learning MVP | Diagnostic tasks, concept graph, retrieval review, project evidence | Learner completes an unseen task and delayed retest; only reviewed evidence changes the application profile |
+| 4 — Adaptive support | Source-grounded tutor, validated feedback, optional mentor view | Beats a simple baseline on independently assessed learning without unacceptable cost/error increases |
+| 5 — Discovery | Stable job identities, updates/closures, sourced networking, opt-in alerts | Updates are not duplicates; outages do not close jobs; scheduling follows provider rules and user preferences |
+
+Keep the UI simple: **profile → target role → reviewed application → learn/build next → demonstrate progress**. Avoid spending effort on bulk autofill before the core workflow and learning outcomes are reliable.
+
+## 12. Testing and troubleshooting
+
+### Existing regression suite
 
 ```bash
 uv run --no-sync pytest -q
+uv run --no-sync python -m py_compile src/tau_job_application/*.py
 ```
 
-Manual checks:
+At the latest code review, 14 tests passed. These primarily cover small synthetic examples and mocked responses. Some tests encode permissive heuristic behavior; they need to change when the known issues are fixed. A green test suite does not prove that live APIs, multilingual documents, authorship checks, or a full browser workflow work correctly.
 
-1. **Fixture demo**: `uv run --no-sync tau-job-application demo` should print a complete report.
-2. **File upload**: drop a PDF/DOCX/TXT CV and a job description in the UI.
-3. **Public sources**: try Greenhouse `apple`, Lever `notion`, or Recruitee `datacamp`.
-4. **Monitoring**: refresh the same source twice; the second run should show 0 new jobs.
-5. **Authenticity**: paste generic phrases or unsupported claims and confirm the status changes.
-6. **Interview**: answer a question and receive structured feedback.
+### Manual checks
+
+- Run `demo` and compare the report with `fixtures/candidate.txt` and `fixtures/job.txt`.
+- Upload selectable-text PDF, DOCX, TXT, and Markdown examples; inspect extracted facts rather than trusting a score.
+- Try empty documents, scanned PDFs, unsupported formats, and job text without recognized skills; expect explicit errors.
+- Use an employer's **verified current** board identifier rather than assuming a company uses a particular ATS.
+- Refresh an unchanged board twice: expect no new fingerprints on the second run, subject to the monitoring limitations above.
+- Exercise imports with missing columns, invalid JSON, duplicates, and oversized files.
+- Check that numerical claims and generic phrases do not get mistaken for independent truth/authorship verification.
+- Confirm no transcription/API request happens until its action is selected; inspect only synthetic audit data for credential leakage.
+- Test browser reruns, stale results after input edits, failed GitHub enrichment, download behavior, and question-specific transcript handling.
+
+### Next automated tests
+
+Add multilingual parsing fixtures, unsupported-generated-claim regressions, exact evidence-span checks, provider contract/pagination tests, scoring edge cases, stable job-identity tests, credential-redaction tests, and Streamlit interaction tests. Use synthetic documents or explicitly consented data; do not commit private CVs or application files.
+
+### Common problems
+
+| Symptom | What to check |
+|---|---|
+| Package cannot be imported after editable install | Use the regular `uv sync --no-editable --reinstall-package ...` command above |
+| Source edits do not appear in the UI | Reinstall the package and restart Streamlit |
+| Scanned PDF yields no text | OCR it externally first; OCR is not implemented |
+| Real CV scores poorly despite relevant skills | Inspect parsing and confirmation status; the vocabulary and matching rules are limited |
+| Job board returns no jobs | Check identifier, provider access, response shape, and skipped parsing; an empty list is not proof that hiring stopped |
+| Token in `.env` has no effect | Export it in the launch shell; `.env` is not automatically loaded |
+| API request fails | Check permissions, rate limits, network access, and provider-plan requirements |
 
 ---
 
-## Dependencies
+## References and project notes
 
-- Python 3.12+
-- `tau-ai==0.2.0` and `tau_agent` for the optional model-backed agent
-- `pydantic`, `pypdf` for parsing and validation
-- `streamlit` for the local UI
-- `pytest`, `pytest-asyncio` for tests
+- [Jobright comparison and code-review backlog](docs/JOBRIGHT_IMPROVEMENT_REPORT.md)
+- [European job-source strategy](docs/EU_JOB_SOURCE_STRATEGY.md)
+- [Jobright public homepage](https://jobright.ai/) — product inspiration, not independently validated performance evidence
+- [Tau library](https://github.com/huggingface/tau) — optional agent dependency
+- [ESCO](https://esco.ec.europa.eu/en) — potential skill/occupation vocabulary; not integrated yet
 
-See `pyproject.toml` for the full list.
-
----
-
-## License and legal note
-
-This is a personal learning and job-readiness tool. It is the user's responsibility to comply with the terms of service of every platform they interact with, to use only data they have permission to use, and to review every generated claim before submitting an application.
+This is a learning and application-preparation prototype. Source permissions, privacy requirements, and employer-specific application rules must be checked for the intended deployment. No claim is made that the system guarantees job offers, verifies authorship, or replaces domain expertise.
