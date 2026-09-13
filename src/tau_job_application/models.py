@@ -46,6 +46,17 @@ class JobRequirement(BaseModel):
     skill: str = Field(min_length=1)
     required: bool = True
     evidence_id: str
+    importance: Literal["required", "preferred", "uncertain"] = "required"
+    confidence: float = Field(default=1.0, ge=0, le=1)
+    extraction_method: Literal["explicit", "context", "phrase", "learned", "reviewed"] = "explicit"
+    needs_review: bool = False
+
+    @model_validator(mode="before")
+    @classmethod
+    def legacy_importance(cls, value):
+        if isinstance(value, dict) and "importance" not in value:
+            return {**value, "importance": "required" if value.get("required", True) else "preferred"}
+        return value
 
 
 class JobPosting(BaseModel):

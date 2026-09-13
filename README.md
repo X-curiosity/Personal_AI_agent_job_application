@@ -2,7 +2,7 @@
 
 **Goal: help applicants become stronger candidates, not just produce better-looking applications.**
 
-The intended product connects a target role to the knowledge, projects, evidence, and interview practice needed to pursue it. Its initial audience is students and early-career applicants targeting Europe.
+The product organizes a broad career direction into related target jobs, connecting their requirements to knowledge, projects, evidence, and interview practice. It does not restrict applicants to one exact job title. Its initial audience is students and early-career applicants targeting Europe.
 
 **Status: local prototype, not a production hiring platform or validated tutor.** The current application implements a deterministic assessment workflow, a Streamlit interface, source connectors, and optional model access. Several important capabilities remain templates or heuristics. The research-based learning system below is a proposed next stage, not a description of features already shipped.
 
@@ -48,7 +48,7 @@ After changing source code, repeat the install command: a regular installation d
 | Setting | Purpose | Required for basic analysis? |
 |---|---|---|
 | `OPENAI_API_KEY` | Optional Tau provider and explicitly requested audio transcription | No |
-| `MODEL_NAME` | Model used by the optional Tau CLI command | No |
+| `MODEL_NAME` | Model used by the optional Tau CLI command and read-only UI coach | No |
 | `LINKEDIN_ACCESS_TOKEN` | Official identity endpoint for the authorized LinkedIn account | No |
 | `X_BEARER_TOKEN` | Official X recent-post search, subject to account access and limits | No |
 | SmartRecruiters token | Entered in the UI for the current connector | No |
@@ -68,7 +68,8 @@ uv run --no-sync tau-job-application agent fixtures/candidate.txt fixtures/job.t
 | CV intake | TXT, Markdown, selectable-text PDF, and DOCX extraction | No OCR; ordinary CV extraction uses a small English-oriented skill vocabulary |
 | Profile links | GitHub, portfolio, LinkedIn, and X fields | Portfolio/social links alone do not retrieve or validate a person's work |
 | GitHub enrichment | Optional public API lookup of profile/repository language signals | No repository code review; languages are unconfirmed signals, not proof of proficiency |
-| Job intake | Pasted descriptions, company-board connectors, CSV/JSON imports | Adapters need broader provider-contract and live validation |
+| Job intake | Natural-language descriptions, contextual skill/capability extraction, requirement review, company-board connectors, CSV/JSON imports | English-first heuristics, not unrestricted semantic understanding; adapters need broader validation |
+| Extraction memory | Saved per-description corrections and explicitly approved phrase-to-skill mappings | Local Quick start memory, not LLM fine-tuning; repetition alone never confirms a mapping |
 | Role comparison | Deterministic required/preferred skill coverage | Not a probability of being hired; no comprehensive European eligibility filtering |
 | CV readiness | Heuristic structure/contact/outcome checks plus role coverage | Not a validated ATS score or assessment of intelligence/ability |
 | CV tailoring | Summary, relevant skill ordering, and section-editing advice | **Not a complete rewritten résumé or PDF/DOCX export** |
@@ -79,24 +80,59 @@ uv run --no-sync tau-job-application agent fixtures/candidate.txt fixtures/job.t
 | Networking | Research queries, manually entered/imported contacts | No verified referral network or automatic outreach |
 | Interview practice | Role-named questions, typed responses, keyword-based feedback | Measures answer structure heuristically, not technical correctness |
 | Voice input | Recording plus explicitly requested OpenAI transcription | Audio leaves the machine when transcription is requested |
-| Optional agent | Bounded Tau CLI harness with domain tools | Quick start does not invoke an LLM; no autonomous research subagents in the product |
-| Persistence | SQLite analysis snapshots, audit events, and source-watch records | Not a full application tracker, résumé version editor, or multi-user service |
+| Career directions | Named workspaces containing multiple target-job threads, skill overlap, and merged learning priorities | Manual organization; not automatic role clustering or a complete semantic job search |
+| Conversations | Separate persistent chat history per job thread; local report guide or optional read-only AI coach | Local mode is templated; AI mode needs credentials and explicit context-sharing consent |
+| Optional agent | Bounded Tau CLI harness with domain tools; one-turn, tool-free UI coaching | Quick start scoring remains deterministic; no autonomous research subagents |
+| Persistence | Shared profile, thread inputs, per-thread analysis/CV suggestions and chats, legacy snapshots, audit events, and source-watch records in SQLite | Not yet a full application-status tracker, résumé version editor, or multi-user service |
 
 The [Jobright comparison](docs/JOBRIGHT_IMPROVEMENT_REPORT.md) contains the detailed code review and product backlog. It distinguishes Jobright's advertised features from independently verified behavior; marketing performance claims are not benchmarks for this project.
 
 ## 3. How to use the interface
 
+### Career directions and separate job conversations
+
+Use the **sidebar** to select a career direction and a job/conversation thread. The first launch creates Embedded Systems, Hardware, and GPU Computing as examples; you can add your own directions and rename/delete individual threads. **Move thread (keep its history)** lets you regroup jobs later—for example into a broader Hardware & Embedded direction—without losing their drafts, results, or conversations.
+
+```text
+Embedded Systems
+├── Firmware Developer — company A
+├── Embedded Linux Engineer — company B
+└── Systems Software Engineer — company C
+
+Hardware
+├── FPGA Engineer — company D
+└── Electronics Design Engineer — company E
+
+GPU Computing
+├── CUDA Engineer — company F
+└── GPU Performance Engineer — company G
+```
+
+These are organizational examples, not title-matching rules. A direction can include several related titles, and a shared skill does not make two roles equivalent. Choosing a direction does not automatically search every related job title or transfer a CV claim between jobs.
+
+**Five tabs:** Quick start, Direction overview, Conversation, Opportunities & contacts, and Interview practice.
+
+- **Each thread owns:** editable CV/job input snapshots, the latest analysis and CV-editing suggestions, a job-specific roadmap, and a conversation history. Text inputs auto-save locally across reruns and switching; analyses and conversations survive restarting the app.
+- **Shared profile:** select **Save as shared profile for new threads** to reuse a CV and links. Existing threads retain their own input snapshots; **Use latest shared profile in this thread** explicitly updates one. Old results are not silently recomputed.
+- **Direction overview:** compares current analyzed jobs by extracted skills and responsibilities rather than exact titles, shows shared/unique requirements, and merges gap-driven learning priorities. Missing required coverage across multiple jobs is prioritized over a gap unique to one optional requirement. You do not need every skill from every job.
+- **Across directions:** the overview can show overlapping extracted requirements, without merging conversations or implying identical roles. Learning completion/proficiency tracking is still future work.
+- **Changed inputs:** old snapshots remain stored but become stale; they are excluded from comparisons and coaching until **Build my plan** is run again. Saved requirement corrections also invalidate snapshots using that exact job text.
+- **Deletion:** deleting a thread removes its inputs, latest result, and chat. It does not delete the separate shared profile, approved extraction memory, or legacy analysis records.
+
+The tables are `career_workspaces`, `career_threads`, `career_messages`, and `career_shared_profile` in `.job_assistant/assistant.sqlite`. Pre-workspace entries in the legacy `analyses` table are preserved but not automatically assigned to a direction.
+
 ### Quick start
 
-1. Drag in a CV or paste text. **An uploaded file takes precedence** if both are supplied.
-2. Add optional links. GitHub enrichment runs only when its checkbox is selected; the other profile links remain references.
-3. Paste a target job description. Title/company can be entered separately. A job URL alone does not fetch its description.
-4. Select **Build my plan**.
-5. Review the three result columns:
+1. Select a direction and a target-job thread in the sidebar.
+2. Drag in a CV or paste text. New uploads populate the editable CV text field; analysis uses the text shown there.
+3. Add optional links. GitHub enrichment runs only when its checkbox is selected; the other profile links remain references.
+4. Paste a target job description. Title/company can be entered separately. A job URL alone does not fetch its description.
+5. Select **Build my plan**.
+6. Review the three result columns:
    - **Tailored CV:** draft summary, skill ordering, and editing suggestions.
    - **Improvements:** score components, next actions, and heuristic review findings.
    - **Roadmap:** skill gaps, resources, and project briefs displayed in expanders.
-6. Download the Markdown planning report. The current UI blocks this download when the heuristic authenticity status is `blocked`; this is a prototype behavior, not a reliable factual-verification gate.
+7. Download the Markdown planning report. The current UI blocks this download when the heuristic authenticity status is `blocked`; this is a prototype behavior, not a reliable factual-verification gate.
 
 A simple synthetic input for testing:
 
@@ -114,7 +150,39 @@ Required skills: Python, Docker
 Preferred skills: SQL
 ```
 
-For now, inspect the extracted skills yourself. There is no structured confirmation editor. Updating input fields also does not automatically recompute the existing result: select **Build my plan** again.
+Inspect candidate skills yourself: there is not yet a candidate-profile confirmation editor. Job requirements now have the review editor below. Updating input fields does not automatically recompute an existing result: select **Build my plan** again.
+
+### Natural-language requirement extraction and learning
+
+You do **not** need `Skills:` or `Required skills:` fields in a job description. For example:
+
+```text
+You are experienced with Python and SQL.
+You are comfortable building APIs.
+Projects involving Docker are a plus.
+You have worked with ClickHouse.
+No experience with Kubernetes required.
+```
+
+The extractor proposes Python, SQL, API development, Docker (preferred), and ClickHouse (a new phrase needing review). It excludes the negated Kubernetes requirement. It also considers headings such as `Requirements`, `Responsibilities`, and `Nice to have`, and phrases such as `familiar with`, `knowledge of`, `background in`, and `proficient in`.
+
+- **Source grounding:** each suggestion includes the exact source clause, character location, extraction method, and a heuristic confidence value. These values are not calibrated probabilities.
+- **Capabilities rather than invented tools:** “building APIs” can suggest API development; “relational databases” does not prove the employer specifically requires PostgreSQL.
+- **Importance:** required/preferred status comes from the local clause and section. Standalone stack mentions can remain `uncertain`; uncertain requirements are excluded from scored coverage and missing-skill project plans.
+- **Unknown vocabulary:** short phrases after experience/project cues are proposed even when the term is outside the built-in skill list. They remain reviewable; this is not a guarantee that every phrase is a useful skill.
+- **Compatibility:** explicit required/preferred lists still work and are combined with prose rather than replacing it.
+
+Under the target job, open **Review inferred requirements / teach the extractor**:
+
+1. Edit skill names and required/preferred/uncertain labels, remove false positives, or add a missed requirement with a quote copied exactly from the job.
+2. Confirm your review and select **Save corrections for this description**. Select **Build my plan** to recalculate the assessment. Exact copies of this description reuse the saved correction; changed descriptions are parsed afresh.
+3. To generalize a correction, enter a short source phrase and its reviewed skill label, opt into reuse, and select **Remember mapping**. For example, review “event-driven services” as “Event-driven architecture” and remember that mapping.
+4. On a future job, that phrase maps to the reviewed skill. Importance is determined again from the new job: the old required/preferred label is not blindly copied.
+5. **Forget mapping** and **Forget corrections for this description** remove those respective memory entries. They are separate controls; removing an alias does not erase an independently saved job review.
+
+Memory is stored in the local SQLite tables `skill_alias_memory` and `requirement_reviews` under `.job_assistant/`. It contains reviewed job quotations and labels, not CV-derived training records or credentials. It is supplied to Quick start analyses; standalone Python callers can opt in through `parse_job_text(..., memory=...)` or `analyze_texts(..., requirement_memory=...)`. CLI tools and source-board fetchers use stateless extraction unless a caller explicitly provides memory.
+
+**What “learning” means here:** accumulating user-approved, reversible extraction corrections—not silently training on every upload or updating an external model. Precision can improve for reviewed phrases, but incorrect corrections can also reduce it; keep testing on unseen descriptions. Complex negation, alternatives (“Python or Java”), unfamiliar wording, and non-English descriptions still require human review. The built-in capability rules do not replace a general semantic model.
 
 ### Opportunities & contacts
 
@@ -122,7 +190,7 @@ For now, inspect the extracted skills yourself. There is no structured confirmat
 - Fetch and monitor jobs manually. “New” means newly observed by this local database, not necessarily newly published.
 - Use official-platform connectors only with appropriate access.
 - Import contacts/jobs obtained with permission as CSV or JSON; up to 500 records and 5 MB are processed. Rows that cannot be parsed can currently be skipped without detailed feedback.
-- Imported jobs are listed separately; selecting one does not yet automatically populate Quick start.
+- Source-board and imported jobs have **Open in a new job thread** buttons. These populate title, company, URL, and description in the current career direction, with the shared CV as a starting point. Review the new thread and build its plan.
 
 Example CSV schemas:
 
@@ -138,9 +206,17 @@ Backend Engineer,Example Systems,"Python, Docker",SQL,https://example.com/career
 
 JSON accepts a list of objects with equivalent fields, or an object containing a `data` or `items` list. Preserve provenance; an imported email is not independently verified just because it is present.
 
+### Conversation
+
+Each target-job thread has an independent **Conversation** tab. History is saved locally and can be downloaded as text. Switching threads restores the chosen history, not a global chat.
+
+- **Local report guide (default):** no API key or model call. Ask for `skill gaps`, `CV suggestions`, `project roadmap`, or `compare roles`. It navigates saved results through templates; it is not an open-ended tutor.
+- **Optional AI coach:** enable the model toggle and explicitly consent to sending context. `OPENAI_API_KEY` and `MODEL_NAME` must be available. Preview the exact context before submitting: the current non-stale analysis (including candidate/job data), up to 12 messages from this thread, and job/skill summaries from this direction. Other directions and other threads' conversations are not sent.
+- **Boundaries:** coaching is read-only, with no tools, a one-turn limit, a 60-second timeout, and bounded input size. It cannot change official scores, submit applications, or create evidence. Model responses may still be wrong; review advice before acting. Failed requests do not save partial turns.
+
 ### Interview practice
 
-Complete an assessment first, select a question, and type an answer. Recording is optional. Selecting transcription sends the recording to OpenAI. Feedback currently checks expressions associated with context, action, validation, and reflection. It does not assess whether an engineering explanation is correct.
+Complete a current assessment in the active thread first, select a question, and type an answer. Interview inputs/transcripts are keyed by thread and question to avoid mixing them; unlike the Conversation tab, interview answers are not yet a persistent practice history. Recording is optional. Selecting transcription sends the recording to OpenAI. Feedback currently checks expressions associated with context, action, validation, and reflection. It does not assess whether an engineering explanation is correct.
 
 ## 4. Scores, evidence, and known limitations
 
@@ -202,7 +278,9 @@ src/tau_job_application/
 ├── agent.py             # optional Tau harness, instructions, turn limit
 ├── tools.py             # typed tool adapters for domain functions
 ├── models.py            # Pydantic candidate/job/evidence/report contracts
-├── parsing.py           # local file extraction and heuristic text parsing
+├── parsing.py           # local file extraction and candidate/job parsing
+├── requirements.py      # contextual job requirements and sourced review validation
+├── requirement_memory.py # local approved phrase mappings and job corrections
 ├── matching.py          # deterministic skill coverage
 ├── career.py            # CV heuristics, template tailoring, contact queries
 ├── authenticity.py      # source-CV wording/claim heuristics
@@ -212,7 +290,10 @@ src/tau_job_application/
 ├── monitoring.py        # local source/job snapshots
 ├── interview.py         # questions, structure checks, audio transcription
 ├── pipeline.py          # analysis orchestration and Markdown rendering
-├── storage.py           # analysis/audit SQLite storage
+├── storage.py           # legacy analysis/audit SQLite storage
+├── workspaces.py        # directions, thread/profile/chat storage, skill aggregation
+├── workspace_ui.py      # sidebar, direction overview, conversations
+├── workspace_chat.py    # scoped local guide and optional read-only model coach
 ├── cli.py               # demo, analyze, agent, ui commands
 └── ui.py                # Streamlit interface
 ```
@@ -243,7 +324,7 @@ See [European source strategy](docs/EU_JOB_SOURCE_STRATEGY.md) for research cont
 - Analysis snapshots contain CV text and personal data in `.job_assistant/assistant.sqlite`. Git ignores this directory, but **Git exclusion is not encryption**.
 - The UI is a local prototype without multi-user authentication/isolation. Do not expose it publicly without additional security work.
 - API tokens are not deliberately written to SQLite. However, password widgets can retain values in server-side session memory; “used once and immediately erased” is not a guarantee.
-- The optional Tau CLI sends supplied CV/job text to the configured provider. Transcription sends audio to OpenAI. Public-source requests send the identifiers/queries required by those services.
+- The optional Tau CLI sends supplied CV/job text to the configured provider. The optional UI coach sends the explicitly previewed thread/direction context after consent. Transcription sends audio to OpenAI. Public-source requests send the identifiers/queries required by those services.
 - Portfolio/social URLs, imported contact details, and generated text must be reviewed. A URL's presence or an email's format does not verify a person's role or address.
 - Data-retention, selective deletion, consent records, credential clearing, and error-redaction tests remain necessary improvements.
 - No AI-authorship percentage, ATS-pass guarantee, hiring probability, or independently verified CV claim is produced by the current system.
@@ -489,7 +570,7 @@ Detailed product comparison: [Jobright improvement report](docs/JOBRIGHT_IMPROVE
 | 4 — Adaptive support | Source-grounded tutor, validated feedback, optional mentor view | Beats a simple baseline on independently assessed learning without unacceptable cost/error increases |
 | 5 — Discovery | Stable job identities, updates/closures, sourced networking, opt-in alerts | Updates are not duplicates; outages do not close jobs; scheduling follows provider rules and user preferences |
 
-Keep the UI simple: **profile → target role → reviewed application → learn/build next → demonstrate progress**. Avoid spending effort on bulk autofill before the core workflow and learning outcomes are reliable.
+Keep the UI simple: **shared profile → career direction → target-job thread → reviewed application → learn/build next → demonstrate progress**. Avoid spending effort on bulk autofill before the core workflow and learning outcomes are reliable.
 
 ## 12. Testing and troubleshooting
 
@@ -500,7 +581,7 @@ uv run --no-sync pytest -q
 uv run --no-sync python -m py_compile src/tau_job_application/*.py
 ```
 
-At the latest code review, 14 tests passed. These primarily cover small synthetic examples and mocked responses. Some tests encode permissive heuristic behavior; they need to change when the known issues are fixed. A green test suite does not prove that live APIs, multilingual documents, authorship checks, or a full browser workflow work correctly.
+The suite now includes contextual requirement extraction, review-memory persistence/reuse/deletion, invalid source-quote rejection, scoped workspace/chat persistence, shared-profile behavior, stale snapshot handling, skill aggregation, a fake-provider read-only coaching test, and Streamlit review/navigation/restart tests, alongside the original regression tests. These primarily cover synthetic examples and mocked responses. Some tests encode permissive heuristic behavior; they need to change when the known issues are fixed. A green test suite does not prove that live APIs, multilingual documents, authorship checks, or a full browser workflow work correctly.
 
 ### Manual checks
 

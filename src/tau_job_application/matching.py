@@ -26,16 +26,17 @@ def calculate_match(candidate: CandidateProfile, job: JobPosting) -> MatchResult
         items.append(RequirementMatch(
             skill=requirement.skill,
             required=requirement.required,
-            status=RequirementStatus.MATCHED if evidence_id and is_confirmed else RequirementStatus.MISSING,
+            status=(RequirementStatus.UNKNOWN if requirement.importance == "uncertain" else
+                    RequirementStatus.MATCHED if evidence_id and is_confirmed else RequirementStatus.MISSING),
             job_evidence_id=requirement.evidence_id,
             candidate_evidence_ids=[evidence_id] if evidence_id and is_confirmed else [],
         ))
-    required_items = [item for item in items if item.required]
-    preferred_items = [item for item in items if not item.required]
+    required_items = [item for item in items if item.required and item.status != RequirementStatus.UNKNOWN]
+    preferred_items = [item for item in items if not item.required and item.status != RequirementStatus.UNKNOWN]
     required_score = _matched_fraction(required_items)
     preferred_score = _matched_fraction(preferred_items)
     return MatchResult(
-        score=round((required_score * 0.8 + preferred_score * 0.2) * 100),
+        score=round((required_score * 0.8 + preferred_score * 0.2) * 100) if required_items or preferred_items else 0,
         required_score=required_score,
         preferred_score=preferred_score,
         requirements=items,
