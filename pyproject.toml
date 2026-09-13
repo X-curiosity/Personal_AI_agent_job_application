@@ -1,13 +1,14 @@
 [project]
 name = "tau-job-application"
-version = "0.1.0"
-description = "A minimal Tau-based personal job-application assistant template"
+version = "0.2.0"
+description = "Evidence-first local AI job-readiness assistant"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
     "pydantic>=2.13,<3",
     "pypdf>=6,<7",
     "tau-ai==0.2.0",
+    "streamlit>=1.42,<2",
 ]
 
 [project.scripts]

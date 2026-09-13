@@ -11,6 +11,7 @@ coverage.xml
 htmlcov/
 output/
 uploads/
+.job_assistant/
 
 # Keep real candidate and application data out of Git.
 private/

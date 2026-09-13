@@ -10,11 +10,10 @@ async def test_tau_tool_executes_without_a_model() -> None:
         "test-call",
         {
             "candidate_text": "Name: Alex\nSkills: Python, SQL",
-            "job_text": (
-                "Title: Engineer\nCompany: Example\nRequired skills: Python, Docker"
-            ),
+            "job_text": "Title: Engineer\nCompany: Example\nRequired skills: Python, Docker",
         },
     )
 
     assert result.details["ok"] is True
-    assert result.details["analysis"]["match"]["score"] == 60
+    assert result.details["match"]["score"] == 60
+    assert result.details["tailored_resume"]["safety_note"]

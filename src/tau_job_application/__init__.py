@@ -1,5 +1,3 @@
-"""Personal job-application assistant template."""
+"""Evidence-first local job-readiness assistant."""
 
-from tau_job_application.cli import main
-
-__all__ = ["main"]
+__version__ = "0.2.0"
