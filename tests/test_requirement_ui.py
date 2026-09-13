@@ -20,7 +20,7 @@ def test_prose_review_is_visible_and_used_by_quickstart(tmp_path, monkeypatch):
     next(x for x in app.text_area if x.label == "Job description").set_value("Experienced with Python. Docker is a plus.")
     app.run()
     assert not app.exception
-    assert any(e.label == "Review inferred requirements / teach the extractor" for e in app.expander)
+    assert any(e.label == "Review inferred requirements / leave parsing feedback (optional)" for e in app.expander)
     next(x for x in app.checkbox if x.label == "I reviewed these interpretations against the source text").check()
     app.run()
     next(x for x in app.button if x.label == "Save corrections for this description").click()

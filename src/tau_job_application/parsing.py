@@ -49,9 +49,29 @@ def load_document(path: Path) -> str:
     return text
 
 
+def infer_profile_links(text: str) -> dict[str, str]:
+    """Infer only recognizable public profile links; a URL is not proof of ownership."""
+    urls = re.findall(r"https?://[^\s<>\]\)\"']+", text)
+    result: dict[str, str] = {}
+    for raw_url in urls:
+        url = raw_url.rstrip(".,;:")
+        host = re.sub(r"^www\.", "", (re.match(r"https?://([^/]+)", url, re.I) or [None, ""])[1].casefold())
+        if host in {"github.com"} and "github" not in result:
+            result["github"] = url
+        elif host in {"linkedin.com"} and "linkedin" not in result:
+            result["linkedin"] = url
+        elif host in {"x.com", "twitter.com"} and "x" not in result:
+            result["x"] = url
+        elif host and host not in {"example.com", "example.org"} and "portfolio" not in result:
+            result["portfolio"] = url
+    return result
+
+
 def parse_candidate_text(text: str, *, links: dict[str, str] | None = None) -> CandidateProfile:
     """Create a candidate profile without claiming that keyword mentions prove skill."""
     fields = _parse_fields(text)
+    inferred_links = infer_profile_links(text)
+    inferred_links.update({key: value for key, value in (links or {}).items() if value})
     name = fields.get("name") or _guess_name(text) or "Candidate (please confirm)"
     explicit_skills = _split_list(fields.get("skills", ""))
     skills = _dedupe(explicit_skills or _find_skills(text))
@@ -79,7 +99,7 @@ def parse_candidate_text(text: str, *, links: dict[str, str] | None = None) -> C
         headline=fields.get("headline") or _first_nonempty_line(text),
         skills=skills,
         experience_summary=fields.get("experience") or _experience_summary(text),
-        links=links or {},
+        links=inferred_links,
         raw_cv=text,
         evidence=evidence,
     )

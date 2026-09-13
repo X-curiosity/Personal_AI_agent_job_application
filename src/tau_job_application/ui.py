@@ -11,6 +11,7 @@ import streamlit as st
 
 from tau_job_application.career import contact_research_plan, parse_contact_leads
 from tau_job_application.interview import build_interview_questions, evaluate_answer, transcribe_openai_audio
+from tau_job_application.job_pages import fetch_job_url
 from tau_job_application.official_sources import (
     fetch_linkedin_authorized_identity,
     fetch_smartrecruiters_postings,
@@ -19,7 +20,7 @@ from tau_job_application.official_sources import (
     import_job_export,
 )
 from tau_job_application.monitoring import JobMonitor
-from tau_job_application.parsing import KNOWN_SKILLS, load_document
+from tau_job_application.parsing import KNOWN_SKILLS, infer_profile_links, load_document
 from tau_job_application.requirement_memory import RequirementMemory, document_key
 from tau_job_application.requirements import extract_requirements, save_requirement_review
 from tau_job_application.pipeline import analyze_texts, render_markdown
@@ -76,6 +77,11 @@ def main() -> None:
 def _quickstart(workspace_id: str, thread_id: str) -> None:
     thread = WORKSPACES.thread(workspace_id, thread_id)
     draft = thread["draft"]
+    if loaded_job := st.session_state.pop(f"loaded-job:{thread_id}", None):
+        draft.update(loaded_job)
+        for field, value in loaded_job.items():
+            st.session_state[draft_key(thread_id, field)] = value
+        WORKSPACES.save_draft(workspace_id, thread_id, draft)
     if st.session_state.pop(f"refresh-profile:{thread_id}", False):
         draft.update(WORKSPACES.shared_profile())
         for field in PROFILE_FIELDS:
@@ -98,6 +104,13 @@ def _quickstart(workspace_id: str, thread_id: str) -> None:
                         st.error(str(exc))
                         upload_error = True
             cv_text = st.text_area("Or paste your CV text", value=draft["cv_text"], key=draft_key(thread_id, "cv_text"), height=220, placeholder="Name: Alex\nSkills: Python, SQL\nExperience: Built a data API...")
+        inferred_links = infer_profile_links(cv_text)
+        if inferred_links:
+            st.success("Detected from CV: " + ", ".join(f"{key} ({value})" for key, value in inferred_links.items()) + ". Please verify or edit them.")
+            for field, value in inferred_links.items():
+                if not draft[field]:
+                    st.session_state.setdefault(draft_key(thread_id, field), value)
+                    draft[field] = value
         with right:
             github = st.text_input("GitHub", value=draft["github"], key=draft_key(thread_id, "github"), placeholder="https://github.com/yourname")
             portfolio = st.text_input("Portfolio / website", value=draft["portfolio"], key=draft_key(thread_id, "portfolio"), placeholder="https://yourname.dev")
@@ -116,11 +129,21 @@ def _quickstart(workspace_id: str, thread_id: str) -> None:
         st.subheader("2. This target job")
         job_title = st.text_input("Job title", value=draft["job_title"], key=draft_key(thread_id, "job_title"), placeholder="Backend Engineer")
         company = st.text_input("Company", value=draft["company"], key=draft_key(thread_id, "company"), placeholder="Acme")
-        job_url = st.text_input("Official job URL", value=draft["job_url"], key=draft_key(thread_id, "job_url"), placeholder="https://careers.example.com/job")
-        job_text = st.text_area("Job description", value=draft["job_text"], key=draft_key(thread_id, "job_text"), height=200, placeholder="You are experienced with Python and comfortable building APIs. Projects involving Docker are a plus.\n\nPaste the full description — no special format needed.")
+        job_url = st.text_input("Job description URL", value=draft["job_url"], key=draft_key(thread_id, "job_url"), placeholder="https://careers.example.com/job")
+        if st.button("Read job URL", key=f"read-job:{thread_id}", disabled=not job_url.strip()):
+            try:
+                page_job = fetch_job_url(job_url)
+                loaded = {"job_title": page_job.title, "company": page_job.company,
+                          "job_url": page_job.url or job_url, "job_text": page_job.description or ""}
+                st.session_state[f"loaded-job:{thread_id}"] = loaded
+                st.success("Job title, company, description, and source URL inferred. Review the extracted text, then build the plan.")
+                st.rerun()
+            except (ValueError, RuntimeError) as exc:
+                st.error(str(exc))
+        job_text = st.text_area("Job description", value=draft["job_text"], key=draft_key(thread_id, "job_text"), height=200, placeholder="Or paste the description: you are experienced with Python and comfortable building APIs…")
         draft = {**profile, "job_title": job_title, "company": company, "job_url": job_url, "job_text": job_text}
         WORKSPACES.save_draft(workspace_id, thread_id, draft)
-        st.caption("Requirements are inferred from wording and context. Review suggestions below; ambiguous mentions are not scored.")
+        st.caption("Requirements are inferred from wording and context. Optional review appears below; ambiguous mentions are not scored.")
         if job_text.strip():
             _requirement_editor(job_text)
 
@@ -230,12 +253,22 @@ def _requirement_editor(job_text: str) -> None:
     key = f"{scope[1] if scope else 'local'}-{document_key(job_text)}"
     requirements, evidence = extract_requirements(job_text, KNOWN_SKILLS, memory=REQUIREMENT_MEMORY)
     quotes = {item.id: item.quote for item in evidence}
-    with st.expander("Review inferred requirements / teach the extractor", expanded=not requirements):
+    with st.expander("Review inferred requirements / leave parsing feedback (optional)", expanded=False):
         st.caption("English-first, rule-based inference, not a trained semantic model. Edit names or importance, remove false positives, or add a missing skill with an exact quote from the description.")
         if requirements:
             st.dataframe([{"Skill": r.skill, "Importance": r.importance, "Method": r.extraction_method,
                            "Heuristic confidence (not calibrated)": r.confidence, "Needs review": r.needs_review}
                           for r in requirements], hide_index=True)
+        else:
+            st.warning("No requirements were inferred yet. Add a source quote and capability manually below, or paste more job context.")
+        rating = st.selectbox("Was this extraction useful?", ["useful", "partly useful", "not useful"], key=f"feedback-rating-{key}")
+        feedback_comment = st.text_area("Feedback for the parser (optional)", key=f"feedback-comment-{key}", placeholder="For example: 'Treat comfortable with X as preferred in this kind of role.'")
+        if st.button("Save extraction feedback", key=f"feedback-save-{key}"):
+            try:
+                REQUIREMENT_MEMORY.save_feedback(job_text, rating, feedback_comment)
+                st.success("Feedback saved locally. It will be reviewed as product data; it does not silently retrain the model.")
+            except ValueError as exc:
+                st.error(str(exc))
         rows = [{"keep": True, "skill": r.skill, "importance": r.importance, "quote": quotes[r.evidence_id]}
                 for r in requirements]
         edited = st.data_editor(rows or [{"keep": True, "skill": "", "importance": "required", "quote": ""}],

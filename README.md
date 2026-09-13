@@ -66,9 +66,10 @@ uv run --no-sync tau-job-application agent fixtures/candidate.txt fixtures/job.t
 | Area | Implemented behavior | Important boundary |
 |---|---|---|
 | CV intake | TXT, Markdown, selectable-text PDF, and DOCX extraction | No OCR; ordinary CV extraction uses a small English-oriented skill vocabulary |
+| CV link inference | Recognizes GitHub, LinkedIn, X/Twitter, and one likely portfolio URL from CV text; shows them for verification | A detected URL is not proof of ownership or relevance; explicit UI edits override inferred values |
 | Profile links | GitHub, portfolio, LinkedIn, and X fields | Portfolio/social links alone do not retrieve or validate a person's work |
 | GitHub enrichment | Optional public API lookup of profile/repository language signals | No repository code review; languages are unconfirmed signals, not proof of proficiency |
-| Job intake | Natural-language descriptions, contextual skill/capability extraction, requirement review, company-board connectors, CSV/JSON imports | English-first heuristics, not unrestricted semantic understanding; adapters need broader validation |
+| Job intake | Natural-language descriptions, one explicitly submitted public HTTPS job URL, server-rendered/JSON-LD extraction, contextual skill/capability extraction, requirement review, company-board connectors, CSV/JSON imports | No crawling; JavaScript-only/authenticated pages may fail; English-first skill heuristics need review |
 | Extraction memory | Saved per-description corrections and explicitly approved phrase-to-skill mappings | Local Quick start memory, not LLM fine-tuning; repetition alone never confirms a mapping |
 | Role comparison | Deterministic required/preferred skill coverage | Not a probability of being hired; no comprehensive European eligibility filtering |
 | CV readiness | Heuristic structure/contact/outcome checks plus role coverage | Not a validated ATS score or assessment of intelligence/ability |
@@ -125,9 +126,11 @@ The tables are `career_workspaces`, `career_threads`, `career_messages`, and `ca
 
 1. Select a direction and a target-job thread in the sidebar.
 2. Drag in a CV or paste text. New uploads populate the editable CV text field; analysis uses the text shown there.
-3. Add optional links. GitHub enrichment runs only when its checkbox is selected; the other profile links remain references.
-4. Paste a target job description. Title/company can be entered separately. A job URL alone does not fetch its description.
-5. Select **Build my plan**.
+3. The UI detects recognizable GitHub, LinkedIn, X/Twitter, and portfolio URLs in the CV. Verify or edit these fields; only the links you confirm are used in the profile.
+4. Paste a target job URL and select **Read job URL**. The app fetches only that explicit public HTTPS URL, follows only public HTTPS redirects, reads server-rendered text and Schema.org `JobPosting` JSON-LD, and populates title, company, description, and source URL. You can edit the extracted fields before analysis. If the page is blocked, JavaScript-only, authenticated, too large, unsafe, or lacks inferable requirements, paste the description manually.
+5. Alternatively paste a job description directly. Title/company can be entered separately.
+6. Requirement review is optional and collapsed by default. Open it to inspect inferred capability phrases, source quotes, required/preferred/uncertain labels, and heuristic confidence; leave feedback or save corrections only if you want to help improve extraction.
+7. Select **Build my plan**.
 6. Review the three result columns:
    - **Tailored CV:** draft summary, skill ordering, and editing suggestions.
    - **Improvements:** score components, next actions, and heuristic review findings.
@@ -167,12 +170,13 @@ No experience with Kubernetes required.
 The extractor proposes Python, SQL, API development, Docker (preferred), and ClickHouse (a new phrase needing review). It excludes the negated Kubernetes requirement. It also considers headings such as `Requirements`, `Responsibilities`, and `Nice to have`, and phrases such as `familiar with`, `knowledge of`, `background in`, and `proficient in`.
 
 - **Source grounding:** each suggestion includes the exact source clause, character location, extraction method, and a heuristic confidence value. These values are not calibrated probabilities.
+- **Feedback:** the optional rating/comment is stored locally against the job-description hash. It is product feedback, not silent model training; only explicitly reviewed phrase mappings can affect future extraction.
 - **Capabilities rather than invented tools:** “building APIs” can suggest API development; “relational databases” does not prove the employer specifically requires PostgreSQL.
 - **Importance:** required/preferred status comes from the local clause and section. Standalone stack mentions can remain `uncertain`; uncertain requirements are excluded from scored coverage and missing-skill project plans.
 - **Unknown vocabulary:** short phrases after experience/project cues are proposed even when the term is outside the built-in skill list. They remain reviewable; this is not a guarantee that every phrase is a useful skill.
 - **Compatibility:** explicit required/preferred lists still work and are combined with prose rather than replacing it.
 
-Under the target job, open **Review inferred requirements / teach the extractor**:
+Under the target job, open **Review inferred requirements / leave parsing feedback (optional)**:
 
 1. Edit skill names and required/preferred/uncertain labels, remove false positives, or add a missed requirement with a quote copied exactly from the job.
 2. Confirm your review and select **Save corrections for this description**. Select **Build my plan** to recalculate the assessment. Exact copies of this description reuse the saved correction; changed descriptions are parsed afresh.
@@ -180,9 +184,13 @@ Under the target job, open **Review inferred requirements / teach the extractor*
 4. On a future job, that phrase maps to the reviewed skill. Importance is determined again from the new job: the old required/preferred label is not blindly copied.
 5. **Forget mapping** and **Forget corrections for this description** remove those respective memory entries. They are separate controls; removing an alias does not erase an independently saved job review.
 
-Memory is stored in the local SQLite tables `skill_alias_memory` and `requirement_reviews` under `.job_assistant/`. It contains reviewed job quotations and labels, not CV-derived training records or credentials. It is supplied to Quick start analyses; standalone Python callers can opt in through `parse_job_text(..., memory=...)` or `analyze_texts(..., requirement_memory=...)`. CLI tools and source-board fetchers use stateless extraction unless a caller explicitly provides memory.
+Memory is stored in the local SQLite tables `skill_alias_memory`, `requirement_reviews`, and `requirement_feedback` under `.job_assistant/`. It contains reviewed job quotations and labels, not CV-derived training records or credentials. It is supplied to Quick start analyses; standalone Python callers can opt in through `parse_job_text(..., memory=...)` or `analyze_texts(..., requirement_memory=...)`. CLI tools and source-board fetchers use stateless extraction unless a caller explicitly provides memory.
 
 **What “learning” means here:** accumulating user-approved, reversible extraction corrections—not silently training on every upload or updating an external model. Precision can improve for reviewed phrases, but incorrect corrections can also reduce it; keep testing on unseen descriptions. Complex negation, alternatives (“Python or Java”), unfamiliar wording, and non-English descriptions still require human review. The built-in capability rules do not replace a general semantic model.
+
+### Visual design
+
+The Quick start is intentionally modeled around a compact job-search flow: profile input → target job → one primary action → result cards for tailored CV, improvements, and roadmap. The sidebar keeps career directions and target-job threads visible, while advanced sourcing and interview practice remain separate tabs. Cards and expanders provide progressive disclosure so skill review does not interrupt first-pass analysis. The layout is optimized for desktop; Streamlit provides basic responsive behavior, but a narrow-mobile visual review remains future work.
 
 ### Opportunities & contacts
 
@@ -279,6 +287,7 @@ src/tau_job_application/
 ├── tools.py             # typed tool adapters for domain functions
 ├── models.py            # Pydantic candidate/job/evidence/report contracts
 ├── parsing.py           # local file extraction and candidate/job parsing
+├── job_pages.py         # safe one-URL HTML/JSON-LD job-page extraction
 ├── requirements.py      # contextual job requirements and sourced review validation
 ├── requirement_memory.py # local approved phrase mappings and job corrections
 ├── matching.py          # deterministic skill coverage
@@ -312,6 +321,7 @@ Source adapters are present, but this is **not** a comprehensive European job in
 | SmartRecruiters | Current adapter accepts a company token and reads listings; detail mapping needs validation | [Posting API](https://developers.smartrecruiters.com/docs/posting-api) |
 | LinkedIn | Authorized user's OIDC identity only, not résumé extraction or people search | [OIDC integration](https://learn.microsoft.com/en-us/linkedin/consumer/integrations/self-serve/sign-in-with-linkedin-v2) |
 | X | Explicit recent-post search; posts are signals, not verified vacancies | [X API documentation](https://docs.x.com/) |
+| User job URL | One explicit public HTTPS fetch; no crawler/search, response cap, public DNS/redirect checks, readable text + JSON-LD | [Schema.org JobPosting](https://schema.org/JobPosting) |
 | CSV/JSON | User-provided job/contact records | Import formats above |
 
 EURES, Welcome to the Jungle, XING, StepStone, and national employment-service integrations are **not implemented**. Their current access/usage terms need individual review; this is not a claim that all require the same commercial arrangement.
@@ -321,6 +331,7 @@ See [European source strategy](docs/EU_JOB_SOURCE_STRATEGY.md) for research cont
 ## 7. Privacy and review boundaries
 
 - The product has no application-submission or messaging tools. Its current social-platform integrations are explicit official API reads, not browser scraping.
+- A submitted job URL is fetched only on the user's explicit button press. The fetcher rejects non-HTTPS URLs, embedded credentials, local/private/reserved addresses, unsupported content types, oversized responses, and non-public redirects. It does not crawl linked pages.
 - Analysis snapshots contain CV text and personal data in `.job_assistant/assistant.sqlite`. Git ignores this directory, but **Git exclusion is not encryption**.
 - The UI is a local prototype without multi-user authentication/isolation. Do not expose it publicly without additional security work.
 - API tokens are not deliberately written to SQLite. However, password widgets can retain values in server-side session memory; “used once and immediately erased” is not a guarantee.

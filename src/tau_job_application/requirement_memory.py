@@ -28,6 +28,10 @@ class RequirementMemory:
                 CREATE TABLE IF NOT EXISTS requirement_reviews (
                     document_hash TEXT PRIMARY KEY, payload TEXT NOT NULL, updated_at TEXT NOT NULL
                 );
+                CREATE TABLE IF NOT EXISTS requirement_feedback (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT, document_hash TEXT NOT NULL,
+                    rating TEXT NOT NULL, comment TEXT NOT NULL, created_at TEXT NOT NULL
+                );
             """)
 
     def _connect(self):
@@ -72,6 +76,20 @@ class RequirementMemory:
         with self._connect() as db:
             db.execute("INSERT OR REPLACE INTO requirement_reviews VALUES (?, ?, ?)",
                        (document_key(text), payload, datetime.now(UTC).isoformat()))
+
+    def save_feedback(self, text: str, rating: str, comment: str = "") -> None:
+        if rating not in {"useful", "partly useful", "not useful"}:
+            raise ValueError("Choose a supported extraction feedback rating")
+        if len(comment) > 2_000:
+            raise ValueError("Feedback is limited to 2,000 characters")
+        with self._connect() as db:
+            db.execute("INSERT INTO requirement_feedback (document_hash, rating, comment, created_at) VALUES (?, ?, ?, ?)",
+                       (document_key(text), rating, comment.strip(), datetime.now(UTC).isoformat()))
+
+    def feedback(self, text: str) -> list[dict[str, str]]:
+        with self._connect() as db:
+            rows = db.execute("SELECT rating, comment, created_at FROM requirement_feedback WHERE document_hash=? ORDER BY id DESC", (document_key(text),)).fetchall()
+        return [{"rating": row[0], "comment": row[1], "created_at": row[2]} for row in rows]
 
     def reviewed(self, text: str) -> tuple[list[JobRequirement], list[EvidenceItem]] | None:
         with self._connect() as db:
