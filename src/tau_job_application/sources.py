@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+from html import unescape
 from ipaddress import ip_address
 import socket
 from urllib.parse import quote, urlparse
@@ -12,6 +13,34 @@ from tau_job_application.models import CandidateProfile, EvidenceItem, JobPostin
 from tau_job_application.parsing import parse_job_text
 
 USER_AGENT = "job-readiness-assistant/0.2 (personal local tool)"
+
+
+def fetch_public_board_openings(source: str, identifier: str, *, company: str) -> list[dict[str, str | None]]:
+    """Fetch raw, published openings for a registered employer board.
+
+    This is intentionally narrower than a web search: callers must supply a
+    vetted employer board and the provider is restricted to a documented public
+    listing API.  Raw openings are kept separate from :class:`JobPosting` so a
+    valid vacancy is not discarded merely because this app cannot infer a known
+    skill from its description.  A user can later choose one opening for the
+    evidence-based Job Workspace flow.
+    """
+    label = source.strip()
+    if label == "Greenhouse":
+        token = _board_identifier(identifier, "Greenhouse board token")
+        payload = _get_json(f"https://boards-api.greenhouse.io/v1/boards/{quote(token)}/jobs?content=true")
+        items = payload.get("jobs", []) if isinstance(payload, dict) else []
+        return [_greenhouse_opening(item, token, company) for item in items if isinstance(item, dict)]
+    if label == "Lever":
+        site = _board_identifier(identifier, "Lever site handle")
+        payload = _get_json(f"https://api.lever.co/v0/postings/{quote(site)}?mode=json")
+        return [_lever_opening(item, site, company) for item in payload if isinstance(item, dict)] if isinstance(payload, list) else []
+    if label == "Ashby":
+        board = _board_identifier(identifier, "Ashby job-board name")
+        payload = _get_json(f"https://api.ashbyhq.com/posting-api/job-board/{quote(board)}?includeCompensation=false")
+        items = payload.get("jobs", []) if isinstance(payload, dict) else []
+        return [_ashby_opening(item, board, company) for item in items if isinstance(item, dict)]
+    raise ValueError("Role discovery supports registered Greenhouse, Lever, and Ashby public boards only")
 
 
 def fetch_greenhouse_jobs(board_token: str) -> list[JobPosting]:
@@ -104,6 +133,113 @@ def _recruitee_job(item: dict) -> JobPosting:
     return parse_job_text(text, title=item.get("title") or "Untitled role", company=company, url=item.get("careers_url") or item.get("url"))
 
 
+def _board_identifier(value: str, label: str) -> str:
+    value = value.strip()
+    # Ashby's documented job-board names may contain dots (for example,
+    # ``mistral.ai``).  These remain a narrow, URL-path-safe identifier set.
+    if not value.replace("-", "").replace("_", "").replace(".", "").isalnum():
+        raise ValueError(f"{label} contains unsupported characters")
+    return value
+
+
+def _greenhouse_opening(item: dict, board_token: str, company: str) -> dict[str, str | None]:
+    location = item.get("location") or {}
+    return {
+        "source": "Greenhouse",
+        "source_id": str(item.get("id") or item.get("absolute_url") or item.get("title") or ""),
+        "board_identifier": board_token,
+        "company": company.strip() or str(item.get("company_name") or "Company (confirm)"),
+        "title": str(item.get("title") or "Untitled role"),
+        "location": _location_name(location),
+        "url": _text_or_none(item.get("absolute_url")),
+        "description": _strip_html(str(item.get("content") or "")) or None,
+        "published_at": _text_or_none(item.get("updated_at")),
+        "work_mode": _text_or_none(item.get("workplace_type")),
+    }
+
+
+def _lever_opening(item: dict, site: str, company: str) -> dict[str, str | None]:
+    categories = item.get("categories") or {}
+    lists = item.get("lists") or []
+    sections = [f"{section.get('text', '')}: {section.get('content', '')}" for section in lists if isinstance(section, dict)]
+    description = "\n".join([str(item.get("descriptionPlain") or ""), *sections]).strip()
+    return {
+        "source": "Lever",
+        "source_id": str(item.get("id") or item.get("hostedUrl") or item.get("text") or ""),
+        "board_identifier": site,
+        "company": company.strip() or "Company (confirm)",
+        "title": str(item.get("text") or "Untitled role"),
+        "location": _listing_locations(
+            categories.get("location") if isinstance(categories, dict) else None,
+            categories.get("allLocations") if isinstance(categories, dict) else None,
+        ),
+        "url": _text_or_none(item.get("hostedUrl")),
+        "description": _strip_html(description) or None,
+        "published_at": _text_or_none(item.get("createdAt")),
+        "work_mode": _text_or_none(categories.get("commitment") if isinstance(categories, dict) else None),
+    }
+
+
+def _ashby_opening(item: dict, board: str, company: str) -> dict[str, str | None]:
+    """Normalize Ashby's documented public Job Postings API response."""
+    primary_location = _address_location(item.get("address")) or _location_name(item.get("location"))
+    secondary_locations = [
+        _address_location(location.get("address")) or _location_name(location)
+        for location in item.get("secondaryLocations", [])
+        if isinstance(location, dict)
+    ]
+    return {
+        "source": "Ashby",
+        "source_id": str(item.get("id") or item.get("jobUrl") or item.get("applyUrl") or item.get("title") or ""),
+        "board_identifier": board,
+        "company": company.strip() or "Company (confirm)",
+        "title": str(item.get("title") or "Untitled role"),
+        "location": _listing_locations(primary_location, secondary_locations),
+        "url": _text_or_none(item.get("jobUrl") or item.get("applyUrl")),
+        "description": _strip_html(str(item.get("descriptionPlain") or item.get("descriptionHtml") or "")) or None,
+        "published_at": _text_or_none(item.get("publishedAt")),
+        "work_mode": _text_or_none(item.get("workplaceType")),
+    }
+
+
+def _location_name(value: object) -> str | None:
+    if isinstance(value, dict):
+        value = value.get("name") or value.get("location")
+    return _text_or_none(value)
+
+
+def _address_location(value: object) -> str | None:
+    """Format a public listing's locality and country without guessing geography."""
+    if not isinstance(value, dict):
+        return None
+    address = value.get("postalAddress") if isinstance(value.get("postalAddress"), dict) else value
+    locality = _text_or_none(address.get("addressLocality"))
+    country = _text_or_none(address.get("addressCountry"))
+    region = _text_or_none(address.get("addressRegion"))
+    # A country makes a city unambiguous for the map.  If absent, retain a
+    # source-supplied regional label rather than inventing one.
+    if locality and country:
+        return f"{locality}, {country}"
+    if locality and region:
+        return f"{locality}, {region}"
+    return locality or region or country
+
+
+def _listing_locations(primary: object, secondary: object = None) -> str | None:
+    """Join only provider-supplied primary/secondary listing locations."""
+    locations: list[str] = []
+    for value in (primary, *(secondary if isinstance(secondary, list) else ())):
+        if location := _location_name(value):
+            if location.casefold() not in {item.casefold() for item in locations}:
+                locations.append(location)
+    return " • ".join(locations) or None
+
+
+def _text_or_none(value: object) -> str | None:
+    text = str(value).strip() if value is not None else ""
+    return text or None
+
+
 def _get_json(url: str) -> dict | list:
     _assert_public_https_url(url)
     request = Request(url, headers={"Accept": "application/json", "User-Agent": USER_AGENT})
@@ -117,7 +253,7 @@ def _get_json(url: str) -> dict | list:
 def _assert_public_https_url(url: str) -> None:
     parsed = urlparse(url)
     hostname = parsed.hostname or ""
-    allowed = {"api.github.com", "boards-api.greenhouse.io", "api.lever.co"}
+    allowed = {"api.github.com", "boards-api.greenhouse.io", "api.lever.co", "api.ashbyhq.com"}
     if parsed.scheme != "https" or (hostname not in allowed and not hostname.endswith(".recruitee.com")):
         raise ValueError("Only allow-listed HTTPS APIs can be fetched")
     for record in socket.getaddrinfo(parsed.hostname, 443, type=socket.SOCK_STREAM):
@@ -128,4 +264,13 @@ def _assert_public_https_url(url: str) -> None:
 
 def _strip_html(value: str) -> str:
     import re
-    return re.sub(r"<[^>]+>", " ", value).replace("&nbsp;", " ")
+    # Providers may entity-encode their HTML once or twice.  Decode a bounded
+    # number of times before stripping tags so a selected opening never carries
+    # literal ``&lt;p&gt;`` markup into a Job Workspace.
+    decoded = value
+    for _ in range(3):
+        next_value = unescape(decoded)
+        if next_value == decoded:
+            break
+        decoded = next_value
+    return unescape(re.sub(r"<[^>]+>", " ", decoded)).replace("\xa0", " ")

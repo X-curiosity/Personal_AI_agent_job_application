@@ -70,15 +70,17 @@ uv run --no-sync tau-job-application agent fixtures/candidate.txt fixtures/job.t
 | Profile links | GitHub, portfolio, LinkedIn, and X fields | Portfolio/social links alone do not retrieve or validate a person's work |
 | GitHub enrichment | Optional public API lookup of profile/repository language signals | No repository code review; languages are unconfirmed signals, not proof of proficiency |
 | Job intake | Natural-language descriptions, one explicitly submitted public HTTPS job URL, server-rendered/JSON-LD extraction, contextual skill/capability extraction, requirement review, company-board connectors, CSV/JSON imports | No crawling; JavaScript-only/authenticated pages may fail; English-first skill heuristics need review |
+| Role market | User-triggered refresh of registered Greenhouse and Ashby public employer feeds, editable role-family aliases, deterministic local CV-skill overlap ranking, source provenance, and a listing-location map | A small vetted registry, not a web-wide job search, hiring prediction, eligibility check, or automatic alert service |
 | Extraction memory | Saved per-description corrections and explicitly approved phrase-to-skill mappings | Local Quick start memory, not LLM fine-tuning; repetition alone never confirms a mapping |
 | Role comparison | Deterministic required/preferred skill coverage | Not a probability of being hired; no comprehensive European eligibility filtering |
+| Evidence match | A transparent role-and-project evidence view: confirmed CV coverage plus user-confirmed completed projects with a proof reference and observable outcome/test | Not a prediction of an interview, offer, or hiring outcome; never derives a score from employee profiles, historic hires, LinkedIn, or unconfirmed GitHub language signals |
 | CV readiness | Heuristic structure/contact/outcome checks plus role coverage | Not a validated ATS score or assessment of intelligence/ability |
 | CV tailoring | Summary, relevant skill ordering, and section-editing advice | **Not a complete rewritten résumé or PDF/DOCX export** |
 | Authenticity review | Generic-phrase and claim/outcome heuristics | Cannot establish authorship or factual truth; known false-acceptance cases exist |
 | Learning plan | Missing-skill list, selected prerequisites, small static resource catalog | Not yet an adaptive knowledge model or interactive dependency graph |
 | Project plan | Up to three generic briefs with milestones, deliverables, and acceptance checks | No live project research or company-specific project design |
-| Job monitoring | Manual refresh, local snapshots, newly observed fingerprints | No scheduled alerts, reliable closure detection, or cross-source deduplication |
-| Networking | Research queries, manually entered/imported contacts | No verified referral network or automatic outreach |
+| Job monitoring | User-triggered refreshes of individual permitted boards, local snapshots, and newly observed fingerprints | No scheduled alerts, reliable closure detection, or cross-source deduplication |
+| LinkedIn handoff | Opens a user-selected role search on LinkedIn | No LinkedIn listing feed/import, profile or people search, scraping, or outreach |
 | Interview practice | Role-specific questions, typed responses, keyword-based feedback, and a saved practice history inside each Job Workspace | Measures answer structure heuristically, not technical correctness |
 | Voice input | Recording plus explicitly requested OpenAI transcription | Audio leaves the machine when transcription is requested |
 | Career tracks | Optional folders containing multiple Job Workspaces, skill overlap, and merged learning priorities | Manual organization; not automatic role clustering or a complete semantic job search |
@@ -107,17 +109,17 @@ Data platforms
 
 These are organizational examples, not title-matching rules. A Career track can include several related titles, and a shared skill does not make two roles equivalent. Choosing a track does not automatically search every related job title or transfer a CV claim between jobs.
 
-**Eight contextual windows:** Overview, Job brief, CV studio, Proof projects, Interview lab, Career track, Explore, and Coach.
+**Nine contextual windows:** Overview, Job brief, CV studio, Evidence match, Proof projects, Interview lab, Career track, Role market, and Coach.
 
-- **Each Job Workspace owns:** editable CV/job input snapshots, its latest analysis and CV guidance, a role-specific project plan, a conversation history, and scored interview rehearsals. Text inputs auto-save locally across reruns and switching; analyses, conversations, and rehearsal history survive restarting the app.
-- **Overview:** shows requirement evidence coverage (not a hiring prediction), the next best move, proof gaps, and a short role-specific preparation route.
+- **Each Job Workspace owns:** editable CV/job input snapshots, its latest analysis and CV guidance, candidate-confirmed completed-project evidence, a role-specific project plan, a conversation history, and scored interview rehearsals. Text inputs auto-save locally across reruns and switching; analyses, conversations, rehearsal history, and project evidence survive restarting the app.
+- **Overview:** shows requirement evidence coverage (not a hiring prediction), the next best move, proof gaps, a short role-specific preparation route, and an Evidence match card when there is completed project proof.
 - **Shared profile:** select **Save as shared profile for new workspaces** to reuse a CV and links. Existing workspaces retain their own input snapshots; **Use latest shared profile in this workspace** explicitly updates one. Old results are not silently recomputed.
 - **Career track:** compares current analyzed jobs by extracted skills and responsibilities rather than exact titles, shows shared/unique requirements, and merges gap-driven learning priorities. Missing required coverage across multiple jobs is prioritized over a gap unique to one optional requirement. You do not need every skill from every job.
 - **Across tracks:** the overview can show overlapping extracted requirements, without merging conversations or implying identical roles. Learning completion/proficiency tracking is still future work.
 - **Changed inputs:** old snapshots remain stored but become stale; they are excluded from comparisons and coaching until **Refresh this job workspace** is run again. Saved requirement corrections also invalidate snapshots using that exact job text.
-- **Deletion:** deleting a workspace removes its inputs, latest result, chat, and interview rehearsal history. It does not delete the separate shared profile, approved extraction memory, or legacy analysis records.
+- **Deletion:** deleting a workspace removes its inputs, latest result, completed-project evidence, chat, and interview rehearsal history. It does not delete the separate shared profile, approved extraction memory, or legacy analysis records.
 
-The tables are `career_workspaces`, `career_threads`, `career_messages`, `career_interview_attempts`, and `career_shared_profile` in `.job_assistant/assistant.sqlite`. Pre-workspace entries in the legacy `analyses` table are preserved but not automatically assigned to a Career track.
+The tables are `career_workspaces`, `career_threads`, `career_messages`, `career_interview_attempts`, `career_shared_profile`, and `career_project_evidence` in `.job_assistant/assistant.sqlite`. Pre-workspace entries in the legacy `analyses` table are preserved but not automatically assigned to a Career track.
 
 ### Build a Job Workspace
 
@@ -130,9 +132,10 @@ The tables are `career_workspaces`, `career_threads`, `career_messages`, `career
 7. Select **Analyze this job**. The Overview becomes the role-specific preparation home.
 8. Act in the contextual windows:
    - **CV studio:** evidence-aware, copy-ready CV guidance and a claim-safety review.
-   - **Proof projects:** a gap-driven project brief, milestones, deliverables, acceptance checks, and a README outline.
+   - **Evidence match:** an evidence-only score for this role. Add completed work you can substantiate with your contribution, skills, a non-confidential proof reference, and an observable outcome/test. It retains CV coverage separately, and never treats a missing or unrelated project as a zero.
+   - **Proof projects:** separates your finished evidence from gap-driven project briefs, milestones, deliverables, acceptance checks, and a README outline. A proposed project does not earn Evidence match credit until it is actually complete and you explicitly add its proof.
    - **Interview lab:** role-specific questions, structured feedback, and saved rehearsal history.
-   - **Explore:** a transparent, CV-skill-overlap world map of companies to research; each map pin links to a company career page only when you choose to open it.
+   - **Role market:** a role-first opportunity board built only when you choose to refresh registered Greenhouse or Ashby public feeds. It offers editable title aliases, local CV-skill ranking, source-aware filters, listing-location pins, a separate company-research view, and lawful manual-source options.
    - **Coach:** job-scoped local guidance or optional consented AI coaching.
 9. Download the Markdown planning report if desired. The current UI blocks this download when the heuristic authenticity status is `blocked`; this is a prototype behavior, not a reliable factual-verification gate.
 
@@ -189,30 +192,30 @@ Memory is stored in the local SQLite tables `skill_alias_memory`, `requirement_r
 
 ### Visual design
 
-The app uses a calm, high-contrast workspace layout: a warm paper surface, forest-green job header, compact Career-track rail, and eight contextual role windows. The Job Workspace—not the generic chat—is the primary unit. Overview foregrounds a next-best action; deeper detail stays in Job brief, CV studio, Proof projects, Interview lab, Career track, Explore, and Coach. Cards and expanders provide progressive disclosure so source review does not interrupt a first pass. The layout is optimized for desktop; Streamlit provides basic responsive behavior, but a narrow-mobile visual review remains future work.
+The app uses a calm, high-contrast workspace layout: a warm paper surface, forest-green job header, compact Career-track rail, and nine contextual role windows. The Job Workspace—not the generic chat—is the primary unit. Overview foregrounds a next-best action; deeper detail stays in Job brief, CV studio, Evidence match, Proof projects, Interview lab, Career track, Role market, and Coach. Cards and expanders provide progressive disclosure so source review does not interrupt a first pass. The layout is optimized for desktop; Streamlit provides basic responsive behavior, but a narrow-mobile visual review remains future work.
 
-### Opportunities & contacts
+### Role market and lawful sources
 
-- Enter a real employer's board identifier for Greenhouse, Lever, or Recruitee.
-- Fetch and monitor jobs manually. “New” means newly observed by this local database, not necessarily newly published.
-- Use official-platform connectors only with appropriate access.
-- Import contacts/jobs obtained with permission as CSV or JSON; up to 500 records and 5 MB are processed. Rows that cannot be parsed can currently be skipped without detailed feedback.
-- Source-board and imported jobs have **Create job workspace** buttons. These populate title, company, URL, and description in the current Career track, with the shared CV as a starting point. Review the new workspace and analyze the job.
-- **Profile company explorer** uses a small local catalogue and skill overlap from the selected Job Workspace's CV (or the saved shared profile if this workspace has no CV). The overview map can be region-filtered; selecting a company opens its separate, global selected-footprint map. Each curated location is labelled precisely—such as Global/Group HQ, engineering hub, or research hub—and has a public source link explaining its stated focus. A footprint is deliberately incomplete unless more verified locations have been catalogued. It never checks current openings, infers work authorization, or sends the profile to a company.
+The **Role market** replaces the prior manual-contact-research entry point with a role-first local opportunity board. It does not discover people, create contacts, submit applications, or send messages.
 
-Example CSV schemas:
+- Enter the role to explore, inspect the suggested lookalike titles, and edit the comma-separated aliases before refreshing. Suggestions come from a small, inspectable local rule set; they are not an opaque relevance claim.
+- Select one or more **registered public feeds** and choose **Discover matching openings**. The current registered market uses only vetted Greenhouse and Ashby employer-board feeds, and makes no request until that button is selected. It is not a provider-wide or internet-wide crawler. Lever remains available for a user-entered official board in **Bring a lawful source**.
+- The ranking is deterministic and explainable: title/alias similarity plus overlap with skills detected locally from the selected CV. CV text stays local for this ranking and is never sent to a board. A listing card shows why it appeared; the score is not a suitability, hiring, or qualification assessment.
+- Opening provenance is retained through deduplication: provider, board identifier, external listing ID, listing URL, and retrieval time remain available for each observed source. Company-type, size, and funding filters are shown as **Unknown** unless a linked company-facts source supports a value; leaving a filter empty includes all values, while selecting **Unknown** deliberately includes unsourced records.
+- The role-location map uses only locations stated on matching listings. It never substitutes a company HQ, office footprint, or inferred geography. A listed location without local coordinates is shown without a pin, and a listing with no location stays unlocated.
+- **Search this role on LinkedIn** is an outbound handoff only: it opens LinkedIn with the chosen query. The app does not scrape LinkedIn, import a LinkedIn job feed, or search people/profiles.
+- **Bring a lawful source** is separate from the registered role market: enter an official employer board you know (Greenhouse, Lever, or Recruitee), use a permitted SmartRecruiters employer token, or import a CSV/JSON job export you personally exported or obtained with permission. These inputs remain reviewable and are not silently added to the registered-feed market.
+- Registered-feed, manual-board, and imported jobs have **Create job workspace** buttons. These populate title, company, URL, and description in the current Career track, with the shared CV as a starting point. Review the new workspace and analyze the job.
+- **Profile company explorer** is a separate research view, using a small local catalogue and skill overlap from the selected Job Workspace's CV (or the saved shared profile if this workspace has no CV). Its source-linked HQ/research/engineering-hub footprint is not the role-location map and never supplies locations for an opening.
 
-```csv
-name,role,profile_url,public_email,evidence
-Alex Example,Engineering Lead,https://example.com/team/alex,,User-provided company team page
-```
+Example CSV schema for a lawful job export:
 
 ```csv
 title,company,required_skills,preferred_skills,url
 Backend Engineer,Example Systems,"Python, Docker",SQL,https://example.com/careers/backend
 ```
 
-JSON accepts a list of objects with equivalent fields, or an object containing a `data` or `items` list. Preserve provenance; an imported email is not independently verified just because it is present.
+JSON accepts a list of objects with equivalent fields, or an object containing a `data` or `items` list. Preserve provenance; imported data is not independently verified simply because it is present.
 
 ### Coach
 
@@ -291,11 +294,14 @@ src/tau_job_application/
 ├── requirements.py      # contextual job requirements and sourced review validation
 ├── requirement_memory.py # local approved phrase mappings and job corrections
 ├── matching.py          # deterministic skill coverage
+├── hiring_match.py      # candidate-owned CV/project evidence matching and safe aggregate-benchmark contract
+├── evidence_match_store.py # scoped SQLite storage for completed project proof
 ├── career.py            # CV heuristics, template tailoring, contact queries
 ├── company_explorer.py  # local, profile-skill company / selected-hub catalogue and ranking
 ├── authenticity.py      # source-CV wording/claim heuristics
 ├── planning.py          # static skill resources and project templates
-├── sources.py           # company-board APIs and GitHub signals
+├── sources.py           # company-board APIs, registered-board raw openings, and GitHub signals
+├── role_discovery.py    # role-market records, aliases, local ranking/filtering, provenance, and run storage
 ├── official_sources.py  # official-platform reads and CSV/JSON imports
 ├── monitoring.py        # local source/job snapshots
 ├── interview.py         # questions, structure checks, audio transcription
@@ -312,18 +318,21 @@ Dependencies are pinned/bounded in `pyproject.toml` and resolved in `uv.lock`. T
 
 ## 6. Job sources and European coverage
 
-Source adapters are present, but this is **not** a comprehensive European job index. Coverage depends on which employers/boards the user supplies. Multilingual parsing, work authorization, salary normalization, and country-specific remote eligibility remain future work.
+The **Role market** is a user-triggered, role-first view over a small registered set of Greenhouse and Ashby public employer feeds. It is not a comprehensive European job index: it does not search arbitrary boards, crawl aggregators, or infer whether a person can work in a location. Its suggested aliases are editable, and CV-skill overlap is calculated locally after listings are retrieved. A separate **Bring a lawful source** panel remains available for an official board, authorized integration, or permitted export that the user supplies.
 
 | Connector | Current scope | Reference |
 |---|---|---|
-| Greenhouse | Company public job board | [Job Board API](https://developers.greenhouse.io/job-board.html) |
-| Lever | Company public postings | [Postings API](https://github.com/lever/postings-api) |
-| Recruitee | Company careers-site offers | [Careers Site API](https://docs.recruitee.com/reference/intro-to-careers-site-api) |
-| SmartRecruiters | Current adapter accepts a company token and reads listings; detail mapping needs validation | [Posting API](https://developers.smartrecruiters.com/docs/posting-api) |
-| LinkedIn | Authorized user's OIDC identity only, not résumé extraction or people search | [OIDC integration](https://learn.microsoft.com/en-us/linkedin/consumer/integrations/self-serve/sign-in-with-linkedin-v2) |
-| X | Explicit recent-post search; posts are signals, not verified vacancies | [X API documentation](https://docs.x.com/) |
+| Greenhouse | Registered public feeds power the Role market; a user can also read a known official employer board in the separate lawful-source panel | [Job Board API](https://developers.greenhouse.io/job-board.html) |
+| Lever | A user can read a known official employer board in the separate lawful-source panel; it is not currently in the small registered Role-market set | [Postings API](https://github.com/lever/postings-api) |
+| Ashby | Registered public feeds can use Ashby's documented public job-postings API | [Job Postings API](https://developers.ashbyhq.com/docs/public-job-posting-api) |
+| Recruitee | Official careers-site board entered by the user in the lawful-source panel; not a registered Role-market feed | [Careers Site API](https://docs.recruitee.com/reference/intro-to-careers-site-api) |
+| SmartRecruiters | Official employer integration only with a permitted company token; not a registered Role-market feed | [Posting API](https://developers.smartrecruiters.com/docs/posting-api) |
+| LinkedIn | Outbound handoff to a user-selected role search; authorized-user OIDC identity is separate | No listing feed/import, résumé extraction, people search, or scraping |
+| X | Explicit official recent-post search; posts are signals, not verified vacancies or Role-market results | [X API documentation](https://docs.x.com/) |
 | User job URL | One explicit public HTTPS fetch; no crawler/search, response cap, public DNS/redirect checks, readable text + JSON-LD | [Schema.org JobPosting](https://schema.org/JobPosting) |
-| CSV/JSON | User-provided job/contact records | Import formats above |
+| CSV/JSON | User-provided or licensed job records, reviewed separately from the registered Role market | Import formats above |
+
+Each Role-market result retains its provider/board/listing provenance. Company type, employee band, and funding stage are filterable only as source-backed values; a missing fact is displayed as **Unknown**, rather than inferred from a company name. Its map reflects only locations written on the job listing, never a company headquarters or office catalogue.
 
 EURES, Welcome to the Jungle, XING, StepStone, and national employment-service integrations are **not implemented**. Their current access/usage terms need individual review; this is not a claim that all require the same commercial arrangement.
 
@@ -337,8 +346,9 @@ See [European source strategy](docs/EU_JOB_SOURCE_STRATEGY.md) for research cont
 - The UI is a local prototype without multi-user authentication/isolation. Do not expose it publicly without additional security work.
 - API tokens are not deliberately written to SQLite. However, password widgets can retain values in server-side session memory; “used once and immediately erased” is not a guarantee.
 - The optional Tau CLI sends supplied CV/job text to the configured provider. The optional UI coach sends the explicitly previewed thread/direction context after consent. Transcription sends audio to OpenAI. Public-source requests send the identifiers/queries required by those services.
+- A Role-market refresh sends the selected registered board identifiers and retrieves their published listings only after the user presses refresh. CV-derived skills rank returned listings locally; CV text is not sent to a job board. The LinkedIn control only opens an outbound search URL and does not retrieve LinkedIn listings.
 - The profile company explorer compares CV skills to its local catalogue in-process. Its map basemap is fetched by the browser from Carto; map requests do not include CV text, profile links, or the company-match list. Company-footprint source and career links open only after an explicit user action. Site descriptions are source-linked research prompts, not live role data or a comprehensive office directory.
-- Portfolio/social URLs, imported contact details, and generated text must be reviewed. A URL's presence or an email's format does not verify a person's role or address.
+- Portfolio/social URLs, imported records, and generated text must be reviewed. A URL's presence or an email's format does not verify a person's role or address.
 - Data-retention, selective deletion, consent records, credential clearing, and error-redaction tests remain necessary improvements.
 - No AI-authorship percentage, ATS-pass guarantee, hiring probability, or independently verified CV claim is produced by the current system.
 

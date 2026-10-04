@@ -4,30 +4,51 @@ from __future__ import annotations
 
 import os
 import hashlib
+from datetime import UTC, datetime
 from html import escape
 from pathlib import Path
 import tempfile
+from urllib.parse import quote_plus
 
 import pydeck as pdk
 import streamlit as st
 
-from tau_job_application.career import contact_research_plan, parse_contact_leads
 from tau_job_application.company_explorer import COMPANY_PINS, company_footprint, detected_profile_skills, recommend_companies
+from tau_job_application.evidence_match_store import EvidenceMatchStore
+from tau_job_application.hiring_match import (
+    ProjectProof,
+    ProjectProofKind,
+    ProjectStatus,
+    calculate_evidence_match,
+)
 from tau_job_application.interview import build_interview_questions, evaluate_answer, transcribe_openai_audio
 from tau_job_application.job_pages import fetch_job_url
 from tau_job_application.official_sources import (
-    fetch_linkedin_authorized_identity,
     fetch_smartrecruiters_postings,
-    fetch_x_recent_posts,
-    import_contact_export,
     import_job_export,
 )
 from tau_job_application.monitoring import JobMonitor
 from tau_job_application.parsing import KNOWN_SKILLS, infer_profile_links, load_document
 from tau_job_application.requirement_memory import RequirementMemory, document_key
 from tau_job_application.requirements import extract_requirements, save_requirement_review
+from tau_job_application.role_discovery import (
+    DEFAULT_VETTED_COMPANY_BOARDS,
+    DiscoveredOpening,
+    RoleDiscoveryStore,
+    RoleQuery,
+    SourceSnapshot,
+    opening_matches_filters,
+    rank_openings,
+    suggest_role_aliases,
+)
 from tau_job_application.pipeline import analyze_texts, render_markdown
-from tau_job_application.sources import enrich_github_profile, fetch_greenhouse_jobs, fetch_lever_jobs, fetch_recruitee_jobs
+from tau_job_application.sources import (
+    enrich_github_profile,
+    fetch_greenhouse_jobs,
+    fetch_lever_jobs,
+    fetch_public_board_openings,
+    fetch_recruitee_jobs,
+)
 from tau_job_application.storage import LocalStore
 from tau_job_application.workspaces import PROFILE_FIELDS, WorkspaceStore
 from tau_job_application.workspace_ui import choose_scope, draft_key, show_chat, show_direction
@@ -45,6 +66,22 @@ STORE = LocalStore(ROOT / ".job_assistant" / "assistant.sqlite")
 MONITOR = JobMonitor(ROOT / ".job_assistant" / "assistant.sqlite")
 REQUIREMENT_MEMORY = RequirementMemory(ROOT / ".job_assistant" / "assistant.sqlite")
 WORKSPACES = WorkspaceStore(ROOT / ".job_assistant" / "assistant.sqlite")
+ROLE_DISCOVERY = RoleDiscoveryStore(ROOT / ".job_assistant" / "assistant.sqlite")
+EVIDENCE_MATCHES = EvidenceMatchStore(ROOT / ".job_assistant" / "assistant.sqlite")
+
+
+def _evidence_store() -> EvidenceMatchStore:
+    """Use the current workspace database in UI tests as well as in the app."""
+
+    return EVIDENCE_MATCHES if EVIDENCE_MATCHES.path == WORKSPACES.path else EvidenceMatchStore(WORKSPACES.path)
+
+
+def _evidence_match_for(result, workspace_id: str, thread_id: str):
+    return calculate_evidence_match(
+        result.candidate,
+        result.job,
+        _evidence_store().list_projects(workspace_id, thread_id),
+    )
 
 
 STYLES = """
@@ -102,14 +139,16 @@ def main() -> None:
     st.markdown(STYLES, unsafe_allow_html=True)
     workspace_id, thread_id = choose_scope(WORKSPACES)
     _workspace_hero(WORKSPACES.thread(workspace_id, thread_id))
-    overview, brief, cv_studio, projects, interview, direction, opportunities, conversation = st.tabs([
-        "Overview", "Job brief", "CV studio", "Proof projects", "Interview lab", "Career track", "Explore", "Coach"])
+    overview, brief, cv_studio, evidence_match, projects, interview, direction, opportunities, conversation = st.tabs([
+        "Overview", "Job brief", "CV studio", "Evidence match", "Proof projects", "Interview lab", "Career track", "Role market", "Coach"])
     with overview:
         _job_workspace_dashboard(workspace_id, thread_id)
     with brief:
         _quickstart(workspace_id, thread_id)
     with cv_studio:
         _cv_studio(workspace_id, thread_id)
+    with evidence_match:
+        _evidence_match(workspace_id, thread_id)
     with projects:
         _project_studio(workspace_id, thread_id)
     with interview:
@@ -157,12 +196,19 @@ def _job_workspace_dashboard(workspace_id: str, thread_id: str) -> None:
     matched = [item.skill for item in result.match.requirements if item.status == "matched"]
     missing = [item.skill for item in result.match.requirements if item.status == "missing"]
     practice_average = round(sum(item["score"] for item in attempts) / len(attempts)) if attempts else None
+    evidence_match = _evidence_match_for(result, workspace_id, thread_id)
     coverage_note = f"{len(matched)} shown · {len(missing)} to build"
-    cards = st.columns(4)
+    cards = st.columns(5)
     _metric_card(cards[0], "Requirement evidence coverage", f"{result.match.score}%", coverage_note)
     _metric_card(cards[1], "CV guidance", f"{result.cv_score.score if result.cv_score else '—'}%", "Document readiness, not a hiring prediction")
     _metric_card(cards[2], "Interview practice", f"{practice_average if practice_average is not None else '—'}", f"{len(attempts)} saved rehearsal{'s' if len(attempts) != 1 else ''}")
     _metric_card(cards[3], "Proof gaps", str(len(missing)), "Role requirements without CV evidence")
+    evidence_value = f"{evidence_match.score}%" if evidence_match.score is not None else "—"
+    evidence_note = (
+        "CV + completed project evidence" if evidence_match.score is not None
+        else "Add verified completed project evidence"
+    )
+    _metric_card(cards[4], "Evidence match", evidence_value, evidence_note)
 
     st.markdown("<div class='section-kicker'>Your next best move</div>", unsafe_allow_html=True)
     next_action, destination, reason = _next_action(result, attempts)
@@ -463,6 +509,141 @@ def _cv_studio(workspace_id: str, thread_id: str) -> None:
                 st.caption(section.candidate_action)
 
 
+def _evidence_match(workspace_id: str, thread_id: str) -> None:
+    """Show candidate-owned project proof beside, never inside, a hiring prediction."""
+    thread = WORKSPACES.thread(workspace_id, thread_id)
+    result = thread["analysis"] if not thread["stale"] else None
+    st.subheader("Evidence match")
+    st.caption(
+        "Not a hiring prediction. This compares the published role requirements with the "
+        "confirmed CV and completed project evidence you choose. It does not search employee "
+        "profiles, infer who was hired, or scrape LinkedIn."
+    )
+    if thread["stale"]:
+        st.warning("Refresh the Job brief first. Evidence match is held back while the role evidence is stale.")
+        return
+    if not result:
+        st.info("Analyze this job in Job brief to compare its sourced requirements with your completed project evidence.")
+        return
+
+    evidence_store = _evidence_store()
+    projects = evidence_store.list_projects(workspace_id, thread_id)
+    assessment = calculate_evidence_match(result.candidate, result.job, projects)
+    metrics = st.columns(4)
+    metrics[0].metric("Evidence match", f"{assessment.score}%" if assessment.score is not None else "—")
+    metrics[1].metric("Confirmed CV coverage", f"{assessment.role_coverage}%")
+    metrics[2].metric("Completed-project proof", f"{assessment.project_coverage}%" if assessment.project_coverage is not None else "—")
+    metrics[3].metric("Company benchmark", f"{assessment.pattern_coverage}%" if assessment.pattern_coverage is not None else "Unavailable")
+    if assessment.score is not None:
+        st.info(
+            "This partial evidence score combines confirmed CV coverage and completed-project proof. "
+            "It is not an estimate of your odds of being hired."
+        )
+    elif assessment.project_status == "not_provided":
+        st.info("Add a completed, verifiable project below to calculate the project-evidence component. Missing inputs are not treated as a zero.")
+    elif assessment.project_status == "no_eligible_projects":
+        st.warning("Saved project records need a completed status, your confirmation, a proof reference, and an observable outcome/test before they can contribute.")
+    elif assessment.project_status == "no_matching_project_evidence":
+        st.info("Your completed projects are saved, but none explicitly demonstrates a currently scored role requirement. They are not used to lower the evidence score.")
+    elif assessment.project_status == "insufficient_role_evidence":
+        st.info("This role currently has no scored required/preferred requirements to compare with project evidence.")
+
+    if assessment.requirement_supports:
+        st.markdown("#### How completed projects support this role")
+        st.dataframe(
+            [
+                {
+                    "Role requirement": item.skill,
+                    "Importance": "Required" if item.required else "Preferred",
+                    "Project support": f"{round(item.support * 100)}%",
+                    "Completed project": " · ".join(item.project_titles) or "—",
+                    "Reason": item.explanation,
+                }
+                for item in assessment.requirement_supports
+            ],
+            hide_index=True,
+            use_container_width=True,
+        )
+
+    st.markdown("#### Your completed project evidence")
+    st.caption(
+        "Add only work you have completed and can explain. Use a public or otherwise non-confidential "
+        "reference; this app stores the reference locally and does not fetch it. Planned briefs in Proof projects never count here."
+    )
+    with st.form(f"project-evidence-form:{thread_id}", clear_on_submit=True):
+        title = st.text_input("Completed project title", placeholder="For example: Incident analytics API")
+        contribution = st.text_area(
+            "Your concrete contribution",
+            placeholder="What you personally designed, built, or validated—not a team-wide claim.",
+        )
+        skills = st.text_input("Skills demonstrated", placeholder="For example: Python, Docker, PostgreSQL")
+        proof_kind = st.selectbox(
+            "Proof type",
+            [kind.value for kind in ProjectProofKind],
+            format_func=lambda value: value.replace("_", " ").title(),
+        )
+        proof_reference = st.text_input(
+            "Proof link or source reference",
+            placeholder="https://… or a precise portfolio/CV reference",
+        )
+        outcome_or_test = st.text_area(
+            "Observable outcome or test",
+            placeholder="For example: deployed demo, passing integration test, or reproducible benchmark.",
+        )
+        confirmed = st.checkbox("I confirm this is completed work, my contribution is accurate, and I can discuss the proof.")
+        submitted = st.form_submit_button("Save completed project evidence", type="primary")
+    if submitted:
+        try:
+            if not confirmed:
+                raise ValueError("Confirm the project before saving it as completed evidence")
+            saved = evidence_store.create_project(
+                workspace_id,
+                thread_id,
+                title=title,
+                contribution=contribution,
+                skills=tuple(part.strip() for part in skills.split(",") if part.strip()),
+                proofs=(ProjectProof(kind=ProjectProofKind(proof_kind), reference=proof_reference, confirmed=True),),
+                outcome_or_test=outcome_or_test,
+                status=ProjectStatus.COMPLETED,
+                candidate_confirmed=True,
+            )
+            STORE.record_event("completed_project_evidence_saved", {"project_id": saved.id, "skill_count": len(saved.skills)})
+            st.success("Completed project evidence saved locally for this Job Workspace.")
+            st.rerun()
+        except (TypeError, ValueError) as exc:
+            st.error(str(exc))
+
+    if projects:
+        for project in projects:
+            with st.expander(f"{project.title} · {project.status.value.replace('_', ' ')}", expanded=False):
+                st.write(project.contribution)
+                st.caption("Skills: " + " · ".join(project.skills))
+                st.caption("Outcome/test: " + (project.outcome_or_test or "Not supplied"))
+                for proof in project.proofs:
+                    confirmation = "confirmed" if proof.confirmed else "not confirmed"
+                    st.caption(f"{proof.kind.value.replace('_', ' ').title()} ({confirmation}): {proof.reference}")
+                if st.button("Remove this project evidence", key=f"remove-project-evidence:{thread_id}:{project.id}"):
+                    evidence_store.delete_project(workspace_id, thread_id, project.id)
+                    STORE.record_event("completed_project_evidence_deleted", {"project_id": project.id})
+                    st.rerun()
+
+    st.markdown("#### Company hiring-pattern alignment")
+    st.info(
+        f"Unavailable for {result.job.company}. This app will not build a score from people who work there, "
+        "public profiles, or inferred hiring history. A future component can use only an employer-authorized, "
+        "anonymous, role-specific capability benchmark with dated provenance."
+    )
+    with st.expander("What would make a company benchmark eligible?", expanded=False):
+        st.markdown(
+            "It must be an employer-authorized or licensed aggregate rubric for this company and role, include "
+            "its source and validity dates, attest data rights and anonymisation, and contain capability criteria "
+            "rather than employee profiles, CVs, or historic-hire records."
+        )
+    with st.expander("Evidence-match limits", expanded=False):
+        for limitation in assessment.limitations:
+            st.markdown(f"- {limitation}")
+
+
 def _project_studio(workspace_id: str, thread_id: str) -> None:
     """Turn evidence gaps into an honest, role-specific portfolio build brief."""
     thread = WORKSPACES.thread(workspace_id, thread_id)
@@ -475,10 +656,30 @@ def _project_studio(workspace_id: str, thread_id: str) -> None:
     if not result:
         st.info("Analyze this job in Job brief to generate projects tied to its evidence gaps.")
         return
+    projects = _evidence_store().list_projects(workspace_id, thread_id)
+    assessment = calculate_evidence_match(result.candidate, result.job, projects)
+    st.markdown("#### Your completed project evidence")
+    st.caption("Only completed, candidate-confirmed projects with a proof reference and observable outcome can support Evidence match. Add or edit them in the Evidence match tab.")
+    if projects:
+        for project in projects:
+            project_skills = " · ".join(project.skills)
+            eligible_note = "eligible for review" if project.title in assessment.matched_project_titles else "not currently mapped to a scored role requirement"
+            with st.container(border=True):
+                st.markdown(f"**{project.title}** · {eligible_note}")
+                st.caption(f"Skills: {project_skills}")
+                st.write(project.contribution)
+                st.caption("Outcome/test: " + (project.outcome_or_test or "Not supplied"))
+        if assessment.project_coverage is not None:
+            st.success(f"Completed-project proof coverage for this role: {assessment.project_coverage}%.")
+        elif assessment.project_status == "no_matching_project_evidence":
+            st.info("These completed projects are retained as your evidence inventory, but none is being used for this role's score.")
+    else:
+        st.info("No completed project evidence has been added for this Job Workspace. Add real, finished work in Evidence match; planned briefs below do not count.")
     if not result.project_plans:
         st.success("The current job analysis did not identify a project gap that needs a new portfolio piece.")
         return
 
+    st.markdown("#### Projects to build")
     missing = {item.skill for item in result.match.requirements if item.status == "missing"}
     requirement_by_skill = {requirement.skill: requirement for requirement in result.job.requirements}
     evidence_by_id = {item.id: item for item in result.job.evidence}
@@ -598,17 +799,427 @@ def _open_job_thread(job, key: str) -> None:
 
 
 def _opportunities(workspace_id: str, thread_id: str) -> None:
-    _company_explorer(workspace_id, thread_id)
+    """Role-first discovery, separate company research, and advanced data paths."""
+    role_tab, company_tab, sources_tab = st.tabs([
+        "Role discovery", "Company research", "Bring a lawful source",
+    ])
+    with role_tab:
+        _role_discovery(workspace_id, thread_id)
+    with company_tab:
+        _company_explorer(workspace_id, thread_id)
+    with sources_tab:
+        _permitted_sources()
+
+
+def _role_discovery(workspace_id: str, thread_id: str) -> None:
+    """Collect and render a role market from a small vetted employer-board set."""
+    thread = WORKSPACES.thread(workspace_id, thread_id)
+    run = ROLE_DISCOVERY.latest_run(career_track_id=workspace_id, workspace_id=thread_id)
+    refresh_notice = st.session_state.get(f"role-market-refresh-notice:{thread_id}")
+    saved_query = run.query if run else None
+    default_title = (saved_query.title if saved_query else thread["draft"]["job_title"].strip())
+    default_aliases = (
+        ", ".join(saved_query.aliases)
+        if saved_query and saved_query.aliases
+        else ", ".join(suggest_role_aliases(default_title)) if default_title else ""
+    )
+    profile = thread["draft"]
+    links = {field: profile[field] for field in PROFILE_FIELDS if field != "cv_text" and profile[field].strip()}
+    profile_skills = detected_profile_skills(profile["cv_text"], links)
+
+    st.subheader("Role discovery")
+    st.caption("Create a market page for one role. The backend collects only registered, public employer career feeds after you choose to refresh; it never scrapes LinkedIn or sends your CV text to a job board.")
+    if refresh_notice:
+        st.warning(refresh_notice)
+    role_title = st.text_input(
+        "Role to explore",
+        value=default_title,
+        placeholder="Machine Learning Engineer",
+        key=f"role-market-title:{thread_id}",
+    )
+    suggested = suggest_role_aliases(role_title) if role_title.strip() else ()
+    if suggested:
+        st.caption("Suggested lookalike family: " + " · ".join(suggested) + ". Edit the list before refreshing if needed.")
+    aliases = st.text_input(
+        "Lookalike role titles (comma-separated)",
+        value=default_aliases,
+        placeholder="Applied Scientist, AI Engineer, Platform Engineer",
+        key=f"role-market-aliases:{thread_id}",
+    )
+    if profile_skills:
+        st.caption("Local profile-skill ranking: " + " · ".join(profile_skills[:12]) + (f" · +{len(profile_skills) - 12} more" if len(profile_skills) > 12 else "") + ". These skills stay on this device.")
+    else:
+        st.caption("Add a CV in Job brief to add local profile-skill ranking. A role title alone can still be explored.")
+
+    catalog_sources = sorted({board.source for board in DEFAULT_VETTED_COMPANY_BOARDS})
+    enabled_sources = st.multiselect(
+        "Registered public feeds to refresh",
+        catalog_sources,
+        default=catalog_sources,
+        key=f"role-market-sources:{thread_id}",
+        help="The current registry is small and vetted. Add an authorized or licensed source in the separate Bring a lawful source panel; this is not an internet-wide crawler.",
+    )
+    if st.button("Discover matching openings", type="primary", key=f"role-market-refresh:{thread_id}"):
+        if not role_title.strip():
+            st.error("Enter the role you want to explore first.")
+        elif not enabled_sources:
+            st.error("Select at least one registered public feed to refresh.")
+        else:
+            with st.spinner("Collecting registered employer openings and matching role families…"):
+                _refresh_role_market(
+                    workspace_id,
+                    thread_id,
+                    role_title=role_title,
+                    aliases=aliases,
+                    profile_skills=profile_skills,
+                    enabled_sources=tuple(enabled_sources),
+                )
+            st.rerun()
+
+    linkedin_target = quote_plus(role_title.strip() or "job openings")
+    st.link_button(
+        "Search this role on LinkedIn",
+        f"https://www.linkedin.com/jobs/search/?keywords={linkedin_target}",
+        type="secondary",
+    )
+    st.caption("This opens LinkedIn for you; it does not import LinkedIn listings. A LinkedIn job feed requires an approved partner or licensed-data integration.")
+
+    if run is None:
+        st.info("Choose a role and refresh to build its first local opportunity board. The visible results will be role-like openings only, not raw feed records.")
+        return
+    if role_title.strip() and role_title.casefold() != run.query.title.casefold():
+        st.warning(f"The saved opportunity board is for “{run.query.title}”. Refresh to replace it with “{role_title.strip()}”.")
 
     st.divider()
-    st.subheader("Permitted job discovery")
-    st.caption("User-triggered refreshes of public career-board APIs. No scraping, no stored credentials.")
+    st.markdown(f"### {run.query.title} opportunity board")
+    st.caption(f"Last refreshed locally: {run.created_at}. Results may have changed at the source since then.")
+    _role_discovery_filters(run, thread_id)
+
+
+def _role_discovery_filters(run, thread_id: str) -> None:
+    """Render stored role matches with sourced-fact filters and a role-location map."""
+    company_types = ["Public", "Private", "Startup", "Unknown"]
+    employee_bands = ["1–10", "11–50", "51–200", "201–500", "501–1,000", "1,001–5,000", "5,001+", "Unknown"]
+    funding_stages = ["Pre-seed", "Seed", "Series A", "Series B", "Series C+", "Not applicable", "Unknown"]
+    sources = sorted({item.source for match in run.matches for item in match.opening.provenance})
+    filters = st.columns(4)
+    with filters[0]:
+        selected_types = st.multiselect("Company type", company_types, key=f"role-filter-type:{thread_id}")
+    with filters[1]:
+        selected_sizes = st.multiselect("Company size", employee_bands, key=f"role-filter-size:{thread_id}")
+    with filters[2]:
+        selected_stages = st.multiselect("Funding stage", funding_stages, key=f"role-filter-stage:{thread_id}")
+    with filters[3]:
+        selected_sources = st.multiselect("Source", sources, key=f"role-filter-source:{thread_id}")
+    st.caption("Company type, size, and funding stage appear only when a dated company source exists. Leave a filter empty to include all values; select Unknown to include records without sourced facts.")
+
+    filtered_query = run.query.model_copy(
+        update={
+            "company_types": tuple(selected_types),
+            "employee_bands": tuple(selected_sizes),
+            "funding_stages": tuple(selected_stages),
+            "sources": tuple(selected_sources),
+        }
+    )
+    matches = [match for match in run.matches if opening_matches_filters(match.opening, filtered_query)]
+    summary = st.columns(3)
+    summary[0].metric("Lookalike openings", len(matches))
+    summary[1].metric("Companies", len({match.opening.company.name for match in matches}))
+    summary[2].metric("Registered feeds checked", len(run.sources))
+    if run.errors:
+        st.warning("Some registered feeds could not be refreshed: " + " · ".join(run.errors))
+    with st.expander("Refresh audit", expanded=False):
+        st.dataframe([source.model_dump() for source in run.sources], hide_index=True, use_container_width=True)
+
+    if not matches:
+        st.info("No stored openings match these filters. Clear a filter or refresh a broader role family.")
+        return
+    for index, match in enumerate(matches):
+        _role_match_card(match, thread_id, index)
+    _role_location_map(matches, thread_id)
+
+
+def _refresh_role_market(
+    workspace_id: str,
+    thread_id: str,
+    *,
+    role_title: str,
+    aliases: str,
+    profile_skills: tuple[str, ...],
+    enabled_sources: tuple[str, ...],
+) -> None:
+    """Fetch only registered official boards, then save transparent local matches."""
+    alias_terms = tuple(item.strip() for item in aliases.split(",") if item.strip()) or suggest_role_aliases(role_title)
+    query = RoleQuery(title=role_title, aliases=alias_terms, profile_skills=profile_skills)
+    openings: list[DiscoveredOpening] = []
+    snapshots: list[SourceSnapshot] = []
+    errors: list[str] = []
+    retrieved_at = datetime.now(UTC).isoformat()
+    for board in DEFAULT_VETTED_COMPANY_BOARDS:
+        if board.source not in enabled_sources:
+            continue
+        try:
+            raw_openings = fetch_public_board_openings(
+                board.source,
+                board.board_identifier,
+                company=board.company.name,
+            )
+            openings.extend(
+                DiscoveredOpening(
+                    title=item["title"] or "Untitled role",
+                    company=board.company,
+                    source=item["source"] or board.source,
+                    source_identifier=item["board_identifier"] or board.board_identifier,
+                    external_id=item["source_id"],
+                    source_url=item["url"],
+                    description=item["description"],
+                    location=item["location"],
+                    retrieved_at=retrieved_at,
+                )
+                for item in raw_openings
+            )
+            snapshots.append(SourceSnapshot(
+                source=f"{board.company.name} · {board.source}",
+                identifier=board.board_identifier,
+                opening_count=len(raw_openings),
+            ))
+        except Exception as exc:
+            message = f"{board.company.name} · {board.source}: {str(exc)[:280]}"
+            errors.append(message)
+            snapshots.append(SourceSnapshot(
+                source=f"{board.company.name} · {board.source}",
+                identifier=board.board_identifier,
+                error=str(exc)[:280],
+            ))
+    all_attempts_failed = bool(snapshots) and all(snapshot.error for snapshot in snapshots)
+    if all_attempts_failed:
+        previous = ROLE_DISCOVERY.latest_run(career_track_id=workspace_id, workspace_id=thread_id)
+        retained = "The last successful opportunity board is still shown." if previous else "No opportunity board has been saved yet."
+        st.session_state[f"role-market-refresh-notice:{thread_id}"] = (
+            "No registered feed could be refreshed. " + retained + " " + " · ".join(errors)
+        )
+        STORE.record_event(
+            "role_discovery_refresh_failed",
+            {
+                "role_title": query.title,
+                "source_count": len(snapshots),
+                "error_count": len(errors),
+            },
+        )
+        return
+
+    st.session_state.pop(f"role-market-refresh-notice:{thread_id}", None)
+    matches = rank_openings(query, openings)
+    ROLE_DISCOVERY.save_latest_run(
+        career_track_id=workspace_id,
+        workspace_id=thread_id,
+        query=query,
+        matches=matches,
+        sources=tuple(snapshots),
+        errors=tuple(errors),
+    )
+    STORE.record_event(
+        "role_discovery_refresh",
+        {
+            "role_title": query.title,
+            "source_count": len(snapshots),
+            "opening_count": len(openings),
+            "match_count": len(matches),
+            "error_count": len(errors),
+        },
+    )
+
+
+def _role_match_card(match, thread_id: str, index: int) -> None:
+    """Present a single sourced opening and allow it to become a Job Workspace."""
+    opening = match.opening
+    with st.container(border=True):
+        st.markdown(f"#### {opening.title} · {opening.company.name}")
+        location = " · ".join(match.role_locations) if match.role_locations else "Location not listed"
+        sources = ", ".join(item.source for item in opening.provenance)
+        st.caption(f"{location} · {sources}")
+        reasons = []
+        if match.matched_title_terms:
+            reasons.append("role family: " + ", ".join(match.matched_title_terms))
+        if match.matched_profile_skills:
+            reasons.append("profile overlap: " + ", ".join(match.matched_profile_skills))
+        st.write("Why it appears: " + ("; ".join(reasons) if reasons else "matching title terms") + ".")
+        facts = opening.company
+        st.caption(f"Company facts: {facts.company_type} · {facts.employee_band} employees · {facts.funding_stage}")
+        if facts.facts_source_url:
+            st.link_button("Open company-facts source", facts.facts_source_url, type="secondary", key=f"role-facts:{thread_id}:{index}")
+        actions = st.columns(2)
+        with actions[0]:
+            if opening.source_url:
+                st.link_button("Open official listing", opening.source_url, type="secondary", key=f"role-listing:{thread_id}:{index}")
+        with actions[1]:
+            _open_discovered_job_workspace(match, f"open-role-match:{thread_id}:{index}")
+
+
+def _open_discovered_job_workspace(match, key: str) -> None:
+    """Turn a chosen raw opening into a normal evidence-preparation workspace."""
+    if st.button("Create job workspace", key=key):
+        opening = match.opening
+        wid = st.session_state["active_scope"][0]
+        job_text = opening.description or ""
+        if opening.location:
+            job_text = f"Location: {opening.location}\n\n{job_text}".strip()
+        draft = {
+            **WORKSPACES.shared_profile(),
+            "job_title": opening.title,
+            "company": opening.company.name,
+            "job_url": opening.source_url or "",
+            "job_text": job_text,
+        }
+        tid = WORKSPACES.create_thread(wid, f"{opening.title} — {opening.company.name}"[:100], draft)
+        st.session_state[f"pending_thread:{wid}"] = tid
+        st.rerun()
+
+
+# A deliberately conservative coordinate lookup for the local map.  We only
+# pin unambiguous, country/region-qualified listing locations; an unmatched
+# string remains visible in the source list rather than being guessed from a
+# company HQ or a same-named city elsewhere in the world.
+_ROLE_LOCATION_COORDINATES = {
+    "amsterdam, netherlands": (52.3676, 4.9041),
+    "austin, tx": (30.2672, -97.7431),
+    "austin, texas": (30.2672, -97.7431),
+    "bengaluru, india": (12.9716, 77.5946),
+    "berlin, germany": (52.5200, 13.4050),
+    "dublin, ireland": (53.3498, -6.2603),
+    "london, england": (51.5072, -0.1276),
+    "london, gb": (51.5072, -0.1276),
+    "london, uk": (51.5072, -0.1276),
+    "london, united kingdom": (51.5072, -0.1276),
+    "mountain view, ca": (37.3861, -122.0839),
+    "mountain view, california": (37.3861, -122.0839),
+    "new york, ny": (40.7128, -74.0060),
+    "new york, new york": (40.7128, -74.0060),
+    "new york, us": (40.7128, -74.0060),
+    "new york, united states": (40.7128, -74.0060),
+    "palo alto, ca": (37.4419, -122.1430),
+    "palo alto, california": (37.4419, -122.1430),
+    "palo alto, us": (37.4419, -122.1430),
+    "palo alto, united states": (37.4419, -122.1430),
+    "madrid, es": (40.4168, -3.7038),
+    "madrid, spain": (40.4168, -3.7038),
+    "paris, france": (48.8566, 2.3522),
+    "paris, fr": (48.8566, 2.3522),
+    "san francisco, ca": (37.7749, -122.4194),
+    "san francisco, california": (37.7749, -122.4194),
+    "san francisco, us": (37.7749, -122.4194),
+    "san francisco, united states": (37.7749, -122.4194),
+    "seattle, wa": (47.6062, -122.3321),
+    "seattle, washington": (47.6062, -122.3321),
+    "singapore, singapore": (1.3521, 103.8198),
+    "toronto, ontario": (43.6532, -79.3832),
+    "toronto, canada": (43.6532, -79.3832),
+    "zurich, switzerland": (47.3769, 8.5417),
+    "zurich, ch": (47.3769, 8.5417),
+}
+
+
+def _role_location_segments(location: str) -> tuple[str, ...]:
+    """Split only explicit multi-location separators from a source listing."""
+    normalized = location.replace("\n", " • ").replace(";", " • ").replace("|", " • ")
+    return tuple(segment.strip(" ,") for segment in normalized.split("•") if segment.strip(" ,"))
+
+
+def _coordinates_for_role_location(location: str) -> tuple[float, float] | None:
+    normalized = " ".join(location.casefold().split())
+    return _ROLE_LOCATION_COORDINATES.get(normalized)
+
+
+def _coordinate_points_for_role_location(location: str) -> tuple[tuple[str, tuple[float, float]], ...]:
+    """Return every unambiguous city included in a source-listed location."""
+    return tuple(
+        (segment, coordinates)
+        for segment in _role_location_segments(location)
+        if (coordinates := _coordinates_for_role_location(segment))
+    )
+
+
+def _role_location_map(matches, thread_id: str) -> None:
+    """Map only listing-stated locations—never company HQs as a proxy for a role."""
+    companies = sorted({match.opening.company.name for match in matches}, key=str.casefold)
+    if not companies:
+        return
+    selected_company = st.selectbox(
+        "Inspect a company's role locations",
+        companies,
+        key=f"role-location-company:{thread_id}",
+    )
+    selected = [match for match in matches if match.opening.company.name == selected_company]
+    by_location: dict[str, list] = {}
+    for match in selected:
+        for location in match.role_locations:
+            by_location.setdefault(location, []).append(match)
+    st.markdown(f"### {selected_company} role locations")
+    st.caption("These pins come only from the locations listed on matching job openings. They are not headquarters or general company-footprint claims.")
+    points_by_location: dict[str, dict] = {}
+    for location, location_matches in by_location.items():
+        for map_location, coordinates in _coordinate_points_for_role_location(location):
+            latitude, longitude = coordinates
+            point = points_by_location.setdefault(map_location, {
+                "location": map_location,
+                "roles": [],
+                "latitude": latitude,
+                "longitude": longitude,
+                "count": 0,
+            })
+            point["roles"].extend(match.opening.title for match in location_matches)
+            point["count"] += len(location_matches)
+    points = [
+        {
+            **point,
+            "roles": " · ".join(dict.fromkeys(point["roles"])),
+            "radius": point["count"] * 45_000,
+        }
+        for point in points_by_location.values()
+    ]
+    if points:
+        layer = pdk.Layer(
+            "ScatterplotLayer",
+            id=f"role-location-markers:{thread_id}",
+            data=points,
+            get_position=["longitude", "latitude"],
+            get_radius="radius",
+            get_fill_color=[210, 130, 75, 205],
+            radius_min_pixels=8,
+            radius_max_pixels=19,
+            pickable=True,
+            auto_highlight=True,
+        )
+        latitude = sum(point["latitude"] for point in points) / len(points)
+        longitude = sum(point["longitude"] for point in points) / len(points)
+        deck = pdk.Deck(
+            layers=[layer],
+            initial_view_state=pdk.ViewState(latitude=latitude, longitude=longitude, zoom=3.2 if len(points) == 1 else 1.3, pitch=0),
+            map_style="https://basemaps.cartocdn.com/gl/positron-gl-style/style.json",
+            tooltip={
+                "html": "<b>{location}</b><br/>{roles}",
+                "style": {"backgroundColor": "#173a31", "color": "#fffef8"},
+            },
+        )
+        st.pydeck_chart(deck, use_container_width=True, height=330, key=f"role-location-map:{thread_id}")
+    elif by_location:
+        st.info("Matching openings list locations, but this local map has no unambiguous coordinate match for them yet. The locations are shown below without a pin.")
+    else:
+        st.info("The matching openings did not state a location. The app will not replace it with a company HQ.")
+    for location, location_matches in by_location.items():
+        st.markdown(f"- **{location}** — " + "; ".join(match.opening.title for match in location_matches))
+
+
+def _permitted_sources() -> None:
+    """Keep custom source reads and imports available without crowding role discovery."""
+    st.subheader("Bring a lawful source")
+    st.caption("Use an official employer board you know, an authorized employer integration, or a job export you obtained lawfully. These are separate from the small registered-feed role market.")
     source, identifier = st.columns(2)
     with source:
         source_kind = st.selectbox("Public source", ["Greenhouse", "Lever", "Recruitee"])
     with identifier:
         token = st.text_input("Board identifier", help="Greenhouse board token, Lever site handle, or Recruitee company slug.")
-    if st.button("Fetch and monitor public job postings"):
+    if st.button("Fetch this official company board"):
         try:
             if source_kind == "Greenhouse":
                 jobs = fetch_greenhouse_jobs(token)
@@ -628,21 +1239,8 @@ def _opportunities(workspace_id: str, thread_id: str) -> None:
         st.markdown(f"- **{job.title}** · {job.company} · {job.location or 'Location not listed'}" + (f" · [Official page]({job.url})" if job.url else ""))
         _open_job_thread(job, f"open-source:{index}")
 
-    st.divider()
-    st.subheader("Official-platform connectors")
-    st.caption("Tokens are used for this request only and are never saved. No profile scraping, messaging, or posting.")
-    official_tab, import_tab = st.tabs(["Official APIs", "Import your lawful export"])
-    with official_tab:
-        linkedin_token = st.text_input("LinkedIn OAuth access token", value=os.environ.get("LINKEDIN_ACCESS_TOKEN", ""), type="password", help="Requires a LinkedIn app and OIDC permissions. Verifies the connected account only.")
-        if st.button("Verify authorized LinkedIn identity"):
-            try:
-                identity = fetch_linkedin_authorized_identity(linkedin_token)
-                st.session_state["linkedin_identity"] = identity
-                STORE.record_event("linkedin_authorized_identity", {"subject": identity.subject})
-            except Exception as exc:
-                st.error(str(exc))
-        if identity := st.session_state.get("linkedin_identity"):
-            st.success(f"Authorized LinkedIn identity: {identity.name or identity.subject}")
+    with st.expander("Authorized employer integration", expanded=False):
+        st.caption("Use SmartRecruiters only when the employer has given you a permitted Posting API token. Tokens are used for this request only and are never stored.")
         smart_company = st.text_input("SmartRecruiters company identifier")
         smart_token = st.text_input("SmartRecruiters Posting API token", type="password")
         if st.button("Fetch SmartRecruiters postings through the official API"):
@@ -657,67 +1255,22 @@ def _opportunities(workspace_id: str, thread_id: str) -> None:
         for index, job in enumerate(st.session_state.get("smart_jobs", [])[:20]):
             st.markdown(f"- **{job.title}** · {job.company}" + (f" · [Official page]({job.url})" if job.url else ""))
             _open_job_thread(job, f"open-smart:{index}")
-        x_query = st.text_input("X API v2 recent-search query", placeholder='("hiring" OR "we are hiring") (AI OR software) lang:en')
-        x_token = st.text_input("X API v2 bearer token", value=os.environ.get("X_BEARER_TOKEN", ""), type="password")
-        x_count = st.slider("Maximum posts", min_value=10, max_value=100, value=10)
-        if st.button("Search recent X posts through the official API"):
-            try:
-                signals = fetch_x_recent_posts(x_query, x_token, x_count)
-                st.session_state["x_signals"] = signals
-                STORE.record_event("x_official_recent_search", {"query": x_query, "count": len(signals)})
-            except Exception as exc:
-                st.error(str(exc))
-        for signal in st.session_state.get("x_signals", []):
-            st.markdown(f"- {signal.text}" + (f" · [Open source post]({signal.url})" if signal.url else ""))
-    with import_tab:
-        st.caption("Upload CSV or JSON that you personally exported or obtained with permission. Up to 500 records/5 MB; imported facts remain reviewable.")
-        contact_export = st.file_uploader("Contact export (.csv or .json)", type=["csv", "json"], key="contact_export")
-        if contact_export and st.button("Import contact export"):
-            try:
-                leads = import_contact_export(contact_export.getvalue(), contact_export.name)
-                st.session_state["imported_leads"] = leads
-                STORE.record_event("contact_export_import", {"filename": contact_export.name, "count": len(leads)})
-                st.success(f"Imported {len(leads)} contacts for review.")
-            except Exception as exc:
-                st.error(str(exc))
-        job_export = st.file_uploader("Job export (.csv or .json)", type=["csv", "json"], key="job_export")
-        if job_export and st.button("Import job export"):
-            try:
-                jobs = import_job_export(job_export.getvalue(), job_export.name)
-                st.session_state["imported_jobs"] = jobs
-                STORE.record_event("job_export_import", {"filename": job_export.name, "count": len(jobs)})
-                st.success(f"Imported {len(jobs)} evidence-ready job records.")
-            except Exception as exc:
-                st.error(str(exc))
-        for index, job in enumerate(st.session_state.get("imported_jobs", [])[:20]):
-            st.markdown(f"- **{job.title}** · {job.company}" + (f" · [Source]({job.url})" if job.url else ""))
-            _open_job_thread(job, f"open-import:{index}")
 
-    st.divider()
-    st.subheader("Human-reviewed contact research")
-    result = st.session_state.get("analysis")
-    default_company = result.job.company if result else ""
-    default_title = result.job.title if result else ""
-    company = st.text_input("Target company", value=default_company, key="contact_company")
-    title = st.text_input("Target role", value=default_title, key="contact_title")
-    contact_scope = st.session_state.get("active_scope", ("", "local"))[1]
-    lead_text = st.text_area("Verified public contacts (one per line: Name | Role | public profile URL | public email if explicitly published)", height=110, key=f"contacts:{contact_scope}")
-    observed_pattern = st.text_input("Observed company email format (optional; never used to generate addresses)", placeholder="first.last@company.com", key=f"email-pattern:{contact_scope}")
-    if st.button("Create research checklist"):
-        leads = [*st.session_state.get("imported_leads", []), *parse_contact_leads(lead_text)]
-        plan = contact_research_plan(company, title, leads, observed_pattern or None)
-        st.session_state["contact_plan"] = plan
-        STORE.record_event("contact_research_plan", {"company": company, "lead_count": len(plan.leads)})
-    plan = st.session_state.get("contact_plan")
-    if plan:
-        st.warning(plan.safety_note)
-        st.write("**Prioritize:** " + " → ".join(plan.target_roles))
-        st.write("**Manual search queries:**")
-        st.code("\n".join(plan.search_queries))
-        if plan.leads:
-            st.dataframe([lead.model_dump() for lead in plan.leads], use_container_width=True, hide_index=True)
-        if plan.email_pattern:
-            st.caption(f"Observed format recorded: {plan.email_pattern}. This is not an individual email address and must not be used to guess one.")
+    st.markdown("#### Import a licensed or user-provided job export")
+    st.caption("Upload CSV or JSON you personally exported or obtained with permission. Up to 500 records/5 MB; imported facts remain reviewable.")
+    job_export = st.file_uploader("Job export (.csv or .json)", type=["csv", "json"], key="job_export")
+    if job_export and st.button("Import job export"):
+        try:
+            jobs = import_job_export(job_export.getvalue(), job_export.name)
+            st.session_state["imported_jobs"] = jobs
+            STORE.record_event("job_export_import", {"filename": job_export.name, "count": len(jobs)})
+            st.success(f"Imported {len(jobs)} evidence-ready job records.")
+        except Exception as exc:
+            st.error(str(exc))
+    for index, job in enumerate(st.session_state.get("imported_jobs", [])[:20]):
+        st.markdown(f"- **{job.title}** · {job.company}" + (f" · [Source]({job.url})" if job.url else ""))
+        _open_job_thread(job, f"open-import:{index}")
+
     with st.expander("Local monitoring registry"):
         st.caption("Monitoring is user-triggered only. Source identifiers are retained locally; credentials are never stored.")
         watches = MONITOR.watches()
