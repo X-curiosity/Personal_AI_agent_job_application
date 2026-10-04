@@ -78,7 +78,7 @@ uv run --no-sync tau-job-application agent fixtures/candidate.txt fixtures/job.t
 | CV tailoring | Summary, relevant skill ordering, and section-editing advice | **Not a complete rewritten résumé or PDF/DOCX export** |
 | Authenticity review | Generic-phrase and claim/outcome heuristics | Cannot establish authorship or factual truth; known false-acceptance cases exist |
 | Learning plan | Missing-skill list, selected prerequisites, small static resource catalog | Not yet an adaptive knowledge model or interactive dependency graph |
-| Project plan | Up to three generic briefs with milestones, deliverables, and acceptance checks | No live project research or company-specific project design |
+| Standout project plan | One focused proof project and, only when useful, one sequenced integration project for unmet, evidence-backed role gaps, with milestones, deliverables, and acceptance checks | No live project research or company-specific project design; proposed work is never counted as completed evidence |
 | Job monitoring | User-triggered refreshes of individual permitted boards, local snapshots, and newly observed fingerprints | No scheduled alerts, reliable closure detection, or cross-source deduplication |
 | LinkedIn handoff | Opens a user-selected role search on LinkedIn | No LinkedIn listing feed/import, profile or people search, scraping, or outreach |
 | Interview practice | Role-specific questions, typed responses, keyword-based feedback, and a saved practice history inside each Job Workspace | Measures answer structure heuristically, not technical correctness |
@@ -133,7 +133,7 @@ The tables are `career_workspaces`, `career_threads`, `career_messages`, `career
 8. Act in the contextual windows:
    - **CV studio:** evidence-aware, copy-ready CV guidance and a claim-safety review.
    - **Evidence match:** an evidence-only score for this role. Add completed work you can substantiate with your contribution, skills, a non-confidential proof reference, and an observable outcome/test. It retains CV coverage separately, and never treats a missing or unrelated project as a zero.
-   - **Proof projects:** separates your finished evidence from gap-driven project briefs, milestones, deliverables, acceptance checks, and a README outline. A proposed project does not earn Evidence match credit until it is actually complete and you explicitly add its proof.
+   - **Proof projects:** separates your finished evidence from one or two gap-driven standout projects. The first makes the highest-priority unmet skill visible; an optional second integrates the first few remaining gaps into a stronger portfolio case. When eligible completed project proof already covers the gap, the suggestion disappears rather than creating redundant work. A proposed project does not earn Evidence match credit until it is actually complete and you explicitly add its proof.
    - **Interview lab:** role-specific questions, structured feedback, and saved rehearsal history.
    - **Role market:** a role-first opportunity board built only when you choose to refresh registered Greenhouse or Ashby public feeds. It offers editable title aliases, local CV-skill ranking, source-aware filters, listing-location pins, a separate company-research view, and lawful manual-source options.
    - **Coach:** job-scoped local guidance or optional consented AI coaching.

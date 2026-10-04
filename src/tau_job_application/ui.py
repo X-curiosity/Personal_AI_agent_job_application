@@ -28,7 +28,9 @@ from tau_job_application.official_sources import (
     import_job_export,
 )
 from tau_job_application.monitoring import JobMonitor
+from tau_job_application.matching import normalize_skill
 from tau_job_application.parsing import KNOWN_SKILLS, infer_profile_links, load_document
+from tau_job_application.planning import build_project_plans
 from tau_job_application.requirement_memory import RequirementMemory, document_key
 from tau_job_application.requirements import extract_requirements, save_requirement_review
 from tau_job_application.role_discovery import (
@@ -82,6 +84,17 @@ def _evidence_match_for(result, workspace_id: str, thread_id: str):
         result.job,
         _evidence_store().list_projects(workspace_id, thread_id),
     )
+
+
+def _standout_plans(result, assessment):
+    """Recommend a build only for gaps not already backed by eligible project proof."""
+
+    covered_skills = [
+        support.skill
+        for support in assessment.requirement_supports
+        if support.support > 0
+    ]
+    return build_project_plans(result.skill_tree, covered_skills=covered_skills)
 
 
 STYLES = """
@@ -197,12 +210,19 @@ def _job_workspace_dashboard(workspace_id: str, thread_id: str) -> None:
     missing = [item.skill for item in result.match.requirements if item.status == "missing"]
     practice_average = round(sum(item["score"] for item in attempts) / len(attempts)) if attempts else None
     evidence_match = _evidence_match_for(result, workspace_id, thread_id)
-    coverage_note = f"{len(matched)} shown · {len(missing)} to build"
+    standout_plans = _standout_plans(result, evidence_match)
+    project_backed = {
+        normalize_skill(support.skill)
+        for support in evidence_match.requirement_supports
+        if support.support > 0
+    }
+    missing_to_build = [skill for skill in missing if normalize_skill(skill) not in project_backed]
+    coverage_note = f"{len(matched)} CV shown · {len(missing_to_build)} to build"
     cards = st.columns(5)
     _metric_card(cards[0], "Requirement evidence coverage", f"{result.match.score}%", coverage_note)
     _metric_card(cards[1], "CV guidance", f"{result.cv_score.score if result.cv_score else '—'}%", "Document readiness, not a hiring prediction")
     _metric_card(cards[2], "Interview practice", f"{practice_average if practice_average is not None else '—'}", f"{len(attempts)} saved rehearsal{'s' if len(attempts) != 1 else ''}")
-    _metric_card(cards[3], "Proof gaps", str(len(missing)), "Role requirements without CV evidence")
+    _metric_card(cards[3], "Proof gaps", str(len(missing_to_build)), "Requirements without CV or eligible project proof")
     evidence_value = f"{evidence_match.score}%" if evidence_match.score is not None else "—"
     evidence_note = (
         "CV + completed project evidence" if evidence_match.score is not None
@@ -211,7 +231,7 @@ def _job_workspace_dashboard(workspace_id: str, thread_id: str) -> None:
     _metric_card(cards[4], "Evidence match", evidence_value, evidence_note)
 
     st.markdown("<div class='section-kicker'>Your next best move</div>", unsafe_allow_html=True)
-    next_action, destination, reason = _next_action(result, attempts)
+    next_action, destination, reason = _next_action(result, attempts, standout_plans)
     st.markdown(
         f"<div class='next-action'><strong>{escape(next_action)}</strong><br><span>{escape(reason)} Open <strong>{escape(destination)}</strong> to work on it.</span></div>",
         unsafe_allow_html=True,
@@ -221,7 +241,7 @@ def _job_workspace_dashboard(workspace_id: str, thread_id: str) -> None:
     route = st.columns(4)
     _path_card(route[0], "01 · Map", "Job evidence", f"{len(result.job.requirements)} requirements reviewed from this role.")
     _path_card(route[1], "02 · Strengthen", "CV guidance", "Truthful edits tied to the experience you already show.")
-    _path_card(route[2], "03 · Prove", "Standout project", _project_summary(result))
+    _path_card(route[2], "03 · Prove", "Standout project", _project_summary(standout_plans))
     _path_card(route[3], "04 · Rehearse", "Interview stories", _practice_summary(attempts))
 
     left, right = st.columns([1.13, 0.87], gap="large")
@@ -236,15 +256,17 @@ def _job_workspace_dashboard(workspace_id: str, thread_id: str) -> None:
                 st.write("No confirmed requirement evidence yet. Add your CV or review the job brief before making claims.")
         st.markdown("<div class='section-kicker' style='margin-top:1rem'>Proof to build</div>", unsafe_allow_html=True)
         with st.container(border=True):
-            if missing:
-                st.write(" · ".join(missing[:8]))
+            if missing_to_build:
+                st.write(" · ".join(missing_to_build[:8]))
                 st.caption("These are gaps in the available evidence—not a judgment of your ability or a prediction of hiring.")
+            elif missing:
+                st.write("Your completed project proof covers the remaining CV evidence gap(s).")
             else:
                 st.write("No missing scored requirement evidence was found in the current job brief.")
     with right:
         st.markdown("<div class='section-kicker'>This week's preparation plan</div>", unsafe_allow_html=True)
         with st.container(border=True):
-            for index, action in enumerate(_weekly_actions(result, attempts), 1):
+            for index, action in enumerate(_weekly_actions(result, attempts, standout_plans), 1):
                 st.markdown(f"**{index}.** {action}")
             st.caption("These are recommendations for this selected role; they do not submit applications or invent experience.")
 
@@ -287,12 +309,12 @@ def _path_card(column, step: str, title: str, detail: str) -> None:
     )
 
 
-def _next_action(result, attempts: list[dict]) -> tuple[str, str, str]:
-    missing = [item.skill for item in result.match.requirements if item.status == "missing"]
+def _next_action(result, attempts: list[dict], standout_plans) -> tuple[str, str, str]:
     if result.authenticity_report and result.authenticity_report.status == "blocked":
         return ("Resolve unsupported CV claims first.", "CV studio", "The workspace cannot safely turn unsupported claims into application language.")
-    if missing and result.project_plans:
-        return (f"Scope {result.project_plans[0].title}.", "Proof projects", f"It is the clearest next chance to build evidence for {', '.join(missing[:2])}.")
+    if standout_plans:
+        plan = standout_plans[0]
+        return (f"Build standout evidence: {plan.title}.", "Proof projects", f"It is the clearest next chance to build evidence for {', '.join(plan.skills_practised[:2])}.")
     if not attempts:
         return ("Complete your first role-specific rehearsal.", "Interview lab", "The question bank is grounded in this job's current requirements.")
     if result.cv_score and result.cv_score.next_actions:
@@ -300,11 +322,11 @@ def _next_action(result, attempts: list[dict]) -> tuple[str, str, str]:
     return ("Review your evidence and choose one thing to strengthen.", "CV studio", "Keep every claim grounded in work you can explain and support.")
 
 
-def _project_summary(result) -> str:
-    if not result.project_plans:
-        return "No new project is suggested from the current evidence gaps."
-    plan = result.project_plans[0]
-    return f"{plan.title} · about {plan.estimated_hours} hours."
+def _project_summary(standout_plans) -> str:
+    if not standout_plans:
+        return "No standout project is needed from the current evidence gaps."
+    plan = standout_plans[0]
+    return f"Standout: {plan.title} · about {plan.estimated_hours} hours."
 
 
 def _practice_summary(attempts: list[dict]) -> str:
@@ -314,12 +336,12 @@ def _practice_summary(attempts: list[dict]) -> str:
     return f"{len(attempts)} saved rehearsal{'s' if len(attempts) != 1 else ''} across {', '.join(categories)}."
 
 
-def _weekly_actions(result, attempts: list[dict]) -> list[str]:
+def _weekly_actions(result, attempts: list[dict], standout_plans) -> list[str]:
     actions: list[str] = []
     if result.cv_score:
         actions.extend(result.cv_score.next_actions[:1])
-    if result.project_plans:
-        plan = result.project_plans[0]
+    if standout_plans:
+        plan = standout_plans[0]
         actions.append(f"Choose the first milestone for “{plan.title}” and define its proof of completion.")
     if not attempts:
         actions.append("Practice one job-specific interview question and save the feedback in Interview lab.")
@@ -649,7 +671,7 @@ def _project_studio(workspace_id: str, thread_id: str) -> None:
     thread = WORKSPACES.thread(workspace_id, thread_id)
     result = thread["analysis"] if not thread["stale"] else None
     st.subheader("Proof projects")
-    st.caption("Build a small, finished piece of evidence you can show and discuss. A project is not work experience until you have actually completed it.")
+    st.caption("When the role needs stronger evidence, we recommend one focused project and, only when useful, one flagship integration project. A project is not work experience until you have actually completed it.")
     if thread["stale"]:
         st.warning("Refresh the Job brief first. Project recommendations are held back while the role evidence is stale.")
         return
@@ -675,26 +697,40 @@ def _project_studio(workspace_id: str, thread_id: str) -> None:
             st.info("These completed projects are retained as your evidence inventory, but none is being used for this role's score.")
     else:
         st.info("No completed project evidence has been added for this Job Workspace. Add real, finished work in Evidence match; planned briefs below do not count.")
-    if not result.project_plans:
-        st.success("The current job analysis did not identify a project gap that needs a new portfolio piece.")
+    standout_plans = _standout_plans(result, assessment)
+    if not standout_plans:
+        st.success("The current job analysis did not identify an evidence gap that needs a standout project.")
         return
 
-    st.markdown("#### Projects to build")
-    missing = {item.skill for item in result.match.requirements if item.status == "missing"}
-    requirement_by_skill = {requirement.skill: requirement for requirement in result.job.requirements}
+    st.markdown("#### Standout projects to build")
+    missing_by_skill = {
+        normalize_skill(item.skill): item.skill
+        for item in result.match.requirements
+        if item.status == "missing"
+    }
+    requirement_by_skill = {
+        normalize_skill(requirement.skill): requirement
+        for requirement in result.job.requirements
+    }
     evidence_by_id = {item.id: item for item in result.job.evidence}
-    st.markdown("<div class='quiet-panel'><strong>What makes a project stand out here?</strong><br>It should solve a credible problem, demonstrate the relevant skills, include a working proof, and explain your trade-offs and limitations.</div>", unsafe_allow_html=True)
-    for index, plan in enumerate(result.project_plans, 1):
-        addressed = [skill for skill in plan.skills_practised if skill in missing]
-        with st.expander(f"{index}. {plan.title} · about {plan.estimated_hours} hours", expanded=index == 1):
+    count_note = "One focused project is enough for this role." if len(standout_plans) == 1 else "Build these in sequence; the second turns the first project's proof into a stronger end-to-end portfolio case."
+    st.markdown(f"<div class='quiet-panel'><strong>{escape(count_note)}</strong><br>We only surface these because the current role has unproven requirements. A standout project should solve a credible problem, make the relevant skills visible, include a working proof, and explain trade-offs and limitations.</div>", unsafe_allow_html=True)
+    for index, plan in enumerate(standout_plans, 1):
+        addressed = [
+            (skill, missing_by_skill[normalize_skill(skill)])
+            for skill in plan.skills_practised
+            if normalize_skill(skill) in missing_by_skill
+        ]
+        project_kind = "Focused proof" if index == 1 else "Flagship integration"
+        with st.expander(f"{index}. {project_kind}: {plan.title} · about {plan.estimated_hours} hours", expanded=index == 1):
             st.markdown(f"**Why this helps:** {plan.problem}")
             if addressed:
-                st.markdown("**Evidence gaps it can help you address:** " + ", ".join(addressed))
-                for skill in addressed:
-                    requirement = requirement_by_skill.get(skill)
+                st.markdown("**Evidence gaps it can help you address:** " + ", ".join(actual_skill for _, actual_skill in addressed))
+                for plan_skill, actual_skill in addressed:
+                    requirement = requirement_by_skill.get(normalize_skill(plan_skill))
                     source = evidence_by_id.get(requirement.evidence_id) if requirement else None
                     if source:
-                        st.caption(f"{skill} in this job brief: “{source.quote}”")
+                        st.caption(f"{actual_skill} in this job brief: “{source.quote}”")
             else:
                 st.caption("This is a supporting project idea; it is not being presented as proof of a missing requirement.")
             milestones, proof = st.columns(2)

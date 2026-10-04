@@ -1,5 +1,8 @@
 """Deterministic gap-to-learning and gap-to-portfolio planning."""
 
+from collections.abc import Iterable
+
+from tau_job_application.matching import normalize_skill
 from tau_job_application.models import LearningResource, MatchResult, ProjectPlan, RequirementStatus, SkillNode
 
 KNOWLEDGE = {
@@ -51,17 +54,33 @@ def build_skill_tree(match: MatchResult) -> list[SkillNode]:
     return nodes
 
 
-def build_project_plans(skill_tree: list[SkillNode]) -> list[ProjectPlan]:
-    """Produce up to three sequenced briefs, never represent them as completed work."""
-    if not skill_tree:
+def build_project_plans(
+    skill_tree: list[SkillNode], *, covered_skills: Iterable[str] = ()
+) -> list[ProjectPlan]:
+    """Produce one or two sequenced standout briefs for real evidence gaps.
+
+    A candidate should be able to finish and explain these.  The first is a
+    focused proof for the highest-priority gap; the optional second turns the
+    first few gaps into one integrated portfolio piece.  More suggestions make
+    a preparation plan less actionable, so this function never emits a third
+    "production extension" as a separate project.
+    """
+    covered = {
+        normalize_skill(skill)
+        for skill in covered_skills
+        if isinstance(skill, str) and skill.strip()
+    }
+    remaining = [
+        node for node in skill_tree
+        if normalize_skill(node.skill) not in covered
+    ]
+    if not remaining:
         return []
-    skills = [node.skill for node in skill_tree]
+    skills = [node.skill for node in sorted(remaining, key=lambda node: node.priority != "high")]
     plans = [_foundation_project(skills[0])]
     if len(skills) > 1:
         plans.append(_integration_project(skills[: min(3, len(skills))]))
-    if len(skills) > 3:
-        plans.append(_production_project(skills[1: min(5, len(skills))]))
-    return plans[:3]
+    return plans
 
 
 def _foundation_project(skill: str) -> ProjectPlan:
@@ -86,16 +105,4 @@ def _integration_project(skills: list[str]) -> ProjectPlan:
         deliverables=["Design note", "Source repository", "Tests", "Demo video or screenshots", "Architecture diagram"],
         acceptance_tests=["Each claimed skill is linked to code, a command, or an architecture decision", "A failure case has a test", "A reviewer can reproduce the demo from the README"],
         readme_outline=["Problem and user", "Requirements", "Architecture", "Local run", "Tests", "Demo", "Trade-offs", "Learning notes"],
-    )
-
-
-def _production_project(skills: list[str]) -> ProjectPlan:
-    return ProjectPlan(
-        title="Production-readiness extension",
-        problem="Extend the integration project with reliability, deployment, and measured operating behaviour.",
-        skills_practised=skills, estimated_hours=12,
-        milestones=["Choose one realistic reliability risk", "Add observability or deployment", "Measure a before/after behaviour", "Write an incident or trade-off note"],
-        deliverables=["Deployment or automation configuration", "Measurement output", "Operational runbook", "Short postmortem/trade-off note"],
-        acceptance_tests=["A fresh environment can deploy or run the project", "The repository contains a measured result", "The runbook describes recovery or rollback"],
-        readme_outline=["Objective", "Deployment", "Monitoring", "Measurement", "Runbook", "Trade-offs"],
     )

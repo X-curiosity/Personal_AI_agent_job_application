@@ -43,3 +43,6 @@ def test_completed_project_evidence_is_saved_only_after_candidate_confirmation(t
     workspace_id, thread_id = app.session_state["active_scope"]
     saved = EvidenceMatchStore(db).list_projects(workspace_id, thread_id)
     assert [(project.title, project.skills) for project in saved] == [("Dockerized service", ("Docker",))]
+    analysis = workspace_store.thread(workspace_id, thread_id)["analysis"]
+    assessment = ui.calculate_evidence_match(analysis.candidate, analysis.job, saved)
+    assert ui._standout_plans(analysis, assessment) == []
