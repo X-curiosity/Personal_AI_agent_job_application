@@ -55,6 +55,18 @@ class WorkspaceStore:
                     role TEXT NOT NULL CHECK(role IN ('user', 'assistant')),
                     content TEXT NOT NULL, mode TEXT NOT NULL, created_at TEXT NOT NULL
                 );
+                CREATE TABLE IF NOT EXISTS career_interview_attempts (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    thread_id TEXT NOT NULL REFERENCES career_threads(id) ON DELETE CASCADE,
+                    question_id TEXT NOT NULL,
+                    category TEXT NOT NULL,
+                    question TEXT NOT NULL,
+                    answer TEXT NOT NULL,
+                    score INTEGER NOT NULL CHECK(score BETWEEN 0 AND 100),
+                    strengths_json TEXT NOT NULL,
+                    missing_json TEXT NOT NULL,
+                    created_at TEXT NOT NULL
+                );
                 CREATE TABLE IF NOT EXISTS career_shared_profile (
                     id INTEGER PRIMARY KEY CHECK(id=1), profile_json TEXT NOT NULL, updated_at TEXT NOT NULL
                 );
@@ -92,7 +104,7 @@ class WorkspaceStore:
 
     def _workspace(self, db, workspace_id):
         if db.execute("SELECT 1 FROM career_workspaces WHERE id=?", (workspace_id,)).fetchone() is None:
-            raise ValueError("Career direction not found")
+            raise ValueError("Career track not found")
 
     def _thread(self, db, workspace_id, thread_id):
         row = db.execute("SELECT * FROM career_threads WHERE workspace_id=? AND id=?", (workspace_id, thread_id)).fetchone()
@@ -207,6 +219,67 @@ class WorkspaceStore:
             now = self._now()
             db.executemany("INSERT INTO career_messages (thread_id, role, content, mode, created_at) VALUES (?, ?, ?, ?, ?)",
                            [(thread_id, "user", question, mode, now), (thread_id, "assistant", answer, mode, now)])
+
+    def interview_attempts(self, workspace_id: str, thread_id: str) -> list[dict]:
+        """Return this job workspace's practice history, newest first."""
+        with self._connect() as db:
+            self._thread(db, workspace_id, thread_id)
+            rows = db.execute(
+                """SELECT question_id, category, question, answer, score, strengths_json,
+                          missing_json, created_at
+                   FROM career_interview_attempts
+                   WHERE thread_id=? ORDER BY id DESC""",
+                (thread_id,),
+            ).fetchall()
+        attempts = []
+        for row in rows:
+            attempt = dict(row)
+            attempt["strengths"] = json.loads(attempt.pop("strengths_json"))
+            attempt["missing"] = json.loads(attempt.pop("missing_json"))
+            attempts.append(attempt)
+        return attempts
+
+    def save_interview_attempt(
+        self,
+        workspace_id: str,
+        thread_id: str,
+        *,
+        question_id: str,
+        category: str,
+        question: str,
+        answer: str,
+        score: int,
+        strengths: list[str],
+        missing: list[str],
+    ) -> None:
+        """Persist a scored rehearsal only inside the selected job workspace."""
+        if not question_id.strip() or not category.strip() or not question.strip() or not answer.strip():
+            raise ValueError("A saved interview practice attempt needs a question and answer")
+        if len(question) > 4_000 or len(answer) > 30_000:
+            raise ValueError("Interview practice text exceeds the allowed length")
+        if not isinstance(score, int) or not 0 <= score <= 100:
+            raise ValueError("Interview practice score must be between 0 and 100")
+        if any(not isinstance(item, str) or len(item) > 4_000 for item in [*strengths, *missing]):
+            raise ValueError("Interview feedback must contain short text items")
+        with self._connect() as db:
+            self._thread(db, workspace_id, thread_id)
+            db.execute(
+                """INSERT INTO career_interview_attempts
+                   (thread_id, question_id, category, question, answer, score,
+                    strengths_json, missing_json, created_at)
+                   VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+                (
+                    thread_id,
+                    question_id.strip(),
+                    category.strip(),
+                    question.strip(),
+                    answer.strip(),
+                    score,
+                    json.dumps(strengths),
+                    json.dumps(missing),
+                    self._now(),
+                ),
+            )
 
 
 def direction_summary(threads: list[dict]) -> dict:

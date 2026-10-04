@@ -26,7 +26,7 @@ def test_prose_review_is_visible_and_used_by_quickstart(tmp_path, monkeypatch):
     next(x for x in app.button if x.label == "Save corrections for this description").click()
     app.run()
     assert not app.exception
-    next(x for x in app.button if x.label == "Build my plan").click()
+    next(x for x in app.button if x.label == "Analyze this job").click()
     app.run()
     assert not app.exception
     job = app.session_state["analysis"].job

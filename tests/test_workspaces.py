@@ -116,6 +116,41 @@ def test_move_preserves_thread_and_chat_but_changes_scope(tmp_path):
         store.thread(source, tid)
 
 
+def test_interview_practice_is_persisted_and_scoped_to_its_job_workspace(tmp_path):
+    store = WorkspaceStore(tmp_path / "local.sqlite")
+    one, two = store.create_workspace("One"), store.create_workspace("Two")
+    first = store.create_thread(one, "First role")
+    second = store.create_thread(two, "Second role")
+
+    store.save_interview_attempt(
+        one,
+        first,
+        question_id="technical-1",
+        category="technical",
+        question="How would you test this system?",
+        answer="I would define an acceptance case, add tests, and explain the trade-offs.",
+        score=72,
+        strengths=["Uses an example."],
+        missing=["State a measurable result."],
+    )
+
+    saved = store.interview_attempts(one, first)
+    assert len(saved) == 1
+    assert saved[0]["score"] == 72
+    assert saved[0]["strengths"] == ["Uses an example."]
+    assert store.interview_attempts(two, second) == []
+    with pytest.raises(ValueError):
+        store.interview_attempts(two, first)
+    with pytest.raises(ValueError):
+        store.save_interview_attempt(
+            two, first, question_id="x", category="technical", question="Question", answer="Answer",
+            score=50, strengths=[], missing=[],
+        )
+    store.delete_thread(one, first)
+    with store._connect() as db:
+        assert db.execute("SELECT count(*) FROM career_interview_attempts WHERE thread_id=?", (first,)).fetchone()[0] == 0
+
+
 def test_duplicate_directions_and_invalid_analysis_rejected(tmp_path):
     store = WorkspaceStore(tmp_path / "local.sqlite")
     wid = store.create_workspace("GPU")

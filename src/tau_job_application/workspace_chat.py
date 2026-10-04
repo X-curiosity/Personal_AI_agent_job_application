@@ -28,7 +28,7 @@ def local_reply(question: str, context: dict) -> str:
     if re.search(r"\b(compare|overlap|shared|direction|roles)\b", lower):
         shared = [entry for entry in context["direction_skills"] if len(entry["threads"]) > 1]
         jobs = context["direction_jobs"]
-        lines = [f"Career direction: {context['direction']}. {len(jobs)} current analyzed job thread(s).",
+        lines = [f"Career track: {context['direction']}. {len(jobs)} current analyzed Job Workspace(s).",
                  "Job titles are labels, not eligibility filters. Compare responsibilities and skills before narrowing your search."]
         lines += [f"- {entry['skill']}: appears in {len(entry['threads'])} threads; missing evidence in {len(entry['missing'])}." for entry in shared[:15]]
         if not shared:
