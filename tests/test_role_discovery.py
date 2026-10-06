@@ -283,6 +283,14 @@ def test_workplace_only_label_is_not_promoted_to_a_world_map_location() -> None:
     assert opening.location == "Hybrid"
     assert opening_role_locations(opening) == ()
     assert match.role_locations == ()
+    legacy_cached_match = RoleMatch(
+        opening=opening,
+        score=100,
+        title_score=100,
+        profile_skill_score=0,
+        role_locations=("Hybrid",),
+    )
+    assert legacy_cached_match.role_locations == ()
 
 
 def test_store_persists_latest_run_per_career_track_and_workspace(tmp_path: Path) -> None:

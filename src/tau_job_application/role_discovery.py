@@ -430,7 +430,18 @@ class RoleMatch(BaseModel):
     def _use_only_the_opening_location(self) -> "RoleMatch":
         expected = opening_role_locations(self.opening)
         if self.role_locations and self.role_locations != expected:
-            raise ValueError("Role locations must come only from the opening location")
+            # Role-market records written before pure work-arrangement labels
+            # were excluded from the map may carry ``("Hybrid",)`` (or an
+            # equivalent label) as a cached role location.  It came directly
+            # from the opening's old location field, so normalize that legacy
+            # value on read rather than making a saved board unparsable.
+            legacy_workplace_label = (
+                not expected
+                and self.opening.location is not None
+                and self.role_locations == (self.opening.location,)
+            )
+            if not legacy_workplace_label:
+                raise ValueError("Role locations must come only from the opening location")
         self.role_locations = expected
         return self
 
