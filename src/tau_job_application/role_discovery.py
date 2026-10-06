@@ -19,13 +19,23 @@ import json
 from pathlib import Path
 import re
 import sqlite3
-from typing import Iterable, Sequence
+from typing import Iterable, Literal, Sequence
 from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
 
 from pydantic import BaseModel, Field, field_validator, model_validator
 
 
 UNKNOWN = "Unknown"
+SourceTimestampKind = Literal["published", "created", "updated"]
+_WORKPLACE_ONLY_LOCATION_LABELS = frozenset({
+    "remote",
+    "hybrid",
+    "on-site",
+    "onsite",
+    "in-office",
+    "in office",
+    "distributed",
+})
 
 
 # A small, inspectable baseline for role-family expansion.  This intentionally
@@ -228,23 +238,48 @@ DEFAULT_VETTED_COMPANY_BOARDS: tuple[VettedCompanyBoard, ...] = (
 
 
 class OpeningProvenance(BaseModel):
-    """One source observation retained when equivalent openings are merged."""
+    """One source observation retained when equivalent openings are merged.
+
+    Listing metadata stays with the observation that supplied it.  This matters
+    when two public boards happen to point to the same vacancy: an ``updated``
+    timestamp from one board must not be relabelled as a ``published`` timestamp
+    from another.
+    """
 
     source: str = Field(min_length=1)
     source_identifier: str | None = None
     external_id: str | None = None
     source_url: str | None = None
     retrieved_at: str | None = None
+    workplace_type: str | None = None
+    employment_type: str | None = None
+    source_timestamp: str | None = None
+    source_timestamp_kind: SourceTimestampKind | None = None
 
     @field_validator("source")
     @classmethod
     def _validate_source(cls, value: str) -> str:
         return _required_text(value, "Source")
 
-    @field_validator("source_identifier", "external_id", "source_url", "retrieved_at", mode="before")
+    @field_validator(
+        "source_identifier",
+        "external_id",
+        "source_url",
+        "retrieved_at",
+        "workplace_type",
+        "employment_type",
+        "source_timestamp",
+        mode="before",
+    )
     @classmethod
     def _validate_optional(cls, value: str | None) -> str | None:
         return _optional_text(value)
+
+    @model_validator(mode="after")
+    def _require_timestamp_for_kind(self) -> "OpeningProvenance":
+        if self.source_timestamp_kind and not self.source_timestamp:
+            raise ValueError("Source timestamp kind requires a source timestamp")
+        return self
 
     @property
     def canonical_url(self) -> str | None:
@@ -278,6 +313,15 @@ class DiscoveredOpening(BaseModel):
     description: str | None = None
     location: str | None = None
     retrieved_at: str | None = None
+    # These fields are copied only from the public listing response.  They are
+    # intentionally not inferred from title, location, company facts, or a
+    # different source.  ``source_timestamp_kind`` distinguishes a listing's
+    # published, created, and updated timestamps; legacy records may have a
+    # timestamp without this semantics label.
+    workplace_type: str | None = None
+    employment_type: str | None = None
+    source_timestamp: str | None = None
+    source_timestamp_kind: SourceTimestampKind | None = None
     provenance: tuple[OpeningProvenance, ...] = Field(default_factory=tuple)
 
     @field_validator("title", "source")
@@ -292,6 +336,9 @@ class DiscoveredOpening(BaseModel):
         "description",
         "location",
         "retrieved_at",
+        "workplace_type",
+        "employment_type",
+        "source_timestamp",
         mode="before",
     )
     @classmethod
@@ -306,9 +353,19 @@ class DiscoveredOpening(BaseModel):
             external_id=self.external_id,
             source_url=self.source_url,
             retrieved_at=self.retrieved_at,
+            workplace_type=self.workplace_type,
+            employment_type=self.employment_type,
+            source_timestamp=self.source_timestamp,
+            source_timestamp_kind=self.source_timestamp_kind,
         )
         combined = _unique_provenance([*self.provenance, primary])
         self.provenance = combined
+        return self
+
+    @model_validator(mode="after")
+    def _require_timestamp_for_kind(self) -> "DiscoveredOpening":
+        if self.source_timestamp_kind and not self.source_timestamp:
+            raise ValueError("Source timestamp kind requires a source timestamp")
         return self
 
     @property
@@ -420,8 +477,20 @@ class RoleDiscoveryRun(BaseModel):
 
 
 def opening_role_locations(opening: DiscoveredOpening) -> tuple[str, ...]:
-    """Return only the location stated by this opening; never a company HQ."""
-    return (opening.location,) if opening.location else ()
+    """Return only an opening's stated geographic location; never a company HQ.
+
+    Some public boards place a pure work-arrangement label such as ``Hybrid``
+    in their location field.  That is useful display information, but it is
+    not a place to map.  Keep the raw value on ``DiscoveredOpening.location``
+    while omitting it from role-location pins and company location claims.
+    """
+
+    if not opening.location:
+        return ()
+    normalized = " ".join(opening.location.casefold().split())
+    if normalized in _WORKPLACE_ONLY_LOCATION_LABELS:
+        return ()
+    return (opening.location,)
 
 
 def _title_term_score(title: str, term: str) -> int:
@@ -547,18 +616,22 @@ def _identity_keys(opening: DiscoveredOpening) -> tuple[tuple[str, ...], ...]:
     return tuple(dict.fromkeys(keys))
 
 
-def _provenance_key(item: OpeningProvenance) -> tuple[str, str, str, str, str]:
+def _provenance_key(item: OpeningProvenance) -> tuple[str, str, str, str, str, str, str, str, str]:
     return (
         item.source.casefold(),
         (item.source_identifier or "").casefold(),
         (item.external_id or "").casefold(),
         item.source_url or "",
         item.retrieved_at or "",
+        (item.workplace_type or "").casefold(),
+        (item.employment_type or "").casefold(),
+        item.source_timestamp or "",
+        item.source_timestamp_kind or "",
     )
 
 
 def _unique_provenance(items: Iterable[OpeningProvenance]) -> tuple[OpeningProvenance, ...]:
-    by_key: dict[tuple[str, str, str, str, str], OpeningProvenance] = {}
+    by_key: dict[tuple[str, str, str, str, str, str, str, str, str], OpeningProvenance] = {}
     for item in items:
         by_key[_provenance_key(item)] = item
     return tuple(by_key[key] for key in sorted(by_key))
@@ -608,6 +681,13 @@ def _merge_openings(openings: Sequence[DiscoveredOpening]) -> DiscoveredOpening:
         # stated role location deterministically; never fill this from company data.
         location=min(locations, key=str.casefold) if locations else None,
         retrieved_at=representative.retrieved_at,
+        # Keep the displayed metadata tied to the selected primary source.
+        # Metadata from every other official source remains inspectable in
+        # ``provenance`` rather than being silently relabelled as primary.
+        workplace_type=representative.workplace_type,
+        employment_type=representative.employment_type,
+        source_timestamp=representative.source_timestamp,
+        source_timestamp_kind=representative.source_timestamp_kind,
         provenance=provenance,
     )
 

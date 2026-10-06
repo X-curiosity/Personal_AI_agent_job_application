@@ -70,7 +70,7 @@ uv run --no-sync tau-job-application agent fixtures/candidate.txt fixtures/job.t
 | Profile links | GitHub, portfolio, LinkedIn, and X fields | Portfolio/social links alone do not retrieve or validate a person's work |
 | GitHub enrichment | Optional public API lookup of profile/repository language signals | No repository code review; languages are unconfirmed signals, not proof of proficiency |
 | Job intake | Natural-language descriptions, one explicitly submitted public HTTPS job URL, server-rendered/JSON-LD extraction, contextual skill/capability extraction, requirement review, company-board connectors, CSV/JSON imports | No crawling; JavaScript-only/authenticated pages may fail; English-first skill heuristics need review |
-| Role market | User-triggered refresh of registered Greenhouse and Ashby public employer feeds, editable role-family aliases, deterministic local CV-skill overlap ranking, source provenance, and a listing-location map | A small vetted registry, not a web-wide job search, hiring prediction, eligibility check, or automatic alert service |
+| Role market | User-triggered refresh of registered Greenhouse, Lever, and Ashby public employer feeds; compact source-truthful role cards, editable role-family aliases, deterministic local CV-skill overlap ranking, local saved/tracking/hidden shortlist states, source provenance, and a listing-location map | A small vetted registry, not a web-wide job search, hiring prediction, eligibility check, automatic application, automatic outreach, or alert service |
 | Extraction memory | Saved per-description corrections and explicitly approved phrase-to-skill mappings | Local Quick start memory, not LLM fine-tuning; repetition alone never confirms a mapping |
 | Role comparison | Deterministic required/preferred skill coverage | Not a probability of being hired; no comprehensive European eligibility filtering |
 | Evidence match | A transparent role-and-project evidence view: confirmed CV coverage plus user-confirmed completed projects with a proof reference and observable outcome/test | Not a prediction of an interview, offer, or hiring outcome; never derives a score from employee profiles, historic hires, LinkedIn, or unconfirmed GitHub language signals |
@@ -89,7 +89,7 @@ uv run --no-sync tau-job-application agent fixtures/candidate.txt fixtures/job.t
 | Optional agent | Bounded Tau CLI harness with domain tools; one-turn, tool-free UI coaching | Quick start scoring remains deterministic; no autonomous research subagents |
 | Persistence | Shared profile, job-workspace inputs, analysis/CV guidance, chats, and interview practice, plus legacy snapshots, audit events, and source-watch records in SQLite | Not yet a full application-status tracker, résumé version editor, or multi-user service |
 
-The [Jobright comparison](docs/JOBRIGHT_IMPROVEMENT_REPORT.md) contains the detailed code review and product backlog. It distinguishes Jobright's advertised features from independently verified behavior; marketing performance claims are not benchmarks for this project.
+The [Jobright comparison](docs/JOBRIGHT_IMPROVEMENT_REPORT.md) contains the detailed code review and product backlog. It distinguishes Jobright's advertised features from independently verified behavior; marketing performance claims are not benchmarks for this project. The [Whali-inspired Role-market direction](docs/WHALI_INSPIRED_PRODUCT_DIRECTION.md) separately records which job-board interaction patterns fit this product and which outreach-automation patterns are intentionally excluded.
 
 ## 3. How to use the interface
 
@@ -205,7 +205,7 @@ The **Role market** replaces the prior manual-contact-research entry point with 
 - The role-location map uses only locations stated on matching listings. It never substitutes a company HQ, office footprint, or inferred geography. A listed location without local coordinates is shown without a pin, and a listing with no location stays unlocated.
 - **Search this role on LinkedIn** is an outbound handoff only: it opens LinkedIn with the chosen query. The app does not scrape LinkedIn, import a LinkedIn job feed, or search people/profiles.
 - **Bring a lawful source** is separate from the registered role market: enter an official employer board you know (Greenhouse, Lever, or Recruitee), use a permitted SmartRecruiters employer token, or import a CSV/JSON job export you personally exported or obtained with permission. These inputs remain reviewable and are not silently added to the registered-feed market.
-- Registered-feed, manual-board, and imported jobs have **Create job workspace** buttons. These populate title, company, URL, and description in the current Career track, with the shared CV as a starting point. Review the new workspace and analyze the job.
+- Registered-feed role cards distinguish **Open official application** from **Prepare this application**. The first opens the supplied employer page; the second creates (or reopens) a local preparation workspace. Manual-board and imported jobs retain **Create job workspace** buttons. The workspace pre-fills title, company, URL, and description in the current Career track, with the shared CV as a starting point. Review the new workspace and analyze the job; opening, saving, tracking, or preparing a listing does not record an application as submitted.
 - **Profile company explorer** is a separate research view, using a small local catalogue and skill overlap from the selected Job Workspace's CV (or the saved shared profile if this workspace has no CV). Its source-linked HQ/research/engineering-hub footprint is not the role-location map and never supplies locations for an opening.
 
 Example CSV schema for a lawful job export:
@@ -340,7 +340,7 @@ See [European source strategy](docs/EU_JOB_SOURCE_STRATEGY.md) for research cont
 
 ## 7. Privacy and review boundaries
 
-- The product has no application-submission or messaging tools. Its current social-platform integrations are explicit official API reads, not browser scraping.
+- The product has no application-submission, bulk-email, automated follow-up, person-enrichment, or messaging tools. Its current social-platform integrations are explicit official API reads, not browser scraping.
 - A submitted job URL is fetched only on the user's explicit button press. The fetcher rejects non-HTTPS URLs, embedded credentials, local/private/reserved addresses, unsupported content types, oversized responses, and non-public redirects. It does not crawl linked pages.
 - Analysis snapshots contain CV text and personal data in `.job_assistant/assistant.sqlite`. Git ignores this directory, but **Git exclusion is not encryption**.
 - The UI is a local prototype without multi-user authentication/isolation. Do not expose it publicly without additional security work.
@@ -640,6 +640,7 @@ Add multilingual parsing fixtures, unsupported-generated-claim regressions, exac
 
 - [Jobright comparison and code-review backlog](docs/JOBRIGHT_IMPROVEMENT_REPORT.md)
 - [European job-source strategy](docs/EU_JOB_SOURCE_STRATEGY.md)
+- [Whali-inspired Role-market direction](docs/WHALI_INSPIRED_PRODUCT_DIRECTION.md)
 - [Jobright public homepage](https://jobright.ai/) — product inspiration, not independently validated performance evidence
 - [Tau library](https://github.com/huggingface/tau) — optional agent dependency
 - [ESCO](https://esco.ec.europa.eu/en) — potential skill/occupation vocabulary; not integrated yet

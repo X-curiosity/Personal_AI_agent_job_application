@@ -47,6 +47,10 @@ def _opening(
     url: str | None = None,
     description: str | None = None,
     location: str | None = "Berlin, Germany",
+    workplace_type: str | None = None,
+    employment_type: str | None = None,
+    source_timestamp: str | None = None,
+    source_timestamp_kind: str | None = None,
 ) -> DiscoveredOpening:
     return DiscoveredOpening(
         title=title,
@@ -58,6 +62,10 @@ def _opening(
         description=description,
         location=location,
         retrieved_at="2026-10-04T09:00:00+00:00",
+        workplace_type=workplace_type,
+        employment_type=employment_type,
+        source_timestamp=source_timestamp,
+        source_timestamp_kind=source_timestamp_kind,
     )
 
 
@@ -169,6 +177,9 @@ def test_deduplication_uses_canonical_url_or_external_identity_and_keeps_provena
         identifier="acme",
         external_id="g-1",
         url="https://jobs.example/acme/1?utm_source=board",
+        workplace_type="Hybrid",
+        source_timestamp="2026-10-04T08:00:00Z",
+        source_timestamp_kind="updated",
     )
     by_lever = _opening(
         "Backend Engineer",
@@ -177,6 +188,9 @@ def test_deduplication_uses_canonical_url_or_external_identity_and_keeps_provena
         identifier="acme",
         external_id="l-9",
         url="https://jobs.example/acme/1#details",
+        employment_type="Full-time",
+        source_timestamp="2026-10-03T09:00:00Z",
+        source_timestamp_kind="created",
     )
     by_external_id = _opening(
         "Platform Engineer",
@@ -202,7 +216,35 @@ def test_deduplication_uses_canonical_url_or_external_identity_and_keeps_provena
     assert backend.canonical_url == "https://jobs.example/acme/1"
     assert opening_sources(backend) == ("Greenhouse", "Lever")
     assert len(backend.provenance) == 2
+    # The displayed fields stay tied to the deterministically selected primary
+    # Greenhouse observation; all other official source metadata is retained.
+    assert backend.workplace_type == "Hybrid"
+    assert backend.employment_type is None
+    assert backend.source_timestamp_kind == "updated"
+    lever_observation = next(item for item in backend.provenance if item.source == "Lever")
+    assert lever_observation.employment_type == "Full-time"
+    assert lever_observation.source_timestamp_kind == "created"
     assert len(next(opening for opening in merged if opening.title == "Platform Engineer").provenance) == 1
+
+
+def test_discovered_opening_keeps_source_timestamp_semantics_without_breaking_older_records() -> None:
+    legacy = DiscoveredOpening.model_validate({
+        "title": "Backend Engineer",
+        "company": _facts("Acme").model_dump(),
+        "source": "Greenhouse",
+    })
+    assert legacy.workplace_type is None
+    assert legacy.employment_type is None
+    assert legacy.source_timestamp is None
+    assert legacy.source_timestamp_kind is None
+
+    with pytest.raises(ValueError, match="timestamp kind requires a source timestamp"):
+        DiscoveredOpening(
+            title="Backend Engineer",
+            company=_facts("Acme"),
+            source="Greenhouse",
+            source_timestamp_kind="updated",
+        )
 
 
 def test_role_location_is_only_the_opening_location_not_company_footprint() -> None:
@@ -227,6 +269,22 @@ def test_role_location_is_only_the_opening_location_not_company_footprint() -> N
         )
 
 
+def test_workplace_only_label_is_not_promoted_to_a_world_map_location() -> None:
+    opening = _opening(
+        "Backend Engineer",
+        _facts("Acme"),
+        external_id="hybrid-only",
+        url="https://jobs.example/acme/hybrid-only",
+        location="Hybrid",
+    )
+
+    match = match_opening(RoleQuery(title="Backend Engineer"), opening)
+
+    assert opening.location == "Hybrid"
+    assert opening_role_locations(opening) == ()
+    assert match.role_locations == ()
+
+
 def test_store_persists_latest_run_per_career_track_and_workspace(tmp_path: Path) -> None:
     store = RoleDiscoveryStore(tmp_path / "discovery.sqlite")
     query = RoleQuery(title="Backend Engineer", profile_skills=("Python",))
@@ -236,6 +294,9 @@ def test_store_persists_latest_run_per_career_track_and_workspace(tmp_path: Path
         external_id="1",
         url="https://jobs.example/acme/1",
         description="Python services",
+        workplace_type="Hybrid",
+        source_timestamp="2026-10-04T08:00:00Z",
+        source_timestamp_kind="updated",
     )
     matches = rank_openings(query, [opening])
 
@@ -252,6 +313,9 @@ def test_store_persists_latest_run_per_career_track_and_workspace(tmp_path: Path
     assert restored == saved
     assert restored is not None
     assert restored.matches[0].opening.external_id == "1"
+    assert restored.matches[0].opening.workplace_type == "Hybrid"
+    assert restored.matches[0].opening.source_timestamp == "2026-10-04T08:00:00Z"
+    assert restored.matches[0].opening.source_timestamp_kind == "updated"
     assert restored.sources[0].identifier == "acme"
     assert restored.errors == ("Lever board unavailable",)
     assert store.latest_run(career_track_id="another-track", workspace_id="backend-role-page") is None

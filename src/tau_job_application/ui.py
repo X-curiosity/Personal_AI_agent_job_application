@@ -39,9 +39,17 @@ from tau_job_application.role_discovery import (
     RoleDiscoveryStore,
     RoleQuery,
     SourceSnapshot,
+    canonicalize_url,
     opening_matches_filters,
+    opening_sources,
     rank_openings,
     suggest_role_aliases,
+)
+from tau_job_application.role_market_state import (
+    RoleMarketState,
+    RoleMarketStateStore,
+    RoleMarketStatus,
+    opening_key,
 )
 from tau_job_application.pipeline import analyze_texts, render_markdown
 from tau_job_application.sources import (
@@ -70,12 +78,23 @@ REQUIREMENT_MEMORY = RequirementMemory(ROOT / ".job_assistant" / "assistant.sqli
 WORKSPACES = WorkspaceStore(ROOT / ".job_assistant" / "assistant.sqlite")
 ROLE_DISCOVERY = RoleDiscoveryStore(ROOT / ".job_assistant" / "assistant.sqlite")
 EVIDENCE_MATCHES = EvidenceMatchStore(ROOT / ".job_assistant" / "assistant.sqlite")
+ROLE_MARKET_STATES = RoleMarketStateStore(ROOT / ".job_assistant" / "assistant.sqlite")
 
 
 def _evidence_store() -> EvidenceMatchStore:
     """Use the current workspace database in UI tests as well as in the app."""
 
     return EVIDENCE_MATCHES if EVIDENCE_MATCHES.path == WORKSPACES.path else EvidenceMatchStore(WORKSPACES.path)
+
+
+def _role_market_state_store() -> RoleMarketStateStore:
+    """Use the active workspace database in tests as well as the local app."""
+
+    return (
+        ROLE_MARKET_STATES
+        if ROLE_MARKET_STATES.path == WORKSPACES.path
+        else RoleMarketStateStore(WORKSPACES.path)
+    )
 
 
 def _evidence_match_for(result, workspace_id: str, thread_id: str):
@@ -123,6 +142,14 @@ div[data-testid="stFileUploader"] section {background: #fffef9 !important; borde
 div[data-testid="stFileUploader"] small, div[data-testid="stFileUploader"] span {color: #4e655a !important;}
 button[data-testid="stBaseButton-primary"] {background: #1f5041 !important; border-color: #1f5041 !important; color: #fffef8 !important;}
 button[data-testid="stBaseButton-primary"]:hover {background: #173a31 !important; border-color: #173a31 !important;}
+button[data-testid="stBaseButton-secondary"] {background: #fffef9 !important; border-color: #b9cdbd !important; color: #173a31 !important;}
+button[data-testid="stBaseButton-secondary"] *, button[data-testid="stBaseButton-secondary"] {color: #173a31 !important;}
+button[data-testid="stBaseButton-secondary"]:hover {background: #edf4ed !important; border-color: #71927a !important;}
+a[data-testid="stBaseLinkButton-primary"] {background: #1f5041 !important; border-color: #1f5041 !important; color: #fffef8 !important;}
+a[data-testid="stBaseLinkButton-primary"] * {color: #fffef8 !important;}
+a[data-testid="stBaseLinkButton-primary"]:hover {background: #173a31 !important; border-color: #173a31 !important;}
+a[data-testid="stBaseLinkButton-secondary"] {background: #fffef9 !important; border-color: #b9cdbd !important; color: #173a31 !important;}
+a[data-testid="stBaseLinkButton-secondary"] * {color: #173a31 !important;}
 [data-testid="stMetricLabel"], [data-testid="stMetricLabel"] *, [data-testid="stMetricValue"], [data-testid="stMetricValue"] * {color: #19352e !important;}
 .workspace-hero {background: radial-gradient(circle at 86% 18%, rgba(218, 194, 119, .36), transparent 24%), linear-gradient(120deg, #173a31 0%, #285445 66%, #47735e 100%); border-radius: 18px; color: #fbfbf3; padding: 2rem 2.15rem 1.7rem; box-shadow: 0 16px 35px rgba(25, 53, 46, .14); margin-bottom: 1.3rem;}
 .workspace-hero .eyebrow {font-size: .74rem; text-transform: uppercase; letter-spacing: .13em; font-weight: 700; color: #d8e5d5; margin-bottom: .55rem;}
@@ -143,6 +170,18 @@ button[data-testid="stBaseButton-primary"]:hover {background: #173a31 !important
 div[data-testid="stTabs"] [role="tab"], div[data-testid="stTabs"] [role="tab"] * {font-weight: 650 !important; color: #52665b !important; opacity: 1 !important;}
 div[data-testid="stTabs"] [role="tab"][aria-selected="true"], div[data-testid="stTabs"] [role="tab"][aria-selected="true"] * {color: #173a31 !important;}
 div[data-testid="stExpander"] {background: rgba(255,255,252,.66); border: 1px solid var(--line); border-radius: 10px;}
+.role-feed-avatar {width: 46px; height: 46px; display: grid; place-items: center; border-radius: 12px; background: linear-gradient(145deg, #e6efe8, #cfded1); border: 1px solid #b8cdbb; color: #1d493c; font-size: .84rem; font-weight: 800; letter-spacing: .045em; margin-top: .25rem;}
+.role-feed-title {font-size: 1.02rem; line-height: 1.25; font-weight: 760; color: #173a31; margin: .05rem 0 .22rem;}
+.role-feed-company {font-size: .88rem; color: #415d51; margin: 0 0 .3rem;}
+.role-feed-meta {display: flex; gap: .35rem; flex-wrap: wrap; margin: .1rem 0 .35rem;}
+.role-feed-pill {display: inline-block; border-radius: 999px; padding: .19rem .5rem; background: #edf3ec; border: 1px solid #d5e3d3; color: #476557; font-size: .72rem; line-height: 1.2;}
+.role-feed-pill.source {background: #f7f2e4; border-color: #e6d8af; color: #74613a;}
+.role-feed-pill.state {background: #e2efe5; border-color: #bdd4c2; color: #27543c; font-weight: 700;}
+.role-feed-relevance {background: #173a31; color: #f9faf4; border-radius: 12px; padding: .68rem .52rem; text-align: center; margin-top: .12rem;}
+.role-feed-relevance b {display: block; color: #fffef8; font-size: 1.16rem; line-height: 1.05;}
+.role-feed-relevance span {display: block; color: #d4e3d5; font-size: .66rem; letter-spacing: .04em; text-transform: uppercase; margin-top: .23rem;}
+.role-feed-reason {font-size: .8rem; color: #5b7164; margin: .15rem 0 0;}
+.role-market-note {background: #f6f1e3; border-left: 3px solid #d2b66c; border-radius: 5px 10px 10px 5px; color: #5e5333; padding: .68rem .85rem; font-size: .84rem; margin: .6rem 0 .9rem;}
 </style>
 """
 
@@ -863,7 +902,7 @@ def _role_discovery(workspace_id: str, thread_id: str) -> None:
     links = {field: profile[field] for field in PROFILE_FIELDS if field != "cv_text" and profile[field].strip()}
     profile_skills = detected_profile_skills(profile["cv_text"], links)
 
-    st.subheader("Role discovery")
+    st.subheader("Build a role market")
     st.caption("Create a market page for one role. The backend collects only registered, public employer career feeds after you choose to refresh; it never scrapes LinkedIn or sends your CV text to a job board.")
     if refresh_notice:
         st.warning(refresh_notice)
@@ -929,11 +968,11 @@ def _role_discovery(workspace_id: str, thread_id: str) -> None:
     st.divider()
     st.markdown(f"### {run.query.title} opportunity board")
     st.caption(f"Last refreshed locally: {run.created_at}. Results may have changed at the source since then.")
-    _role_discovery_filters(run, thread_id)
+    _role_discovery_filters(run, workspace_id, thread_id)
 
 
-def _role_discovery_filters(run, thread_id: str) -> None:
-    """Render stored role matches with sourced-fact filters and a role-location map."""
+def _role_discovery_filters(run, career_track_id: str, thread_id: str) -> None:
+    """Render a compact, source-truthful Role Market feed and local shortlist."""
     company_types = ["Public", "Private", "Startup", "Unknown"]
     employee_bands = ["1–10", "11–50", "51–200", "201–500", "501–1,000", "1,001–5,000", "5,001+", "Unknown"]
     funding_stages = ["Pre-seed", "Seed", "Series A", "Series B", "Series C+", "Not applicable", "Unknown"]
@@ -958,21 +997,107 @@ def _role_discovery_filters(run, thread_id: str) -> None:
         }
     )
     matches = [match for match in run.matches if opening_matches_filters(match.opening, filtered_query)]
+    search, order = st.columns((3, 2))
+    with search:
+        search_text = st.text_input(
+            "Search these official openings",
+            placeholder="Company, title, location, or source",
+            key=f"role-filter-search:{thread_id}",
+        ).strip().casefold()
+    with order:
+        sort_order = st.selectbox(
+            "Order by",
+            ["Role relevance", "Source timestamp", "Company A–Z"],
+            key=f"role-filter-order:{thread_id}",
+        )
+    if search_text:
+        matches = [
+            match
+            for match in matches
+            if search_text in " ".join(
+                (
+                    match.opening.title,
+                    match.opening.company.name,
+                    match.opening.location or "",
+                    " ".join(opening_sources(match.opening)),
+                )
+            ).casefold()
+        ]
+    if sort_order == "Source timestamp":
+        matches.sort(
+            key=lambda match: (
+                bool(match.opening.source_timestamp),
+                match.opening.source_timestamp or "",
+                match.opening.company.name.casefold(),
+                match.opening.title.casefold(),
+            ),
+            reverse=True,
+        )
+    elif sort_order == "Company A–Z":
+        matches.sort(
+            key=lambda match: (
+                match.opening.company.name.casefold(),
+                match.opening.title.casefold(),
+                match.opening.canonical_url or "",
+            )
+        )
+
+    state_store = _role_market_state_store()
+    states = state_store.list_states(career_track_id, thread_id)
+    state_by_opening_key = {state.opening_key: state for state in states}
+    visible_matches: list = []
+    for match in matches:
+        state = _role_market_state_for(match.opening, state_by_opening_key)
+        if state is None or state.status is not RoleMarketStatus.HIDDEN:
+            visible_matches.append(match)
+
     summary = st.columns(3)
-    summary[0].metric("Lookalike openings", len(matches))
-    summary[1].metric("Companies", len({match.opening.company.name for match in matches}))
-    summary[2].metric("Registered feeds checked", len(run.sources))
+    summary[0].metric("Visible openings", len(visible_matches))
+    summary[1].metric("Companies", len({match.opening.company.name for match in visible_matches}))
+    summary[2].metric(
+        "Saved / tracking",
+        sum(state.status is not RoleMarketStatus.HIDDEN for state in states),
+    )
+    st.markdown(
+        "<div class=\"role-market-note\">"
+        "<strong>Role relevance</strong> combines the role family with optional local CV-skill overlap. "
+        "It is not a prediction of eligibility, interview odds, or hiring likelihood. "
+        "Availability can change—verify every role on its official listing."
+        "</div>",
+        unsafe_allow_html=True,
+    )
     if run.errors:
         st.warning("Some registered feeds could not be refreshed: " + " · ".join(run.errors))
     with st.expander("Refresh audit", expanded=False):
         st.dataframe([source.model_dump() for source in run.sources], hide_index=True, use_container_width=True)
 
-    if not matches:
-        st.info("No stored openings match these filters. Clear a filter or refresh a broader role family.")
+    _role_market_shortlist(career_track_id, thread_id, states)
+
+    if not visible_matches:
+        if matches:
+            st.info("Every matching opening is hidden in your local shortlist. Restore one below to show it in the feed.")
+        else:
+            st.info("No stored openings match these filters. Clear a filter, search more broadly, or refresh a wider role family.")
         return
-    for index, match in enumerate(matches):
-        _role_match_card(match, thread_id, index)
-    _role_location_map(matches, thread_id)
+    visible_limit = len(visible_matches)
+    if len(visible_matches) > 12:
+        visible_limit = st.selectbox(
+            "Show in feed",
+            [12, 24, 48],
+            key=f"role-feed-limit:{thread_id}",
+        )
+        st.caption(
+            f"Showing the top {min(visible_limit, len(visible_matches))} of {len(visible_matches)} matching openings. "
+            "Use search or filters to narrow the board."
+        )
+    for match in visible_matches[:visible_limit]:
+        _role_match_card(
+            match,
+            career_track_id,
+            thread_id,
+            _role_market_state_for(match.opening, state_by_opening_key),
+        )
+    _role_location_map(visible_matches, thread_id)
 
 
 def _refresh_role_market(
@@ -1011,6 +1136,14 @@ def _refresh_role_market(
                     description=item["description"],
                     location=item["location"],
                     retrieved_at=retrieved_at,
+                    # A newer source response carries explicit semantics.  The
+                    # fallback supports old locally stored/test feed shapes,
+                    # but intentionally does not guess whether its timestamp
+                    # was created, published, or updated.
+                    workplace_type=item.get("workplace_type") or item.get("work_mode"),
+                    employment_type=item.get("employment_type"),
+                    source_timestamp=item.get("source_timestamp") or item.get("published_at"),
+                    source_timestamp_kind=item.get("source_timestamp_kind"),
                 )
                 for item in raw_openings
             )
@@ -1066,40 +1199,338 @@ def _refresh_role_market(
     )
 
 
-def _role_match_card(match, thread_id: str, index: int) -> None:
-    """Present a single sourced opening and allow it to become a Job Workspace."""
+def _role_card_key(opening: DiscoveredOpening) -> str:
+    """Create a stable widget suffix without falling back to a saved identity."""
+
+    try:
+        value = opening_key(opening)
+    except ValueError:
+        # This is only a widget key.  The local shortlist remains unavailable
+        # when an official source does not provide a durable opening identity.
+        value = "|".join((
+            opening.source,
+            opening.source_identifier or "",
+            opening.external_id or "",
+            opening.source_url or "",
+            opening.title,
+            opening.company.name,
+        ))
+    return hashlib.sha256(value.encode("utf-8")).hexdigest()[:16]
+
+
+def _company_monogram(name: str) -> str:
+    """Return a local, privacy-preserving company mark instead of fetching logos."""
+
+    words = [
+        "".join(character for character in word if character.isalnum())
+        for word in name.split()
+    ]
+    words = [word for word in words if word]
+    if not words:
+        return "?"
+    if len(words) == 1:
+        return words[0][:2].upper()
+    return f"{words[0][0]}{words[1][0]}".upper()
+
+
+def _source_timestamp_label(opening: DiscoveredOpening) -> str | None:
+    """Present only the timestamp semantics that the official source supplied."""
+
+    if not opening.source_timestamp:
+        return None
+    labels = {
+        "published": "Published at source",
+        "created": "Created at source",
+        "updated": "Updated at source",
+    }
+    label = labels.get(opening.source_timestamp_kind or "", "Source timestamp")
+    try:
+        timestamp = datetime.fromisoformat(opening.source_timestamp.replace("Z", "+00:00"))
+        value = timestamp.strftime("%d %b %Y").lstrip("0")
+    except ValueError:
+        value = opening.source_timestamp
+    return f"{label} · {value}"
+
+
+def _role_market_state_for(
+    opening: DiscoveredOpening,
+    states_by_opening_key: dict[str, RoleMarketState],
+) -> RoleMarketState | None:
+    """Find a local state only when the listing has a source-owned identity."""
+
+    try:
+        return states_by_opening_key.get(opening_key(opening))
+    except ValueError:
+        return None
+
+
+def _role_match_card(
+    match,
+    career_track_id: str,
+    thread_id: str,
+    state: RoleMarketState | None,
+) -> None:
+    """Render a compact official-opening card with local, non-submission actions."""
+
     opening = match.opening
+    card_key = _role_card_key(opening)
+    sources = opening_sources(opening)
+    source_label = " / ".join(sources) if sources else opening.source
+    # ``role_locations`` excludes pure work-arrangement labels (for example,
+    # a provider placing "Hybrid" in its location field), so they never become
+    # a world-map pin or a claim about a company base.
+    location = " · ".join(match.role_locations) if match.role_locations else "Location not listed"
+    metadata = [location]
+    if opening.workplace_type:
+        metadata.append(opening.workplace_type)
+    elif opening.location and not match.role_locations:
+        metadata.append(opening.location)
+    if opening.employment_type:
+        metadata.append(opening.employment_type)
+    timestamp_label = _source_timestamp_label(opening)
+    if timestamp_label:
+        metadata.append(timestamp_label)
+    metadata_html = "".join(
+        f'<span class="role-feed-pill">{escape(item)}</span>'
+        for item in metadata
+    )
+    metadata_html += f'<span class="role-feed-pill source">Official {escape(source_label)} listing</span>'
+    if state and state.status is not RoleMarketStatus.HIDDEN:
+        metadata_html += (
+            f'<span class="role-feed-pill state">{escape(state.status.label)} locally</span>'
+        )
+
+    reasons = []
+    if match.matched_title_terms:
+        reasons.append("role family: " + ", ".join(match.matched_title_terms))
+    if match.matched_profile_skills:
+        reasons.append("local profile overlap: " + ", ".join(match.matched_profile_skills))
+    reason_text = "; ".join(reasons) if reasons else "matching role-title terms"
+
     with st.container(border=True):
-        st.markdown(f"#### {opening.title} · {opening.company.name}")
-        location = " · ".join(match.role_locations) if match.role_locations else "Location not listed"
-        sources = ", ".join(item.source for item in opening.provenance)
-        st.caption(f"{location} · {sources}")
-        reasons = []
-        if match.matched_title_terms:
-            reasons.append("role family: " + ", ".join(match.matched_title_terms))
-        if match.matched_profile_skills:
-            reasons.append("profile overlap: " + ", ".join(match.matched_profile_skills))
-        st.write("Why it appears: " + ("; ".join(reasons) if reasons else "matching title terms") + ".")
-        facts = opening.company
-        st.caption(f"Company facts: {facts.company_type} · {facts.employee_band} employees · {facts.funding_stage}")
-        if facts.facts_source_url:
-            st.link_button("Open company-facts source", facts.facts_source_url, type="secondary", key=f"role-facts:{thread_id}:{index}")
-        actions = st.columns(2)
+        avatar, summary, relevance = st.columns((0.72, 5.7, 1.25))
+        with avatar:
+            st.markdown(
+                f'<div class="role-feed-avatar" aria-label="{escape(opening.company.name)}">'
+                f"{escape(_company_monogram(opening.company.name))}</div>",
+                unsafe_allow_html=True,
+            )
+        with summary:
+            st.markdown(
+                f'<div class="role-feed-title">{escape(opening.title)}</div>'
+                f'<div class="role-feed-company">{escape(opening.company.name)}</div>'
+                f'<div class="role-feed-meta">{metadata_html}</div>'
+                f'<p class="role-feed-reason"><strong>Why it appears:</strong> {escape(reason_text)}.</p>',
+                unsafe_allow_html=True,
+            )
+        with relevance:
+            st.markdown(
+                f'<div class="role-feed-relevance"><b>{match.score}</b><span>role relevance</span></div>',
+                unsafe_allow_html=True,
+            )
+
+        actions = st.columns((1.35, 1.35, 1))
         with actions[0]:
             if opening.source_url:
-                st.link_button("Open official listing", opening.source_url, type="secondary", key=f"role-listing:{thread_id}:{index}")
+                st.link_button(
+                    "Open official application",
+                    opening.source_url,
+                    type="primary",
+                    key=f"role-listing:{thread_id}:{card_key}",
+                )
+            else:
+                st.caption("Official listing URL unavailable")
         with actions[1]:
-            _open_discovered_job_workspace(match, f"open-role-match:{thread_id}:{index}")
+            _open_discovered_job_workspace(
+                match,
+                career_track_id,
+                key=f"prepare-role-match:{thread_id}:{card_key}",
+            )
+        with actions[2]:
+            _role_market_primary_action(
+                career_track_id,
+                thread_id,
+                opening,
+                state,
+                key=f"role-state:{thread_id}:{card_key}",
+            )
+
+        with st.expander("Role details & sources", expanded=False):
+            st.caption(
+                "This is a public-board observation. The app does not submit an application, "
+                "contact people, or infer hiring activity."
+            )
+            if opening.description:
+                st.write(opening.description[:2_000])
+                if len(opening.description) > 2_000:
+                    st.caption("Description excerpt shown. Use the official listing for the full text.")
+            else:
+                st.caption("No description was supplied by this source response.")
+            facts = opening.company
+            st.caption(
+                f"Company facts: {facts.company_type} · {facts.employee_band} employees · {facts.funding_stage}."
+            )
+            if facts.facts_source_url:
+                st.link_button(
+                    "Open company-facts source",
+                    facts.facts_source_url,
+                    type="secondary",
+                    key=f"role-facts:{thread_id}:{card_key}",
+                )
+            _role_source_observations(opening)
+            _role_market_secondary_actions(
+                career_track_id,
+                thread_id,
+                opening,
+                state,
+                key=f"role-secondary:{thread_id}:{card_key}",
+            )
 
 
-def _open_discovered_job_workspace(match, key: str) -> None:
-    """Turn a chosen raw opening into a normal evidence-preparation workspace."""
-    if st.button("Create job workspace", key=key):
-        opening = match.opening
-        wid = st.session_state["active_scope"][0]
-        job_text = opening.description or ""
+def _role_source_observations(opening: DiscoveredOpening) -> None:
+    """Keep provider-specific timestamp semantics visible after source merges."""
+
+    rows = []
+    for source in opening.provenance:
+        timestamp_label = _source_timestamp_label(
+            opening.model_copy(
+                update={
+                    "source_timestamp": source.source_timestamp,
+                    "source_timestamp_kind": source.source_timestamp_kind,
+                }
+            )
+        )
+        rows.append({
+            "Source": source.source,
+            "Board": source.source_identifier or "Not supplied",
+            "Workplace": source.workplace_type or "Not supplied",
+            "Employment": source.employment_type or "Not supplied",
+            "Timestamp": timestamp_label or "Not supplied",
+            "Retrieved": source.retrieved_at or "Not supplied",
+        })
+    if rows:
+        st.caption("Official source observations retained for this listing")
+        st.dataframe(rows, hide_index=True, use_container_width=True)
+
+
+def _role_market_primary_action(
+    career_track_id: str,
+    thread_id: str,
+    opening: DiscoveredOpening,
+    state: RoleMarketState | None,
+    *,
+    key: str,
+) -> None:
+    """Offer a shortlist choice without claiming an application was made."""
+
+    try:
+        opening_key(opening)
+    except ValueError:
+        st.caption("Save unavailable: the source did not provide a durable listing ID.")
+        return
+    store = _role_market_state_store()
+    if state is None:
+        if st.button("Save for review", key=key):
+            store.set_status(career_track_id, thread_id, opening, RoleMarketStatus.SAVED)
+            st.rerun()
+    elif state.status is RoleMarketStatus.SAVED:
+        if st.button("Start tracking", key=key):
+            store.set_status(career_track_id, thread_id, opening, RoleMarketStatus.TRACKING)
+            st.rerun()
+    else:
+        if st.button("Keep saved", key=key):
+            store.set_status(career_track_id, thread_id, opening, RoleMarketStatus.SAVED)
+            st.rerun()
+
+
+def _role_market_secondary_actions(
+    career_track_id: str,
+    thread_id: str,
+    opening: DiscoveredOpening,
+    state: RoleMarketState | None,
+    *,
+    key: str,
+) -> None:
+    """Allow candidates to edit local viewing choices; never mark an application."""
+
+    try:
+        opening_key(opening)
+    except ValueError:
+        return
+    store = _role_market_state_store()
+    actions = st.columns(2)
+    with actions[0]:
+        if state is not None and st.button("Remove local status", key=f"{key}:remove"):
+            store.clear_status(career_track_id, thread_id, opening)
+            st.rerun()
+    with actions[1]:
+        if st.button("Hide from this feed", key=f"{key}:hide"):
+            store.set_status(career_track_id, thread_id, opening, RoleMarketStatus.HIDDEN)
+            st.rerun()
+
+
+def _role_market_shortlist(
+    career_track_id: str,
+    thread_id: str,
+    states: list[RoleMarketState],
+) -> None:
+    """Expose saved/hidden source snapshots even if a later refresh drops them."""
+
+    with st.expander("Your local shortlist", expanded=False):
+        st.caption(
+            "Saved, tracking, and hidden are local viewing choices. They do not mean an application "
+            "was submitted or a company was contacted."
+        )
+        if not states:
+            st.caption("Save an official opening to keep its source snapshot here.")
+            return
+        store = _role_market_state_store()
+        for state in states:
+            opening = state.opening
+            state_key = _role_card_key(opening)
+            info, action = st.columns((4, 1))
+            with info:
+                st.text(
+                    f"{opening.title} · {opening.company.name}\n"
+                    f"{state.status.label} locally · {opening.location or 'Location not listed'}"
+                )
+            with action:
+                label = "Unhide" if state.status is RoleMarketStatus.HIDDEN else "Remove"
+                if st.button(label, key=f"shortlist:{thread_id}:{state_key}:{label.casefold()}"):
+                    store.clear_status(career_track_id, thread_id, opening)
+                    st.rerun()
+
+
+def _prepared_discovered_workspace(career_track_id: str, opening: DiscoveredOpening) -> str | None:
+    """Find an existing preparation workspace only through the official URL."""
+
+    canonical_url = opening.canonical_url
+    if not canonical_url:
+        return None
+    for workspace_thread in WORKSPACES.list_threads(career_track_id):
+        if canonicalize_url(workspace_thread["draft"].get("job_url")) == canonical_url:
+            return workspace_thread["id"]
+    return None
+
+
+def _open_discovered_job_workspace(match, career_track_id: str, key: str) -> None:
+    """Open or create a normal local preparation workspace for one official opening."""
+
+    opening = match.opening
+    if existing := _prepared_discovered_workspace(career_track_id, opening):
+        if st.button("Open preparation workspace", key=key):
+            st.session_state[f"pending_thread:{career_track_id}"] = existing
+            st.rerun()
+        return
+    if st.button("Prepare this application", key=key):
+        context = []
         if opening.location:
-            job_text = f"Location: {opening.location}\n\n{job_text}".strip()
+            context.append(f"Listing location: {opening.location}")
+        if opening.workplace_type:
+            context.append(f"Listing workplace type: {opening.workplace_type}")
+        if opening.employment_type:
+            context.append(f"Listing employment type: {opening.employment_type}")
+        job_text = "\n".join((*context, "", opening.description or "")).strip()
         draft = {
             **WORKSPACES.shared_profile(),
             "job_title": opening.title,
@@ -1107,8 +1538,12 @@ def _open_discovered_job_workspace(match, key: str) -> None:
             "job_url": opening.source_url or "",
             "job_text": job_text,
         }
-        tid = WORKSPACES.create_thread(wid, f"{opening.title} — {opening.company.name}"[:100], draft)
-        st.session_state[f"pending_thread:{wid}"] = tid
+        prepared_thread_id = WORKSPACES.create_thread(
+            career_track_id,
+            f"{opening.title} — {opening.company.name}"[:100],
+            draft,
+        )
+        st.session_state[f"pending_thread:{career_track_id}"] = prepared_thread_id
         st.rerun()
 
 

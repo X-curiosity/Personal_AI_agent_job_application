@@ -144,6 +144,7 @@ def _board_identifier(value: str, label: str) -> str:
 
 def _greenhouse_opening(item: dict, board_token: str, company: str) -> dict[str, str | None]:
     location = item.get("location") or {}
+    source_timestamp = _text_or_none(item.get("updated_at"))
     return {
         "source": "Greenhouse",
         "source_id": str(item.get("id") or item.get("absolute_url") or item.get("title") or ""),
@@ -153,8 +154,12 @@ def _greenhouse_opening(item: dict, board_token: str, company: str) -> dict[str,
         "location": _location_name(location),
         "url": _text_or_none(item.get("absolute_url")),
         "description": _strip_html(str(item.get("content") or "")) or None,
-        "published_at": _text_or_none(item.get("updated_at")),
-        "work_mode": _text_or_none(item.get("workplace_type")),
+        # Greenhouse calls this ``updated_at``.  Keep that semantics explicit
+        # rather than presenting it as a publication time.
+        "source_timestamp": source_timestamp,
+        "source_timestamp_kind": "updated" if source_timestamp else None,
+        "workplace_type": _text_or_none(item.get("workplace_type")),
+        "employment_type": None,
     }
 
 
@@ -163,6 +168,7 @@ def _lever_opening(item: dict, site: str, company: str) -> dict[str, str | None]
     lists = item.get("lists") or []
     sections = [f"{section.get('text', '')}: {section.get('content', '')}" for section in lists if isinstance(section, dict)]
     description = "\n".join([str(item.get("descriptionPlain") or ""), *sections]).strip()
+    source_timestamp = _text_or_none(item.get("createdAt"))
     return {
         "source": "Lever",
         "source_id": str(item.get("id") or item.get("hostedUrl") or item.get("text") or ""),
@@ -175,8 +181,12 @@ def _lever_opening(item: dict, site: str, company: str) -> dict[str, str | None]
         ),
         "url": _text_or_none(item.get("hostedUrl")),
         "description": _strip_html(description) or None,
-        "published_at": _text_or_none(item.get("createdAt")),
-        "work_mode": _text_or_none(categories.get("commitment") if isinstance(categories, dict) else None),
+        # Lever's ``createdAt`` is a creation time, and ``commitment`` (for
+        # example, Full-time) is an employment type—not a work arrangement.
+        "source_timestamp": source_timestamp,
+        "source_timestamp_kind": "created" if source_timestamp else None,
+        "workplace_type": None,
+        "employment_type": _text_or_none(categories.get("commitment") if isinstance(categories, dict) else None),
     }
 
 
@@ -188,6 +198,7 @@ def _ashby_opening(item: dict, board: str, company: str) -> dict[str, str | None
         for location in item.get("secondaryLocations", [])
         if isinstance(location, dict)
     ]
+    source_timestamp = _text_or_none(item.get("publishedAt"))
     return {
         "source": "Ashby",
         "source_id": str(item.get("id") or item.get("jobUrl") or item.get("applyUrl") or item.get("title") or ""),
@@ -197,8 +208,10 @@ def _ashby_opening(item: dict, board: str, company: str) -> dict[str, str | None
         "location": _listing_locations(primary_location, secondary_locations),
         "url": _text_or_none(item.get("jobUrl") or item.get("applyUrl")),
         "description": _strip_html(str(item.get("descriptionPlain") or item.get("descriptionHtml") or "")) or None,
-        "published_at": _text_or_none(item.get("publishedAt")),
-        "work_mode": _text_or_none(item.get("workplaceType")),
+        "source_timestamp": source_timestamp,
+        "source_timestamp_kind": "published" if source_timestamp else None,
+        "workplace_type": _text_or_none(item.get("workplaceType")),
+        "employment_type": _text_or_none(item.get("employmentType")),
     }
 
 

@@ -38,8 +38,10 @@ def test_public_board_openings_keep_greenhouse_roles_without_inferable_skills(mo
             "location": "Zurich, Switzerland",
             "url": "https://boards.greenhouse.io/example/jobs/42",
             "description": "Coordinate  tea  tastings & seasonal menus.",
-            "published_at": "2026-10-04T08:00:00Z",
-            "work_mode": "On-site",
+            "source_timestamp": "2026-10-04T08:00:00Z",
+            "source_timestamp_kind": "updated",
+            "workplace_type": "On-site",
+            "employment_type": None,
         }
     ]
 
@@ -80,8 +82,10 @@ def test_public_board_openings_keep_lever_roles_without_inferable_skills(monkeyp
             "location": "Berlin, Germany • Paris, France",
             "url": "https://jobs.lever.co/example/lever-9",
             "description": "Coordinate community gardens and local harvests.\nWhat you will do: Plan seed exchanges.",
-            "published_at": "2026-10-03T09:00:00Z",
-            "work_mode": "Full-time",
+            "source_timestamp": "2026-10-03T09:00:00Z",
+            "source_timestamp_kind": "created",
+            "workplace_type": None,
+            "employment_type": "Full-time",
         }
     ]
 
@@ -108,6 +112,7 @@ def test_public_board_openings_keep_ashby_secondary_locations(monkeypatch) -> No
                     "descriptionPlain": "Build applied machine-learning systems.",
                     "publishedAt": "2026-10-04T10:00:00Z",
                     "workplaceType": "Hybrid",
+                    "employmentType": "Full-time",
                 }
             ]
         }
@@ -127,8 +132,10 @@ def test_public_board_openings_keep_ashby_secondary_locations(monkeypatch) -> No
             "location": "Paris, France • London, United Kingdom",
             "url": "https://jobs.ashbyhq.com/example/ashby-7",
             "description": "Build applied machine-learning systems.",
-            "published_at": "2026-10-04T10:00:00Z",
-            "work_mode": "Hybrid",
+            "source_timestamp": "2026-10-04T10:00:00Z",
+            "source_timestamp_kind": "published",
+            "workplace_type": "Hybrid",
+            "employment_type": "Full-time",
         }
     ]
 
