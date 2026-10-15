@@ -78,8 +78,8 @@ from tau_job_application.sources import (
 from tau_job_application.storage import LocalStore
 from tau_job_application.workspaces import PROFILE_FIELDS, WorkspaceStore
 from tau_job_application.workspace_ui import choose_scope, draft_key, show_chat, show_direction
+from tau_job_application.capital_atlas import AtlasStore
 from tau_job_application.yc_directory import YCDirectoryStore
-from tau_job_application.yc_directory_ui import render_yc_browser
 
 
 def _project_root() -> Path:
@@ -101,6 +101,7 @@ COMPANY_BRANDS = CompanyBrandStore(ROOT / ".job_assistant" / "assistant.sqlite")
 APPLICATIONS = ApplicationTrackerStore(ROOT / ".job_assistant" / "assistant.sqlite")
 COMPANY_CATALOG = CompanyCatalogStore(ROOT / ".job_assistant" / "assistant.sqlite")
 YC_DIRECTORY = YCDirectoryStore(ROOT / ".job_assistant" / "assistant.sqlite")
+ATLAS = AtlasStore(ROOT / ".job_assistant" / "assistant.sqlite")
 RESIDENCY = ResidencyStore(ROOT / ".job_assistant" / "assistant.sqlite")
 
 
@@ -158,6 +159,15 @@ def _residency_store() -> ResidencyStore:
         RESIDENCY
         if RESIDENCY.path == WORKSPACES.path
         else ResidencyStore(WORKSPACES.path)
+    )
+
+
+def _atlas_store() -> AtlasStore:
+    """Use the active workspace database in UI tests as well as in the app."""
+    return (
+        ATLAS
+        if ATLAS.path == WORKSPACES.path
+        else AtlasStore(WORKSPACES.path)
     )
 
 
@@ -259,7 +269,7 @@ def main() -> None:
         _product_landing()
         return
 
-    workspace_id, thread_id = choose_scope(WORKSPACES, compact=_route_value("view") in {"career", "onboarding", "role", "application", "companies", "yc", "eligibility", "agents"})
+    workspace_id, thread_id = choose_scope(WORKSPACES, compact=_route_value("view") in {"career", "onboarding", "role", "application", "companies", "eligibility", "agents"})
     with st.sidebar:
         st.divider()
         if st.button("Find my roles", key="open-career-hub", use_container_width=True):
@@ -268,8 +278,6 @@ def main() -> None:
             _navigate(view="applications")
         if st.button("Company database", key="open-company-database", use_container_width=True):
             _navigate(view="companies")
-        if st.button("YC explorer", key="open-yc-explorer", use_container_width=True):
-            _navigate(view="yc")
         if st.button("Work eligibility", key="open-eligibility", use_container_width=True):
             _navigate(view="eligibility")
         if st.button("Agent team", key="open-agent-team", use_container_width=True):
@@ -281,9 +289,6 @@ def main() -> None:
         st.caption("Open the separate live landing page for a market-level view of your local progress.")
     if _route_value("view") in {"career", "onboarding", "role", "application", "companies"}:
         render_portal(sys.modules[__name__], workspace_id, _route_value("view"))
-        return
-    if _route_value("view") == "yc":
-        render_yc_browser(sys.modules[__name__])
         return
     if _route_value("view") == "eligibility":
         render_eligibility(sys.modules[__name__], workspace_id)

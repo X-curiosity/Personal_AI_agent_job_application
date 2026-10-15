@@ -14,7 +14,8 @@ def _payload():
         {"slug": "alpha-ai", "name": "Alpha AI", "status": "Active", "batch": "W24", "isHiring": True,
          "team_size": 12, "stage": "Early", "one_liner": "AI tooling", "industries": ["B2B", "Artificial Intelligence"],
          "regions": ["United States of America"], "tags": ["AI"], "all_locations": "San Francisco, CA, USA",
-         "website": "https://alpha.example.com", "url": "https://www.ycombinator.com/companies/alpha-ai"},
+         "website": "https://alpha.example.com", "small_logo_thumb_url": "https://bookface-static.ycombinator.com/alpha.png",
+         "url": "https://www.ycombinator.com/companies/alpha-ai"},
         {"slug": "beta-health", "name": "Beta Health", "status": "Active", "batch": "S23", "isHiring": False,
          "team_size": 60, "stage": "Growth", "one_liner": "Clinic software", "industries": ["Healthcare"],
          "regions": ["Germany"], "tags": ["health"], "all_locations": "Berlin, Germany"},
@@ -31,6 +32,8 @@ def test_parse_yc_directory_validates_and_bounds():
     alpha = companies[0]
     assert alpha.status == "Active" and alpha.is_hiring is True and alpha.team_size == 12
     assert alpha.industries == ("B2B", "Artificial Intelligence")
+    assert alpha.logo_url == "https://bookface-static.ycombinator.com/alpha.png"
+    assert companies[1].logo_url is None
     assert companies[2].is_hiring is None
     with pytest.raises(ValueError):
         parse_yc_directory({"not": "a list"})

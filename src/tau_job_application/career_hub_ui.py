@@ -13,6 +13,7 @@ from tau_job_application.application_tracker_ui import tracker_today
 from tau_job_application.career_hub import FIELDS, HubStore, Interests, contact_searches, draft_documents, infer_email, suggested_roles
 from tau_job_application.career_inbox import InboxStore, read_gmail, read_slack
 from tau_job_application.capital_atlas import fetch_capital_atlas
+from tau_job_application.company_browser_ui import render_company_browser
 from tau_job_application.company_catalog import fetch_companies_marketcap, fetch_yc_hiring
 from tau_job_application.hiring_match import calculate_evidence_match
 from tau_job_application.parsing import parse_candidate_text
@@ -218,6 +219,7 @@ def _role(api, store, track):
     run = api.ROLE_DISCOVERY.latest_run(career_track_id=track, workspace_id=thread)
     if not run:
         st.info("Refresh positions to load this role’s first live cluster. No demonstration vacancies are mixed into the results.")
+        _role_company_browser(api, role, thread)
         return
     companies = sorted({board.company.name for board in boards})
     coverage = ", ".join(companies[:6]) + (f" and {len(companies) - 6} more" if len(companies) > 6 else "")
@@ -248,6 +250,22 @@ def _role(api, store, track):
                 go("application", application=record.id)
     if not matches:
         st.info("No related positions in these employer feeds match your filters. Try an alias or use the existing Role market to bring a permitted source.")
+    _role_company_browser(api, role, thread)
+
+
+def _role_company_browser(api, role, thread):
+    """The portfolio-style company choice shown on every role page."""
+
+    st.divider()
+    st.markdown(
+        f'<div class="section-kicker">Choose your target</div><h2>Explore companies for {escape(role)}</h2>',
+        unsafe_allow_html=True,
+    )
+    st.caption(
+        "Pick a startup from the local YC directory snapshot or a big company from the Global Capital "
+        "Atlas snapshot. Entries are research leads, not vacancy claims — verify openings on official boards."
+    )
+    render_company_browser(api, role=role, key_prefix=f"role-browser:{thread}")
 
 
 def _document_upload(api, label, key):

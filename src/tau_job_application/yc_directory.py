@@ -64,6 +64,7 @@ class YCCompany(BaseModel):
     tags: tuple[str, ...] = ()
     locations: str | None = None
     website: str | None = None
+    logo_url: str | None = None
     directory_url: str
 
     @field_validator("status")
@@ -72,7 +73,7 @@ class YCCompany(BaseModel):
         cleaned = str(value).strip()
         return cleaned if cleaned in YC_STATUSES else "Unknown"
 
-    @field_validator("website", "directory_url")
+    @field_validator("website", "logo_url", "directory_url")
     @classmethod
     def url_must_be_https(cls, value: object) -> str | None:
         return _optional_https(value)
@@ -134,6 +135,7 @@ def parse_yc_directory(payload: object, *, limit: int = MAX_DIRECTORY_RECORDS) -
             tags=_clean_list(item.get("tags")),
             locations=_clean_text(item.get("all_locations")),
             website=_optional_https(item.get("website")),
+            logo_url=_optional_https(item.get("small_logo_thumb_url")),
             directory_url=_optional_https(item.get("url"))
             or f"https://www.ycombinator.com/companies/{item['slug']}",
         ))

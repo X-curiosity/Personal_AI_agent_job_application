@@ -34,22 +34,29 @@ Boundaries kept: no autonomous research subagents, no messaging, no application
 submission, no LinkedIn/X scraping; model context is limited to the request and
 its tool results.
 
-## YC explorer (`yc_directory.py`, `yc_directory_ui.py`)
+## Company browser (`company_browser_ui.py`, `yc_directory.py`)
+
+Revised 16 October 2026: the standalone YC view was removed. Every role page
+now embeds one portfolio-style company browser with a segmented **Startups /
+Big companies** choice — card layout (real logo, bold name, one-liner, muted
+meta line) matching the supplied reference design.
 
 - `YCDirectoryStore` keeps a local snapshot of the public yc-oss mirror
   (`all.json`, ~6,300 records, 24 MB fetch bound, fixed host, redirects
   rejected). Refresh is an explicit button/agent tool; filters never touch the
-  network.
+  network. `YCCompany.logo_url` carries the dataset's real logo URL.
 - `YCFilters` mirrors the ycglobe query style: `statuses`
   (Active/Acquired/Public/Inactive), `hiring_only` / `top_only` flags, batches,
   industries, regions, team-size range, text query, bounded limit.
   `filter_yc_companies` is pure and deterministic; `directory_facets` lists the
   snapshot's distinct filter values.
-- The `?view=yc` view syncs the two headline filters to the URL
-  (`?view=yc&status=Active&flags=hiring`), shows snapshot age, empty/error
-  states, and lets the user tick companies and save them as local research
-  leads into the existing company database. A directory entry — even flagged
-  hiring — is never presented as an open vacancy.
+- Remote logos are opt-in per browser (default: monograms). Startup logos come
+  from the dataset; big-company logos are derived from the company website
+  domain via Clearbit's logo lookup, rendered only after the same opt-in, with
+  an `onerror` fallback so broken logos never break a card.
+- Ticked companies save as local research leads into the existing company
+  database. A directory entry — even flagged hiring — is never presented as an
+  open vacancy.
 
 ## Work eligibility (`eligibility.py`, `eligibility_ui.py`)
 
@@ -65,23 +72,24 @@ its tool results.
   result carries the "preparation aid, not legal advice" disclaimer.
 - The `?view=eligibility` view edits the profile and renders the checklist.
 
-## Company database: Global Capital Atlas (`capital_atlas.py`)
+## Big companies: Global Capital Atlas (`capital_atlas.py`)
 
 - `capital.theojaffee.net` ships its 2,429 company records ($10B+ public and
-  private) inside its page JavaScript. The importer fetches only the fixed
+  private) inside its page JavaScript. The fetcher reads only the fixed
   homepage and the referenced `/assets/page-*.js` on the same host (8 MB
   bound), tolerantly parses the embedded record array (minified JS literals,
-  nested history arrays), and converts a bounded subset into `CatalogCompany`
-  leads with rank, formatted valuation, ticker, country, address, industry, and
-  provenance URL.
-- The companies view gains a third import ("Global Capital Atlas majors") with
-  the same value thresholds as the atlas ($10B+ … $1T+), and the source filter
-  accepts the new `Global Capital Atlas` catalogue source. `company_catalog`'s
-  fetcher now takes an explicit `max_bytes` bound instead of a hard-coded one.
+  nested history arrays), and stores a local `AtlasStore` snapshot
+  (`atlas_companies`, `atlas_snapshots` tables) that role-page filters run
+  against. `AtlasFilters`: value threshold ($10B+ … $1T+), ownership type,
+  industry, country, text query, bounded limit.
+- `to_catalog_company` converts selected atlas records into `CatalogCompany`
+  leads; the companies view keeps its "Global Capital Atlas majors" import,
+  and the source filter accepts the `Global Capital Atlas` catalogue source.
+  `company_catalog`'s fetcher takes an explicit `max_bytes` bound.
 
 ## Verification
 
-- `.venv/bin/python -m pytest -q` — 172 passed (24 new tests: directory
+- `.venv/bin/python -m pytest -q` — 181 passed (35 new tests: directory
   parsing/filters/store, eligibility rules/store, coordinator routing/budget/
   trace/provider-failure with a scripted fake provider, atlas parser/fetcher,
   Streamlit AppTest coverage of both new views).
