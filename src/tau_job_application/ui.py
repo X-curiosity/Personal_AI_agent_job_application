@@ -202,6 +202,11 @@ STYLES = """
     --clay: #d9865c;
 }
 .stApp, [data-testid="stAppViewContainer"] {background: #f7faf8; color: var(--ink); color-scheme: light;}
+/* Hide the default Streamlit chrome: the white header bar and its colored top line.
+   The sidebar collapse control stays usable; the bar itself is transparent. */
+[data-testid="stDecoration"] {display: none;}
+[data-testid="stHeader"] {background: transparent; box-shadow: none; backdrop-filter: none;}
+[data-testid="stHeader"] [data-testid="stToolbar"] {background: transparent;}
 .block-container {padding-top: 1.35rem; padding-bottom: 3rem; max-width: 1440px;}
 div[data-testid="stSidebar"] {background: #173a31;}
 div[data-testid="stSidebar"] * {color: #f5f5ed;}
