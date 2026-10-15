@@ -42,6 +42,12 @@ _WORKPLACE_ONLY_LOCATION_LABELS = frozenset({
 # avoids pretending that an opaque model has verified relevance: users see and
 # can edit the generated aliases before a public board is queried.
 ROLE_FAMILY_ALIASES: tuple[tuple[tuple[str, ...], tuple[str, ...]], ...] = (
+    (("hardware engineer",), ("Hardware Engineer", "Electrical Engineer", "Hardware Design Engineer", "Hardware Validation Engineer", "FPGA Engineer", "ASIC Engineer")),
+    (("electrical engineer",), ("Electrical Engineer", "Electronics Engineer", "Hardware Design Engineer")),
+    (("mechanical engineer",), ("Mechanical Engineer", "Mechanical Design Engineer", "Mechatronics Engineer")),
+    (("investment banking",), ("Investment Banking Analyst", "M&A Analyst", "Investment Banking Associate")),
+    (("private equity",), ("Private Equity Analyst", "Private Equity Associate")),
+    (("venture capital",), ("Venture Capital Analyst", "Venture Capital Associate")),
     (("backend",), ("Backend Developer", "Platform Engineer", "Software Engineer")),
     (("frontend",), ("Front End Engineer", "Frontend Developer", "UI Engineer")),
     (("full stack", "fullstack"), ("Full Stack Engineer", "Software Engineer")),

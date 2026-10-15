@@ -19,7 +19,7 @@ apply on the employer's official site → practice for the interview
 | Transparent relevance | Ranking uses editable role aliases and local CV-skill overlap, with reasons shown beside a result. | Label it **Role relevance**, explain the matched terms/skills, and state that it is not a prediction of being hired. |
 | Direct official application handoff | A result can open its supplied official listing and seed a local Job Workspace. | Make the two actions visually clear: **Open official application** and **Prepare this application**. The former leaves the product; the latter never submits anything. |
 | Focused local preparation | A Job Workspace keeps the role-specific CV guidance, evidence review, proof projects, interview practice, and coaching history locally. | Keep preparation tied to one role and preserve the distinction between completed evidence and a proposed project. |
-| Candidate-entered progress | The Role market has a local `saved`, `tracking`, and `hidden` shortlist that preserves a source snapshot across refreshes. None of those states means an application was sent. | Add a fuller, user-edited application timeline next; it should never infer that opening a listing or downloading a document means the person applied. |
+| Candidate-entered progress | My applications retains saved adverts across refreshes and records explicit stages, dates, next steps, notes, and history. | Continue making progress editable; opening a listing or downloading a document must not be treated as an application. |
 
 Whali's public job-board materials also illustrate the value of showing a score explanation, filtering a role list, and handing a candidate to an employer's application page. Those interaction ideas are useful here; marketing claims or proprietary data coverage are not treated as product evidence. See [Whali's job-board documentation](https://whali.com/docs/job-board).
 
@@ -36,7 +36,7 @@ The visual hierarchy can take inspiration from the compact listing layout in the
       [Open official application]  [Prepare this application]
 ```
 
-- Use a generated company monogram rather than scraping or hotlinking company logos.
+- Use a managed visual catalog or a candidate-supplied public HTTPS image with a local initials fallback. Do not scrape employer sites, guess a company's domain, or generate a logo; name the catalog and let the candidate replace or suppress a mark.
 - Show location, workplace type, employment type, and source timestamp only when the source supplies them.
 - Put the explanation and source provenance near the primary actions; full description and company facts can stay in an expandable details area.
 - Do not show labels such as “actively reviewing,” “promoted,” or “easy apply” unless a permitted source provides that exact status and the product is authorized to display it. This product should call the action **Open official application**, not imply an in-product submission flow.
@@ -60,9 +60,11 @@ Connection preparation can still be valuable, but only with candidate-supplied c
 
 Continue improving the source-provenance cards, explicit official-listing handoff, local role preparation, and interview-practice loop. Keep refreshes user-triggered and make unavailable or unsourced facts visibly unknown.
 
-### Phase 2 — Local application timeline
+### Phase 2 — Local application timeline (implemented)
 
-Extend the local shortlist with candidate-edited milestones such as `preparing`, `applied by me`, `interviewing`, `offer`, `rejected`, and `withdrawn`, plus dates and notes. Every status change should be explicit, locally stored, editable, and exportable/deletable. The product must not advance a status based on a click, a download, an email draft, or a calendar event.
+My applications now extends the shortlist with Saved, Preparing, Applied, Contacted, Interview, Offer, and Closed; Rejected and Withdrawn are closing reasons. Candidate-entered deadlines, next actions/dates, notes, and application dates have a local change history and JSON export. The original advert stays attached to the record. Old shortlist entries carry over as Saved; removing a tracker record prevents its automatic reimport.
+
+The **I applied** action explicitly records the candidate's confirmation. Opening the employer page, creating a preparation workspace, or hiding a feed card does not advance an application. Listing expiry remains a separate candidate-entered observation; absence from a refreshed feed is inconclusive.
 
 ### Phase 3 — Opt-in email and calendar connectors
 

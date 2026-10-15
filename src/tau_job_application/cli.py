@@ -30,6 +30,9 @@ def _parser() -> argparse.ArgumentParser:
     agent = commands.add_parser("agent", help="Run the optional Tau agent (requires model credentials)")
     agent.add_argument("candidate", type=Path)
     agent.add_argument("job", type=Path)
+    team = commands.add_parser("agent-team", help="Route one request through the optional multi-agent team (requires model credentials)")
+    team.add_argument("request", type=str)
+    team.add_argument("--specialist", choices=["company_scout", "eligibility_advisor", "application_prep"], default=None)
     commands.add_parser("ui", help="Launch the local Streamlit application")
     return parser
 
@@ -42,6 +45,8 @@ def main() -> None:
         print(render_markdown(analyze_files(args.candidate, args.job)))
     elif args.command == "ui":
         subprocess.run([sys.executable, "-m", "streamlit", "run", str(Path(__file__).with_name("ui.py"))], check=True)
+    elif args.command == "agent-team":
+        asyncio.run(_run_agent_team(args.request, specialist=args.specialist))
     else:
         asyncio.run(_run_agent(args.candidate, args.job))
 
@@ -54,3 +59,35 @@ async def _run_agent(candidate_path: Path, job_path: Path) -> None:
 
     async for event in build_agent().prompt(prompt):
         print(event)
+
+
+async def _run_agent_team(request: str, *, specialist: str | None = None) -> None:
+    """One bounded specialist run; routing, budget, and trace stay visible."""
+
+    from tau_job_application.agents import TeamCoordinator, TeamDependencies
+    from tau_job_application.agent import build_agent  # validates credentials early
+    from tau_job_application.company_catalog import CompanyCatalogStore
+    from tau_job_application.eligibility import ResidencyStore
+    from tau_job_application.yc_directory import YCDirectoryStore
+
+    harness = build_agent()  # raises unless OPENAI_API_KEY and MODEL_NAME are set
+    database = PROJECT_ROOT / ".job_assistant" / "assistant.sqlite"
+    coordinator = TeamCoordinator(
+        provider=harness.config.provider, model=harness.config.model,
+        deps=TeamDependencies(
+            yc_store=YCDirectoryStore(database),
+            catalog_store=CompanyCatalogStore(database),
+            residency_store=ResidencyStore(database),
+            workspace_id="cli",
+        ),
+    )
+    result = await coordinator.run(request, agent_key=specialist)
+    print(f"# {result.agent_name} — {result.routing.reason}")
+    for call in result.tool_trace:
+        status = "ok" if call.ok else ("error" if call.ok is False else "pending")
+        print(f"- [{status}] {call.tool_name} {call.arguments}")
+    if result.blocked_tool_calls:
+        print(f"- {result.blocked_tool_calls} tool call(s) blocked by the run budget")
+    if result.error:
+        print(f"ERROR: {result.error}")
+    print(result.text)

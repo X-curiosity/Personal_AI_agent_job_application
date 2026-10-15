@@ -29,7 +29,7 @@ def persist_active_inputs(store: WorkspaceStore):
         st.session_state.pop("active_scope", None)
 
 
-def choose_scope(store: WorkspaceStore) -> tuple[str, str]:
+def choose_scope(store: WorkspaceStore, *, compact: bool = False) -> tuple[str, str]:
     persist_active_inputs(store)
     workspaces = store.list_workspaces()
     if not workspaces:
@@ -58,6 +58,13 @@ def choose_scope(store: WorkspaceStore) -> tuple[str, str]:
                         st.rerun()
                     except ValueError as exc:
                         st.error(str(exc))
+        if compact:
+            previous = st.session_state.pop("active_scope", None)
+            if previous:
+                for field in DRAFT_FIELDS:
+                    st.session_state.pop(draft_key(previous[1], field), None)
+            st.caption("Your interests and application records stay on this device. Select a role or vacancy in the main panel.")
+            return wid, ""
         threads = store.list_threads(wid)
         if not threads:
             store.create_thread(wid, "New target role")

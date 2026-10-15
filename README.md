@@ -6,6 +6,8 @@ The product organizes a broad career direction into related target jobs, connect
 
 **Status: local prototype, not a production hiring platform or validated tutor.** The current application implements a deterministic assessment workflow, a Streamlit interface, source connectors, and optional model access. Several important capabilities remain templates or heuristics. The research-based learning system below is a proposed next stage, not a description of features already shipped.
 
+**15 October 2026 — role-first portal:** start at `?view=career` or **Find my roles**. Multi-interest onboarding leads to role clusters and per-vacancy CV/letter, project-evidence, contact-search and reply-review workspaces. The portal adds OpenAI's official Ashby board to the existing sources. Gmail/Slack readers require external token setup; there is no one-click account login or autonomous application submission. See [implementation report and decisions](docs/ROLE_FIRST_IMPLEMENTATION_REPORT.md), [Codex context](Codex.md), and [module context](src/tau_job_application/codex.md).
+
 ## Contents
 
 - [1. Run locally](#1-run-locally)
@@ -70,7 +72,10 @@ uv run --no-sync tau-job-application agent fixtures/candidate.txt fixtures/job.t
 | Profile links | GitHub, portfolio, LinkedIn, and X fields | Portfolio/social links alone do not retrieve or validate a person's work |
 | GitHub enrichment | Optional public API lookup of profile/repository language signals | No repository code review; languages are unconfirmed signals, not proof of proficiency |
 | Job intake | Natural-language descriptions, one explicitly submitted public HTTPS job URL, server-rendered/JSON-LD extraction, contextual skill/capability extraction, requirement review, company-board connectors, CSV/JSON imports | No crawling; JavaScript-only/authenticated pages may fail; English-first skill heuristics need review |
-| Role market | User-triggered refresh of registered Greenhouse and Ashby public employer feeds; compact source-truthful role cards, editable role-family aliases, deterministic local CV-skill overlap ranking, local saved/tracking/hidden shortlist states, source provenance, and a listing-location map | A small vetted registry, not a web-wide job search, hiring prediction, eligibility check, automatic application, automatic outreach, or alert service. The separate official-board path also supports a user-supplied Lever board. |
+| Role market | User-triggered refresh of registered Greenhouse, Lever, and Ashby public employer feeds; compact source-truthful role cards, editable role-family aliases, deterministic local CV-skill overlap ranking, local saved/tracking/hidden shortlist states, source provenance, a listing-location map, and managed company marks | A reviewed employer-board registry, not a web-wide job search, hiring prediction, eligibility check, automatic application, automatic outreach, or alert service. Company marks are a small named visual catalog, a candidate-managed public HTTPS image, or initials—not automatic company enrichment. |
+| Company database | Manual, capped imports from CompaniesMarketCap and the yc-oss hiring-company dataset; local filters, source links, opt-in logo loading, and reviewed employer-board registration | Directory membership is not a vacancy. The app does not crawl arbitrary company sites; jobs appear only after a Greenhouse, Lever, or Ashby public board is verified. YC data is a community mirror, not an official YC API. |
+| Product home | Separate dynamic landing route with a local snapshot of job workspaces, the newest role market, shortlist choices, and a small opening preview | It never refreshes a feed, uploads profile data, applies, or contacts anyone; counters are saved local observations and availability must be verified on the official listing. |
+| My applications | Saved roles across the selected career track, editable stages, deadlines, next steps, notes, retained adverts, history and JSON export; per-vacancy document/reply workspace | User-confirmed progress by default; optional bound Gmail replies can record clear future outcomes after setup/consent. Opening an employer page never marks a role Applied; missing feed results never mark it Expired. |
 | Extraction memory | Saved per-description corrections and explicitly approved phrase-to-skill mappings | Local Quick start memory, not LLM fine-tuning; repetition alone never confirms a mapping |
 | Role comparison | Deterministic required/preferred skill coverage | Not a probability of being hired; no comprehensive European eligibility filtering |
 | Evidence match | A transparent role-and-project evidence view: confirmed CV coverage plus user-confirmed completed projects with a proof reference and observable outcome/test | Not a prediction of an interview, offer, or hiring outcome; never derives a score from employee profiles, historic hires, LinkedIn, or unconfirmed GitHub language signals |
@@ -80,18 +85,31 @@ uv run --no-sync tau-job-application agent fixtures/candidate.txt fixtures/job.t
 | Learning plan | Missing-skill list, selected prerequisites, small static resource catalog | Not yet an adaptive knowledge model or interactive dependency graph |
 | Standout project plan | One focused proof project and, only when useful, one sequenced integration project for unmet, evidence-backed role gaps, with milestones, deliverables, and acceptance checks | No live project research or company-specific project design; proposed work is never counted as completed evidence |
 | Job monitoring | User-triggered refreshes of individual permitted boards, local snapshots, and newly observed fingerprints | No scheduled alerts, reliable closure detection, or cross-source deduplication |
-| LinkedIn handoff | Opens a user-selected role search on LinkedIn | No LinkedIn listing feed/import, profile or people search, scraping, or outreach |
+| LinkedIn handoff | Opens role searches or role-specific people-search suggestions on LinkedIn | No automated listing/profile retrieval, verified named-person recommendations, scraping or outreach |
 | Interview practice | Role-specific questions, typed responses, keyword-based feedback, and a saved practice history inside each Job Workspace | Measures answer structure heuristically, not technical correctness |
 | Voice input | Recording plus explicitly requested OpenAI transcription | Audio leaves the machine when transcription is requested |
 | Career tracks | Optional folders containing multiple Job Workspaces, skill overlap, and merged learning priorities | Manual organization; not automatic role clustering or a complete semantic job search |
 | Profile company explorer | A small curated world map, locally ranked from skills detected in the selected CV, regional overview filters, and a company drill-down with selected source-linked HQ/research/engineering hubs and their public focus | Not a live vacancy feed, hiring prediction, eligibility check, complete office directory, or assertion that every pin is a headquarters |
 | Coach | Separate persistent chat history per Job Workspace; local report guide or optional read-only AI coach | Local mode is templated; AI mode needs credentials and explicit context-sharing consent |
 | Optional agent | Bounded Tau CLI harness with domain tools; one-turn, tool-free UI coaching | Quick start scoring remains deterministic; no autonomous research subagents |
-| Persistence | Shared profile, job-workspace inputs, analysis/CV guidance, chats, and interview practice, plus legacy snapshots, audit events, and source-watch records in SQLite | Not yet a full application-status tracker, résumé version editor, or multi-user service |
+| Persistence | Shared profile, job-workspace inputs, analysis/CV guidance, chats, interview practice, application progress and history, plus legacy snapshots, audit events, and source-watch records in SQLite | Local storage; no multi-user service or cross-device sync |
 
 The [Jobright comparison](docs/JOBRIGHT_IMPROVEMENT_REPORT.md) contains the detailed code review and product backlog. It distinguishes Jobright's advertised features from independently verified behavior; marketing performance claims are not benchmarks for this project. The [Whali-inspired Role-market direction](docs/WHALI_INSPIRED_PRODUCT_DIRECTION.md) separately records which job-board interaction patterns fit this product and which outreach-automation patterns are intentionally excluded.
 
 ## 3. How to use the interface
+
+### Role-first portal
+
+1. Open **Find my roles** or `?view=career`. Select multiple fields and subfields, choose suggested roles, or enter custom titles. Cross-disciplinary roles appear in several branches; education is not an eligibility gate.
+2. Open a role page. Its first cluster loads from official public feeds; **Refresh positions** checks again. Company/location filters, source publication dates and pagination keep the two-column list manageable. Current portal coverage is Figma, Mistral AI, Cloudflare and OpenAI—not a comprehensive job index. Finance and other sectors need additional sources.
+3. Open a vacancy's **application workspace**. This saves it at **Saved**, not Applied. Upload or paste a CV/background and motivation letter, review extracted skills and select **Save documents & assess fit**. Review CV coverage and completed-project coverage separately.
+4. Add real project proof under **Project evidence**. Generate reviewable text CV/letter drafts when useful; placeholders need your edits. Missing background is never fabricated. The letter does not earn fit-score points.
+5. **People to contact** offers LinkedIn search strategies and emails explicitly mentioned in the advert. Optional pattern-based email output is marked unverified; it is not a verified contact, stored hypothesis or send action.
+6. **Replies & status** supports read-only Gmail/Slack adapters after external token setup, conversation/sender binding and read consent. Manual checks and optional page-open 60-second polling are available. Gmail auto-progression is separately opt-in; ambiguous/old/Slack replies remain review items. Provider credentials, limitations and setup are in the [report](docs/ROLE_FIRST_IMPLEMENTATION_REPORT.md#connection-setup).
+7. Use **Apply** to open the official form and confirm a real submission. No computer-use autofill/submission runner is enabled. **Application dashboard** retains the application's history and links back to its documents and replies.
+8. Open **Company database** to import a bounded public-company or hiring-YC set. Review source records, then connect a company's public Greenhouse, Lever, or Ashby identifier. Verified boards automatically join later role-page refreshes.
+
+The original workspace tabs remain available for existing workflows. With no saved interests, the base route also places onboarding above them.
 
 ### Career tracks and Job Workspaces
 
@@ -119,7 +137,21 @@ These are organizational examples, not title-matching rules. A Career track can 
 - **Changed inputs:** old snapshots remain stored but become stale; they are excluded from comparisons and coaching until **Refresh this job workspace** is run again. Saved requirement corrections also invalidate snapshots using that exact job text.
 - **Deletion:** deleting a workspace removes its inputs, latest result, completed-project evidence, chat, and interview rehearsal history. It does not delete the separate shared profile, approved extraction memory, or legacy analysis records.
 
-The tables are `career_workspaces`, `career_threads`, `career_messages`, `career_interview_attempts`, `career_shared_profile`, and `career_project_evidence` in `.job_assistant/assistant.sqlite`. Pre-workspace entries in the legacy `analyses` table are preserved but not automatically assigned to a Career track.
+The local database is `.job_assistant/assistant.sqlite`. Workspace/profile tables include `career_workspaces`, `career_threads`, `career_messages`, `career_interview_attempts`, `career_shared_profile`, and `career_project_evidence`. Discovery uses `role_discovery_runs`, `role_discovery_results`, `role_market_states`, and `company_brand_assets`; source-aware company intake uses `company_catalog`, `company_catalog_imports`, and `company_job_boards`; application tracking uses `tracked_applications`, `application_events`, and `application_shortlist_imports`. Pre-workspace entries in the legacy `analyses` table are preserved but not automatically assigned to a Career track.
+
+### Track your applications
+
+Select **Save for review** on a role card to keep it in **My applications**, accessible from the sidebar or the Role market. **Start tracking** opens this page. It collects applications across the job workspaces in the selected career track; change the career track in the sidebar to switch the collection. Existing Saved/Tracking shortlist entries carry over once as Saved.
+
+- The stages are **Saved, Preparing, Applied, Contacted, Interview, Offer, and Closed**. Use **I applied** after submitting on the employer's website, or edit the status under **Update progress & notes**. Each save records your changes in the application's history.
+- Add an application deadline, next action and date, application date, and notes. **Your next seven days** surfaces overdue actions and upcoming deadlines first; **Closing soon** and **Next action** sorting show the full queue. Deadlines are currently entered by you, not extracted automatically from adverts; date cues use Europe/Zurich.
+- Click a stage in the pipeline to filter its applications, or enable **Needs attention in the next seven days** to focus on due actions and upcoming deadlines. The interface uses green and white; overdue next steps also have a red **Overdue action** label, so urgency is not communicated by colour alone.
+- Choose **Closed** with Rejected, Withdrawn, or another reason to archive an application. Select **Closed** or **All stages** to revisit it. You can reopen it by changing its stage.
+- Mark a listing Open or Expired after checking it yourself. Its original advert and progress remain available. Disappearance from a refresh is not treated as proof of expiry.
+- **Prepare this role** opens or creates its preparation workspace using the official listing URL. It does not change the application stage. Hiding a role or removing its feed status also keeps the application record.
+- **History & saved advert** retains the source snapshot and change history. **Export your application history** downloads the selected career track as JSON. Removing an application removes its history; deleting its owning job workspace also deletes the associated application records. A removed record is not recreated by shortlist migration, but you can explicitly save the role again.
+
+This flow adapts application-management patterns described in [Whali's job-board documentation](https://whali.com/docs/job-board). The new vacancy workspace adds optional, bound Gmail outcome updates; sending emails, calendar events, off-page scheduled reminders and automatic listing-expiry detection remain unimplemented.
 
 ### Build a Job Workspace
 
@@ -135,7 +167,8 @@ The tables are `career_workspaces`, `career_threads`, `career_messages`, `career
    - **Evidence match:** an evidence-only score for this role. Add completed work you can substantiate with your contribution, skills, a non-confidential proof reference, and an observable outcome/test. It retains CV coverage separately, and never treats a missing or unrelated project as a zero.
    - **Proof projects:** separates your finished evidence from one or two gap-driven standout projects. The first makes the highest-priority unmet skill visible; an optional second integrates the first few remaining gaps into a stronger portfolio case. When eligible completed project proof already covers the gap, the suggestion disappears rather than creating redundant work. A proposed project does not earn Evidence match credit until it is actually complete and you explicitly add its proof.
    - **Interview lab:** role-specific questions, structured feedback, and saved rehearsal history.
-   - **Role market:** a role-first opportunity board built only when you choose to refresh registered Greenhouse or Ashby public feeds. It offers editable title aliases, local CV-skill ranking, source-aware filters, listing-location pins, a separate company-research view, and lawful manual-source options.
+   - **Role market:** a role-first opportunity board built only when you choose to refresh registered Greenhouse or Ashby public feeds. It offers editable title aliases, local CV-skill ranking, source-aware filters, listing-location pins, a separate company-research view, and lawful manual-source options. Cards use a small named visual catalog where available and initials elsewhere. Open **Manage company marks** to replace a mark with a public HTTPS image you are allowed to use, force initials, or remove a local override. The browser loads those images directly; the app does not scrape company sites or fetch logo files server-side.
+   - **Product home:** select **Product home** in the sidebar, or open `?view=landing`, for a separate dynamic view of your latest local role market. It is a summary and entry point; use **See live role markets** to return with that view placed first.
    - **Coach:** job-scoped local guidance or optional consented AI coaching.
 9. Download the Markdown planning report if desired. The current UI blocks this download when the heuristic authenticity status is `blocked`; this is a prototype behavior, not a reliable factual-verification gate.
 
@@ -207,6 +240,8 @@ The **Role market** replaces the prior manual-contact-research entry point with 
 - **Bring a lawful source** is separate from the registered role market: enter an official employer board you know (Greenhouse, Lever, or Recruitee), use a permitted SmartRecruiters employer token, or import a CSV/JSON job export you personally exported or obtained with permission. These inputs remain reviewable and are not silently added to the registered-feed market.
 - Registered-feed role cards distinguish **Open official application** from **Prepare this application**. The first opens the supplied employer page; the second creates (or reopens) a local preparation workspace. Manual-board and imported jobs retain **Create job workspace** buttons. The workspace pre-fills title, company, URL, and description in the current Career track, with the shared CV as a starting point. Review the new workspace and analyze the job; opening, saving, tracking, or preparing a listing does not record an application as submitted.
 - **Profile company explorer** is a separate research view, using a small local catalogue and skill overlap from the selected Job Workspace's CV (or the saved shared profile if this workspace has no CV). Its source-linked HQ/research/engineering-hub footprint is not the role-location map and never supplies locations for an opening.
+
+The separate **Company database** route (`?view=companies`) adds company discovery without weakening these source rules. CompaniesMarketCap is read from one ranking page and the YC import reads the yc-oss `companies/hiring.json` snapshot; each request is fixed-host, HTTPS-only, 15-second bounded, capped at 8 MB and stores at most 100 companies. The initial local catalogue contains 10 public companies and 10 hiring YC hardware startups; refreshes are manual and idempotent. Remote YC logos load only after the user opts in because the image host otherwise receives the browser's IP address. A directory record produces no jobs until its supported official ATS board is tested and saved.
 
 Example CSV schema for a lawful job export:
 
@@ -298,6 +333,7 @@ src/tau_job_application/
 ├── evidence_match_store.py # scoped SQLite storage for completed project proof
 ├── career.py            # CV heuristics, template tailoring, contact queries
 ├── company_explorer.py  # local, profile-skill company / selected-hub catalogue and ranking
+├── company_catalog.py   # bounded public/YC company imports and reviewed ATS mappings
 ├── authenticity.py      # source-CV wording/claim heuristics
 ├── planning.py          # static skill resources and project templates
 ├── sources.py           # company-board APIs, registered-board raw openings, and GitHub signals
@@ -350,6 +386,7 @@ See [European source strategy](docs/EU_JOB_SOURCE_STRATEGY.md) for research cont
 - The profile company explorer compares CV skills to its local catalogue in-process. Its map basemap is fetched by the browser from Carto; map requests do not include CV text, profile links, or the company-match list. Company-footprint source and career links open only after an explicit user action. Site descriptions are source-linked research prompts, not live role data or a comprehensive office directory.
 - Portfolio/social URLs, imported records, and generated text must be reviewed. A URL's presence or an email's format does not verify a person's role or address.
 - Data-retention, selective deletion, consent records, credential clearing, and error-redaction tests remain necessary improvements.
+- New portal reply data is read only after conversation-level consent; connector errors are redacted and tokens are supplied through the server environment. Reply excerpts persist locally until application deletion. Exact sender matching is not cryptographic identity verification; start with manual review. Auto-mode is a prototype literal classifier, not a reliable universal email-understanding system.
 - No AI-authorship percentage, ATS-pass guarantee, hiring probability, or independently verified CV claim is produced by the current system.
 
 ## 8. Proposed learning system
@@ -596,6 +633,14 @@ Detailed product comparison: [Jobright improvement report](docs/JOBRIGHT_IMPROVE
 Keep the UI simple: **shared profile → career direction → target-job thread → reviewed application → learn/build next → demonstrate progress**. Avoid spending effort on bulk autofill before the core workflow and learning outcomes are reliable.
 
 ## 12. Testing and troubleshooting
+
+Role-first delivery verification is recorded in the reports; rerun the current suite rather than relying on a historical test count. Company-catalog coverage includes HTML/JSON parsing, input bounds, fixed source selection, idempotent persistence, and reviewed board-provider validation. Live Gmail/Slack credentials were not used. See the [role-first report](docs/ROLE_FIRST_IMPLEMENTATION_REPORT.md) and [company-catalog report](docs/COMPANY_CATALOG_IMPLEMENTATION_REPORT.md).
+
+### Role-first operations and resource budget
+
+The feature map and interfaces are in [module context](src/tau_job_application/codex.md). No new runtime dependencies, custom browser JavaScript, visitor analytics or fingerprinting were added. Portal pages show at most twelve vacancy tiles at once; catalogue imports and displays are bounded, uploads are capped at 5 MB, extracted documents at 100,000 characters, and optional reply polling at one check per 60 seconds while its page remains open. Initial framework payload and load-time baselines are unmeasured; establish them before public deployment rather than claiming a performance improvement.
+
+Continue to bind the preview to localhost. Public hosting needs authentication, account isolation, HTTPS/security-header policy, safe credential lifecycle, validated mail attribution, retention/deletion controls and coordinated rate limits. To back up private data, stop the app and protect a copy of `.job_assistant/assistant.sqlite`; test restoration before destructive changes. No managed backup, incident-alert service or public deployment is configured. Credentials remain environment configuration; dependencies remain locked in `uv.lock`. The implementation report records current limitations and follow-up release gates.
 
 ### Existing regression suite
 

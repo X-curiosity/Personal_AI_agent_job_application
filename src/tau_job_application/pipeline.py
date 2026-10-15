@@ -1,6 +1,7 @@
 """Framework-independent, evidence-first job-readiness workflow."""
 
 from pathlib import Path
+import re
 
 from tau_job_application.authenticity import check_authenticity
 from tau_job_application.career import score_cv, tailor_resume
@@ -20,8 +21,16 @@ def analyze_texts(
     company: str | None = None,
     job_url: str | None = None,
     requirement_memory: RequirementMemory | None = None,
+    confirmed_skills: list[str] | None = None,
 ) -> AnalysisResult:
     candidate = parse_candidate_text(candidate_text, links=links)
+    if confirmed_skills is not None:
+        if not set(confirmed_skills).issubset(candidate.skills):
+            raise ValueError("Only skills present in the supplied CV can be confirmed")
+        confirmed_ids = {"candidate-skill-" + re.sub(r"[^a-z0-9]+", "-", skill.casefold()).strip("-") for skill in confirmed_skills}
+        for item in candidate.evidence:
+            if item.id.startswith("candidate-skill-"):
+                item.confirmed = item.id in confirmed_ids
     job = parse_job_text(job_text, title=job_title, company=company, url=job_url, memory=requirement_memory)
     match = calculate_match(candidate, job)
     skill_tree = build_skill_tree(match)

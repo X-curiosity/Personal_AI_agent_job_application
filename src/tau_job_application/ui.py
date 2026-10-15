@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import os
+import sys
 import hashlib
 from datetime import UTC, datetime
 from html import escape
@@ -13,6 +14,16 @@ from urllib.parse import quote_plus
 import pydeck as pdk
 import streamlit as st
 
+from tau_job_application.application_tracker import ApplicationTrackerStore
+from tau_job_application.application_tracker_ui import render_application_tracker
+from tau_job_application.career_hub import HubStore
+from tau_job_application.career_hub_ui import render_portal, render_onboarding
+from tau_job_application.career_hub_ui import go as _hub_go
+from tau_job_application.agents_ui import render_agents_console
+from tau_job_application.company_branding import CompanyBrandStore, validate_public_https_logo_url
+from tau_job_application.company_catalog import CompanyCatalogStore
+from tau_job_application.eligibility import ResidencyStore
+from tau_job_application.eligibility_ui import render_eligibility
 from tau_job_application.company_explorer import COMPANY_PINS, company_footprint, detected_profile_skills, recommend_companies
 from tau_job_application.evidence_match_store import EvidenceMatchStore
 from tau_job_application.hiring_match import (
@@ -23,6 +34,11 @@ from tau_job_application.hiring_match import (
 )
 from tau_job_application.interview import build_interview_questions, evaluate_answer, transcribe_openai_audio
 from tau_job_application.job_pages import fetch_job_url
+from tau_job_application.landing_page import (
+    LandingOpportunity,
+    build_landing_page_data,
+    render_landing_page,
+)
 from tau_job_application.official_sources import (
     fetch_smartrecruiters_postings,
     import_job_export,
@@ -62,6 +78,8 @@ from tau_job_application.sources import (
 from tau_job_application.storage import LocalStore
 from tau_job_application.workspaces import PROFILE_FIELDS, WorkspaceStore
 from tau_job_application.workspace_ui import choose_scope, draft_key, show_chat, show_direction
+from tau_job_application.yc_directory import YCDirectoryStore
+from tau_job_application.yc_directory_ui import render_yc_browser
 
 
 def _project_root() -> Path:
@@ -79,6 +97,15 @@ WORKSPACES = WorkspaceStore(ROOT / ".job_assistant" / "assistant.sqlite")
 ROLE_DISCOVERY = RoleDiscoveryStore(ROOT / ".job_assistant" / "assistant.sqlite")
 EVIDENCE_MATCHES = EvidenceMatchStore(ROOT / ".job_assistant" / "assistant.sqlite")
 ROLE_MARKET_STATES = RoleMarketStateStore(ROOT / ".job_assistant" / "assistant.sqlite")
+COMPANY_BRANDS = CompanyBrandStore(ROOT / ".job_assistant" / "assistant.sqlite")
+APPLICATIONS = ApplicationTrackerStore(ROOT / ".job_assistant" / "assistant.sqlite")
+COMPANY_CATALOG = CompanyCatalogStore(ROOT / ".job_assistant" / "assistant.sqlite")
+YC_DIRECTORY = YCDirectoryStore(ROOT / ".job_assistant" / "assistant.sqlite")
+RESIDENCY = ResidencyStore(ROOT / ".job_assistant" / "assistant.sqlite")
+
+
+def _application_store() -> ApplicationTrackerStore:
+    return APPLICATIONS if APPLICATIONS.path == WORKSPACES.path else ApplicationTrackerStore(WORKSPACES.path)
 
 
 def _evidence_store() -> EvidenceMatchStore:
@@ -94,6 +121,43 @@ def _role_market_state_store() -> RoleMarketStateStore:
         ROLE_MARKET_STATES
         if ROLE_MARKET_STATES.path == WORKSPACES.path
         else RoleMarketStateStore(WORKSPACES.path)
+    )
+
+
+def _company_brand_store() -> CompanyBrandStore:
+    """Use the active workspace database in UI tests as well as in the app."""
+
+    return (
+        COMPANY_BRANDS
+        if COMPANY_BRANDS.path == WORKSPACES.path
+        else CompanyBrandStore(WORKSPACES.path)
+    )
+
+
+def _company_catalog_store() -> CompanyCatalogStore:
+    """Use the active workspace database in UI tests as well as in the app."""
+    return (
+        COMPANY_CATALOG
+        if COMPANY_CATALOG.path == WORKSPACES.path
+        else CompanyCatalogStore(WORKSPACES.path)
+    )
+
+
+def _yc_directory_store() -> YCDirectoryStore:
+    """Use the active workspace database in UI tests as well as in the app."""
+    return (
+        YC_DIRECTORY
+        if YC_DIRECTORY.path == WORKSPACES.path
+        else YCDirectoryStore(WORKSPACES.path)
+    )
+
+
+def _residency_store() -> ResidencyStore:
+    """Use the active workspace database in UI tests as well as in the app."""
+    return (
+        RESIDENCY
+        if RESIDENCY.path == WORKSPACES.path
+        else ResidencyStore(WORKSPACES.path)
     )
 
 
@@ -127,7 +191,7 @@ STYLES = """
     --line: #dce4d9;
     --clay: #d9865c;
 }
-.stApp, [data-testid="stAppViewContainer"] {background: linear-gradient(135deg, #fcfbf6 0%, #f2f5ed 56%, #f8f8f1 100%); color: var(--ink); color-scheme: light;}
+.stApp, [data-testid="stAppViewContainer"] {background: #f7faf8; color: var(--ink); color-scheme: light;}
 .block-container {padding-top: 1.35rem; padding-bottom: 3rem; max-width: 1440px;}
 div[data-testid="stSidebar"] {background: #173a31;}
 div[data-testid="stSidebar"] * {color: #f5f5ed;}
@@ -170,7 +234,9 @@ a[data-testid="stBaseLinkButton-secondary"] * {color: #173a31 !important;}
 div[data-testid="stTabs"] [role="tab"], div[data-testid="stTabs"] [role="tab"] * {font-weight: 650 !important; color: #52665b !important; opacity: 1 !important;}
 div[data-testid="stTabs"] [role="tab"][aria-selected="true"], div[data-testid="stTabs"] [role="tab"][aria-selected="true"] * {color: #173a31 !important;}
 div[data-testid="stExpander"] {background: rgba(255,255,252,.66); border: 1px solid var(--line); border-radius: 10px;}
-.role-feed-avatar {width: 46px; height: 46px; display: grid; place-items: center; border-radius: 12px; background: linear-gradient(145deg, #e6efe8, #cfded1); border: 1px solid #b8cdbb; color: #1d493c; font-size: .84rem; font-weight: 800; letter-spacing: .045em; margin-top: .25rem;}
+.role-feed-avatar {position:relative; overflow:hidden; width: 46px; height: 46px; display: grid; place-items: center; border-radius: 12px; background: linear-gradient(145deg, #e6efe8, #cfded1); border: 1px solid #b8cdbb; color: #1d493c; font-size: .84rem; font-weight: 800; letter-spacing: .045em; margin-top: .25rem;}
+.role-feed-avatar .role-feed-monogram {display:grid; place-items:center; width:100%; height:100%;}
+.role-feed-avatar img {position:absolute; inset:0; width:100%; height:100%; object-fit:contain; padding:5px;}
 .role-feed-title {font-size: 1.02rem; line-height: 1.25; font-weight: 760; color: #173a31; margin: .05rem 0 .22rem;}
 .role-feed-company {font-size: .88rem; color: #415d51; margin: 0 0 .3rem;}
 .role-feed-meta {display: flex; gap: .35rem; flex-wrap: wrap; margin: .1rem 0 .35rem;}
@@ -189,28 +255,188 @@ div[data-testid="stExpander"] {background: rgba(255,255,252,.66); border: 1px so
 def main() -> None:
     st.set_page_config(page_title="Career Workspace", page_icon="◒", layout="wide")
     st.markdown(STYLES, unsafe_allow_html=True)
-    workspace_id, thread_id = choose_scope(WORKSPACES)
+    if _route_value("view") == "landing":
+        _product_landing()
+        return
+
+    workspace_id, thread_id = choose_scope(WORKSPACES, compact=_route_value("view") in {"career", "onboarding", "role", "application", "companies", "yc", "eligibility", "agents"})
+    with st.sidebar:
+        st.divider()
+        if st.button("Find my roles", key="open-career-hub", use_container_width=True):
+            _navigate(view="career")
+        if st.button("My applications", key="open-application-tracker", use_container_width=True):
+            _navigate(view="applications")
+        if st.button("Company database", key="open-company-database", use_container_width=True):
+            _navigate(view="companies")
+        if st.button("YC explorer", key="open-yc-explorer", use_container_width=True):
+            _navigate(view="yc")
+        if st.button("Work eligibility", key="open-eligibility", use_container_width=True):
+            _navigate(view="eligibility")
+        if st.button("Agent team", key="open-agent-team", use_container_width=True):
+            _navigate(view="agents")
+        if _route_value("view") == "applications" and st.button("Back to workspace", use_container_width=True):
+            _navigate()
+        if st.button("Product home", key="open-product-home", use_container_width=True):
+            _navigate(view="landing")
+        st.caption("Open the separate live landing page for a market-level view of your local progress.")
+    if _route_value("view") in {"career", "onboarding", "role", "application", "companies"}:
+        render_portal(sys.modules[__name__], workspace_id, _route_value("view"))
+        return
+    if _route_value("view") == "yc":
+        render_yc_browser(sys.modules[__name__])
+        return
+    if _route_value("view") == "eligibility":
+        render_eligibility(sys.modules[__name__], workspace_id)
+        return
+    if _route_value("view") == "agents":
+        render_agents_console(sys.modules[__name__], workspace_id)
+        return
+    if _route_value("view") == "applications":
+        _my_applications(workspace_id)
+        return
+    if HubStore(WORKSPACES.path).interests(workspace_id) is None:
+        with st.expander("Start here: choose your interests", expanded=True):
+            render_onboarding(sys.modules[__name__], workspace_id, standalone=False)
     _workspace_hero(WORKSPACES.thread(workspace_id, thread_id))
-    overview, brief, cv_studio, evidence_match, projects, interview, direction, opportunities, conversation = st.tabs([
-        "Overview", "Job brief", "CV studio", "Evidence match", "Proof projects", "Interview lab", "Career track", "Role market", "Coach"])
-    with overview:
+    tab_labels = [
+        "Overview", "Job brief", "CV studio", "Evidence match", "Proof projects",
+        "Interview lab", "Career track", "Role market", "Coach",
+    ]
+    focus = _route_value("focus")
+    if focus in tab_labels:
+        tab_labels = [focus, *(label for label in tab_labels if label != focus)]
+    tabs = dict(zip(tab_labels, st.tabs(tab_labels), strict=True))
+    with tabs["Overview"]:
         _job_workspace_dashboard(workspace_id, thread_id)
-    with brief:
+    with tabs["Job brief"]:
         _quickstart(workspace_id, thread_id)
-    with cv_studio:
+    with tabs["CV studio"]:
         _cv_studio(workspace_id, thread_id)
-    with evidence_match:
+    with tabs["Evidence match"]:
         _evidence_match(workspace_id, thread_id)
-    with projects:
+    with tabs["Proof projects"]:
         _project_studio(workspace_id, thread_id)
-    with interview:
+    with tabs["Interview lab"]:
         _interview(workspace_id, thread_id)
-    with direction:
+    with tabs["Career track"]:
         show_direction(WORKSPACES, workspace_id)
-    with opportunities:
+    with tabs["Role market"]:
         _opportunities(workspace_id, thread_id)
-    with conversation:
+    with tabs["Coach"]:
         show_chat(WORKSPACES, workspace_id, thread_id)
+
+
+def _route_value(name: str) -> str:
+    """Read one optional query value without letting repeated values affect routing."""
+
+    value = st.query_params.get(name, "")
+    if isinstance(value, list):
+        value = value[-1] if value else ""
+    return value.strip() if isinstance(value, str) else ""
+
+
+def _navigate(*, view: str | None = None, focus: str | None = None) -> None:
+    """Move between the product home and workspace without retaining stale routing."""
+
+    st.query_params.clear()
+    if view:
+        st.query_params["view"] = view
+    if focus:
+        st.query_params["focus"] = focus
+    st.rerun()
+
+
+def _product_landing() -> None:
+    """Render the separate, local-data-driven product landing route."""
+
+    render_landing_page(
+        _landing_page_data(),
+        on_enter_workspace=lambda: _navigate(view="career"),
+        on_open_role_market=lambda: _navigate(focus="Role market"),
+    )
+    if st.button("My applications", key="landing-application-tracker"):
+        _navigate(view="applications")
+    with st.expander("What this page does—and does not—do", expanded=False):
+        st.write(
+            "This product home reads only your local workspace and latest saved public-board snapshots. "
+            "It does not refresh a job board, upload your CV, submit an application, or contact anyone."
+        )
+        st.write(
+            "Openings remain observations from their official sources. Use the Career Workspace to inspect "
+            "provenance, prepare a role, and choose the next action yourself."
+        )
+
+
+def _landing_page_data():
+    """Derive a concise, factual landing snapshot from local Role Market state."""
+
+    role_pages = 0
+    newest: tuple[str, str, str, object] | None = None
+    for career_track in WORKSPACES.list_workspaces():
+        career_track_id = career_track["id"]
+        for thread in WORKSPACES.list_threads(career_track_id):
+            role_pages += 1
+            run = ROLE_DISCOVERY.latest_run(
+                career_track_id=career_track_id,
+                workspace_id=thread["id"],
+            )
+            if run is None:
+                continue
+            candidate = (run.created_at, career_track_id, thread["id"], run)
+            if newest is None or candidate[0] > newest[0]:
+                newest = candidate
+
+    if newest is None:
+        return build_landing_page_data(
+            role_pages=role_pages,
+            official_openings=0,
+            shortlisted_openings=0,
+            companies=0,
+        )
+
+    _, career_track_id, thread_id, run = newest
+    state_by_opening_key = {
+        state.opening_key: state
+        for state in _role_market_state_store().list_states(career_track_id, thread_id)
+    }
+    visible_matches = [
+        match
+        for match in run.matches
+        if (
+            (state := _role_market_state_for(match.opening, state_by_opening_key)) is None
+            or state.status is not RoleMarketStatus.HIDDEN
+        )
+    ]
+    shortlisted = sum(
+        state.status in {RoleMarketStatus.SAVED, RoleMarketStatus.TRACKING}
+        for state in state_by_opening_key.values()
+    )
+    logo_store = _company_brand_store()
+    opportunities = tuple(
+        LandingOpportunity(
+            title=match.opening.title,
+            company=match.opening.company.name,
+            location=" · ".join(match.role_locations) or None,
+            workplace_type=match.opening.workplace_type,
+            source_label=(
+                "Official " + " / ".join(opening_sources(match.opening)) + " listing"
+                if opening_sources(match.opening)
+                else "Official listing"
+            ),
+            relevance=match.score,
+            logo_url=logo_store.logo_for(match.opening.company.name),
+        )
+        for match in visible_matches[:6]
+    )
+    return build_landing_page_data(
+        role_pages=role_pages,
+        official_openings=len(visible_matches),
+        shortlisted_openings=shortlisted,
+        companies=len({match.opening.company.name for match in visible_matches}),
+        latest_role_title=run.query.title,
+        latest_refreshed_at=run.created_at,
+        opportunities=opportunities,
+    )
 
 
 def _workspace_hero(thread: dict) -> None:
@@ -875,6 +1101,8 @@ def _open_job_thread(job, key: str) -> None:
 
 def _opportunities(workspace_id: str, thread_id: str) -> None:
     """Role-first discovery, separate company research, and advanced data paths."""
+    if st.button("My applications", key=f"market-application-tracker:{thread_id}"):
+        _navigate(view="applications")
     role_tab, company_tab, sources_tab = st.tabs([
         "Role discovery", "Company research", "Bring a lawful source",
     ])
@@ -926,6 +1154,11 @@ def _role_discovery(workspace_id: str, thread_id: str) -> None:
     else:
         st.caption("Add a CV in Job brief to add local profile-skill ranking. A role title alone can still be explored.")
 
+    market_companies = {board.company.name for board in DEFAULT_VETTED_COMPANY_BOARDS}
+    if run:
+        market_companies.update(match.opening.company.name for match in run.matches)
+    _company_mark_manager(market_companies, thread_id)
+
     catalog_sources = sorted({board.source for board in DEFAULT_VETTED_COMPANY_BOARDS})
     enabled_sources = st.multiselect(
         "Registered public feeds to refresh",
@@ -969,6 +1202,124 @@ def _role_discovery(workspace_id: str, thread_id: str) -> None:
     st.markdown(f"### {run.query.title} opportunity board")
     st.caption(f"Last refreshed locally: {run.created_at}. Results may have changed at the source since then.")
     _role_discovery_filters(run, workspace_id, thread_id)
+
+
+def _company_mark_manager(company_names: set[str], thread_id: str) -> None:
+    """Let the candidate transparently manage browser-rendered company marks."""
+
+    store = _company_brand_store()
+    local_brands = store.list_brands()
+    known_companies = sorted(
+        {*company_names, *(brand.company_name for brand in local_brands)},
+        key=str.casefold,
+    )
+    with st.expander("Manage company marks", expanded=False):
+        st.caption(
+            "Cards use a small visual catalog for supported companies, a local initials fallback elsewhere, "
+            "or a logo image you explicitly add below. Your mapping stays on this device."
+        )
+        st.caption(
+            "Logo images load directly in your browser—not through this app's server. "
+            "Use only a public HTTPS image URL you trust and are allowed to display."
+        )
+        choice = st.selectbox(
+            "Company to manage",
+            ["Add another company", *known_companies],
+            key=f"brand-company-choice:{thread_id}",
+        )
+        custom_company = ""
+        if choice == "Add another company":
+            custom_company = st.text_input(
+                "Company name",
+                placeholder="Example company",
+                key=f"brand-company-custom:{thread_id}",
+            )
+        company_name = custom_company if choice == "Add another company" else choice
+        saved = None
+        if company_name.strip():
+            try:
+                saved = store.get(company_name)
+            except ValueError:
+                saved = None
+        form_token = hashlib.sha256(company_name.strip().casefold().encode("utf-8")).hexdigest()[:12]
+        with st.form(f"company-brand-form:{thread_id}:{form_token}"):
+            logo_url = st.text_input(
+                "Public HTTPS logo image URL",
+                value=saved.logo_url if saved and saved.logo_url else "",
+                placeholder="https://assets.example.com/company-mark.svg",
+                help="Leave empty and save to choose initials for this company.",
+                key=f"brand-url:{thread_id}:{form_token}",
+            )
+            source = st.text_input(
+                "Source / note",
+                value=saved.source if saved else "candidate-provided",
+                help="For example: 'company press kit, checked 6 Oct 2026'.",
+                key=f"brand-source:{thread_id}:{form_token}",
+            )
+            actions = st.columns(3)
+            with actions[0]:
+                save = st.form_submit_button("Save mark", type="primary", use_container_width=True)
+            with actions[1]:
+                initials = st.form_submit_button("Use initials", use_container_width=True)
+            with actions[2]:
+                remove = st.form_submit_button(
+                    "Remove override",
+                    disabled=saved is None,
+                    use_container_width=True,
+                )
+        if save or initials or remove:
+            if not company_name.strip():
+                st.error("Enter a company name before changing a company mark.")
+            elif remove:
+                store.delete(company_name)
+                st.success("Local company-mark override removed. The card now uses its catalog mark or initials.")
+                st.rerun()
+            elif initials:
+                try:
+                    store.upsert(company_name, None, source="candidate chose initials")
+                except ValueError as exc:
+                    st.error(str(exc))
+                else:
+                    st.success("This company will use initials locally.")
+                    st.rerun()
+            else:
+                try:
+                    checked_url = validate_public_https_logo_url(logo_url)
+                    store.upsert(
+                        company_name,
+                        checked_url,
+                        source=source or "candidate-provided",
+                    )
+                except ValueError as exc:
+                    st.error(str(exc))
+                else:
+                    if checked_url:
+                        st.success("Company mark saved locally.")
+                    else:
+                        st.success("This company will use initials locally.")
+                    st.rerun()
+
+        st.markdown("**Local overrides**")
+        if local_brands:
+            st.dataframe(
+                [
+                    {
+                        "Company": brand.company_name,
+                        "Display": "Custom HTTPS image" if brand.logo_url else "Initials",
+                        "Source": brand.source,
+                        "Changed": brand.updated_at,
+                    }
+                    for brand in local_brands
+                ],
+                hide_index=True,
+                use_container_width=True,
+            )
+        else:
+            st.caption("No local overrides yet. The role cards use a catalog mark where available and initials otherwise.")
+        st.caption(
+            "Catalog marks come from Simple Icons and can be replaced or suppressed above. "
+            "They are visual identifiers, not endorsements or proof of affiliation."
+        )
 
 
 def _role_discovery_filters(run, career_track_id: str, thread_id: str) -> None:
@@ -1108,6 +1459,7 @@ def _refresh_role_market(
     aliases: str,
     profile_skills: tuple[str, ...],
     enabled_sources: tuple[str, ...],
+    boards=None,
 ) -> None:
     """Fetch only registered official boards, then save transparent local matches."""
     alias_terms = tuple(item.strip() for item in aliases.split(",") if item.strip()) or suggest_role_aliases(role_title)
@@ -1116,7 +1468,7 @@ def _refresh_role_market(
     snapshots: list[SourceSnapshot] = []
     errors: list[str] = []
     retrieved_at = datetime.now(UTC).isoformat()
-    for board in DEFAULT_VETTED_COMPANY_BOARDS:
+    for board in (DEFAULT_VETTED_COMPANY_BOARDS if boards is None else boards):
         if board.source not in enabled_sources:
             continue
         try:
@@ -1219,7 +1571,7 @@ def _role_card_key(opening: DiscoveredOpening) -> str:
 
 
 def _company_monogram(name: str) -> str:
-    """Return a local, privacy-preserving company mark instead of fetching logos."""
+    """Return a local, privacy-preserving fallback company mark."""
 
     words = [
         "".join(character for character in word if character.isalnum())
@@ -1231,6 +1583,29 @@ def _company_monogram(name: str) -> str:
     if len(words) == 1:
         return words[0][:2].upper()
     return f"{words[0][0]}{words[1][0]}".upper()
+
+
+def _company_mark_markup(company_name: str) -> str:
+    """Render a managed image mark above a resilient local monogram fallback."""
+
+    logo_url = _company_brand_store().logo_for(company_name)
+    try:
+        logo_url = validate_public_https_logo_url(logo_url)
+    except ValueError:
+        # Stored mappings are validated on write. This guard also protects a
+        # future catalog edit from becoming an unsafe HTML attribute.
+        logo_url = None
+    image = (
+        f'<img src="{escape(logo_url, quote=True)}" alt="{escape(company_name, quote=True)} logo" '
+        'loading="lazy" referrerpolicy="no-referrer">'
+        if logo_url
+        else ""
+    )
+    return (
+        f'<div class="role-feed-avatar" aria-label="{escape(company_name, quote=True)}">'
+        f'<span class="role-feed-monogram" aria-hidden="true">{escape(_company_monogram(company_name))}</span>'
+        f"{image}</div>"
+    )
 
 
 def _source_timestamp_label(opening: DiscoveredOpening) -> str | None:
@@ -1311,8 +1686,7 @@ def _role_match_card(
         avatar, summary, relevance = st.columns((0.72, 5.7, 1.25))
         with avatar:
             st.markdown(
-                f'<div class="role-feed-avatar" aria-label="{escape(opening.company.name)}">'
-                f"{escape(_company_monogram(opening.company.name))}</div>",
+                _company_mark_markup(opening.company.name),
                 unsafe_allow_html=True,
             )
         with summary:
@@ -1353,6 +1727,7 @@ def _role_match_card(
                 opening,
                 state,
                 key=f"role-state:{thread_id}:{card_key}",
+                relevance=match.score,
             )
 
         with st.expander("Role details & sources", expanded=False):
@@ -1420,6 +1795,7 @@ def _role_market_primary_action(
     state: RoleMarketState | None,
     *,
     key: str,
+    relevance: int | None = None,
 ) -> None:
     """Offer a shortlist choice without claiming an application was made."""
 
@@ -1431,12 +1807,15 @@ def _role_market_primary_action(
     store = _role_market_state_store()
     if state is None:
         if st.button("Save for review", key=key):
+            _application_store().save(career_track_id, thread_id, opening, relevance=relevance)
             store.set_status(career_track_id, thread_id, opening, RoleMarketStatus.SAVED)
+            st.session_state["tracker-notice"] = f"Saved {opening.company.name} to My applications."
             st.rerun()
     elif state.status is RoleMarketStatus.SAVED:
         if st.button("Start tracking", key=key):
+            _application_store().save(career_track_id, thread_id, opening, relevance=relevance)
             store.set_status(career_track_id, thread_id, opening, RoleMarketStatus.TRACKING)
-            st.rerun()
+            _navigate(view="applications")
     else:
         if st.button("Keep saved", key=key):
             store.set_status(career_track_id, thread_id, opening, RoleMarketStatus.SAVED)
@@ -1479,7 +1858,8 @@ def _role_market_shortlist(
     with st.expander("Your local shortlist", expanded=False):
         st.caption(
             "Saved, tracking, and hidden are local viewing choices. They do not mean an application "
-            "was submitted or a company was contacted."
+            "was submitted or a company was contacted. Manage your progress in My applications. "
+            "Hiding or removing a feed status keeps your application history."
         )
         if not states:
             st.caption("Save an official opening to keep its source snapshot here.")
@@ -1513,6 +1893,50 @@ def _prepared_discovered_workspace(career_track_id: str, opening: DiscoveredOpen
     return None
 
 
+def _my_applications(career_track_id: str) -> None:
+    tracker = _application_store()
+    tracker.import_shortlist(career_track_id)
+    track = next(track for track in WORKSPACES.list_workspaces() if track["id"] == career_track_id)
+    render_application_tracker(
+        tracker,
+        career_track_id,
+        track_name=track["name"],
+        thread_names={thread["id"]: thread["name"] for thread in WORKSPACES.list_threads(career_track_id)},
+        logo_markup=_company_mark_markup,
+        on_browse=lambda: _navigate(focus="Role market"),
+        on_prepare=lambda record: _enter_preparation_workspace(career_track_id, record.opening),
+        on_open=lambda record: _hub_go("application", application=record.id),
+    )
+
+
+def _enter_preparation_workspace(career_track_id: str, opening: DiscoveredOpening) -> None:
+    """Reuse the official listing's preparation space when entering from tracking."""
+    prepared_thread_id = _prepared_discovered_workspace(career_track_id, opening)
+    if not prepared_thread_id:
+        prepared_thread_id = _create_discovered_job_workspace(career_track_id, opening)
+    st.session_state[f"pending_thread:{career_track_id}"] = prepared_thread_id
+    _navigate(focus="Job brief")
+
+
+def _create_discovered_job_workspace(career_track_id: str, opening: DiscoveredOpening) -> str:
+    context = []
+    if opening.location:
+        context.append(f"Listing location: {opening.location}")
+    if opening.workplace_type:
+        context.append(f"Listing workplace type: {opening.workplace_type}")
+    if opening.employment_type:
+        context.append(f"Listing employment type: {opening.employment_type}")
+    job_text = "\n".join((*context, "", opening.description or "")).strip()
+    draft = {
+        **WORKSPACES.shared_profile(),
+        "job_title": opening.title,
+        "company": opening.company.name,
+        "job_url": opening.source_url or "",
+        "job_text": job_text,
+    }
+    return WORKSPACES.create_thread(career_track_id, f"{opening.title} — {opening.company.name}"[:100], draft)
+
+
 def _open_discovered_job_workspace(match, career_track_id: str, key: str) -> None:
     """Open or create a normal local preparation workspace for one official opening."""
 
@@ -1523,26 +1947,7 @@ def _open_discovered_job_workspace(match, career_track_id: str, key: str) -> Non
             st.rerun()
         return
     if st.button("Prepare this application", key=key):
-        context = []
-        if opening.location:
-            context.append(f"Listing location: {opening.location}")
-        if opening.workplace_type:
-            context.append(f"Listing workplace type: {opening.workplace_type}")
-        if opening.employment_type:
-            context.append(f"Listing employment type: {opening.employment_type}")
-        job_text = "\n".join((*context, "", opening.description or "")).strip()
-        draft = {
-            **WORKSPACES.shared_profile(),
-            "job_title": opening.title,
-            "company": opening.company.name,
-            "job_url": opening.source_url or "",
-            "job_text": job_text,
-        }
-        prepared_thread_id = WORKSPACES.create_thread(
-            career_track_id,
-            f"{opening.title} — {opening.company.name}"[:100],
-            draft,
-        )
+        prepared_thread_id = _create_discovered_job_workspace(career_track_id, opening)
         st.session_state[f"pending_thread:{career_track_id}"] = prepared_thread_id
         st.rerun()
 
