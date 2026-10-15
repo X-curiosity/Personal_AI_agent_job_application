@@ -25,27 +25,111 @@ The product organizes a broad career direction into related target jobs, connect
 
 ## 1. Run locally
 
-Requirements: Python 3.12+, [uv](https://docs.astral.sh/uv/), and a browser. No API key is needed for local CV analysis, template plans, or typed interview practice.
+### What you need
+
+| Requirement | Check with | Install |
+|---|---|---|
+| Python 3.12 or newer | `python3 --version` | uv installs a managed one automatically (below) |
+| [uv](https://docs.astral.sh/uv/) | `uv --version` | `curl -LsSf https://astral.sh/uv/install.sh \| sh` (macOS/Linux) or `brew install uv` |
+| A browser | — | any modern browser |
+
+No API key is needed for the core app: CV analysis, role pages, the company browser, work-eligibility checklists, and interview practice all work offline-deterministically. Model credentials only unlock the optional agent team and AI coach.
+
+### Install once
 
 ```bash
 git clone https://github.com/X-curiosity/Personal_AI_agent_job_application.git
 cd Personal_AI_agent_job_application
 
 # Regular install avoids an editable-install pointer issue seen on macOS.
-uv sync --no-editable --reinstall-package tau-job-application
-
-# Launch the UI from the repository directory.
-uv run --no-sync tau-job-application ui
-
-# Other entry points:
-uv run --no-sync tau-job-application demo
-uv run --no-sync tau-job-application analyze fixtures/candidate.txt fixtures/job.txt
-uv run --no-sync pytest -q
+# If your shell has an old conda/pyenv active (e.g. Python 3.9), deactivate it
+# first or pin the interpreter:
+uv sync --python 3.12 --no-editable --reinstall-package tau-job-application
 ```
 
-After changing source code, repeat the install command: a regular installation does not automatically pick up source edits. Run from the repository so the demo can find `fixtures/` and the UI uses the intended local data directory.
+> **`Package 'tau-job-application' requires a different Python: 3.9.x not in '>=3.12'`?**
+> Your terminal activated an old environment (conda `(base)` is the usual suspect). Run `conda deactivate`, then repeat the command above — or permanently stop auto-activation with `conda config --set auto_activate_base false`.
+
+### Run it (every time)
+
+The easiest way — one script, opens the browser for you:
+
+```bash
+./run.sh
+```
+
+or double-click **`Start Career Workspace.command`** in Finder (macOS). The script always uses the project's own Python 3.12 environment, restarts any previous instance, and opens http://127.0.0.1:8506. Press `Ctrl+C` in the terminal to stop.
+
+Manual alternative:
+
+```bash
+uv run --no-sync tau-job-application ui
+# or directly:
+.venv/bin/python -m streamlit run src/tau_job_application/ui.py --server.port 8506
+```
+
+### Where things are in the app
+
+| Screen | How to open |
+|---|---|
+| Product home | `?view=landing` (sidebar: Product home) |
+| Role pages (listings + company browser) | sidebar: Find my roles → pick a role; the Startups / Big companies browser is at the bottom of each role page |
+| Company database | sidebar: Company database |
+| Work eligibility checklists | sidebar: Work eligibility |
+| Agent team (optional, needs credentials) | sidebar: Agent team |
+| Application dashboard | sidebar: My applications |
+
+First use of the company browser: click **Refresh startups** / **Refresh big companies** once on a role page to load the local snapshots; filters are instant afterwards. Remote company logos stay off until you tick **Load remote company logos**.
 
 ### Optional credentials and network access
+
+| Setting | Purpose | Required for basic analysis? |
+|---|---|---|
+| `OPENAI_API_KEY` | Optional Tau provider and explicitly requested audio transcription | No |
+| `MODEL_NAME` | Model used by the optional Tau CLI command, agent team, and read-only UI coach | No |
+| `LINKEDIN_ACCESS_TOKEN` | Official identity endpoint for the authorized LinkedIn account | No |
+| `X_BEARER_TOKEN` | Official X recent-post search, subject to account access and limits | No |
+| SmartRecruiters token | Entered in the UI for the current connector | No |
+
+```bash
+export OPENAI_API_KEY="your-key"
+export MODEL_NAME="a-model-supported-by-your-provider"
+./run.sh   # the agent team view is now enabled
+
+# or one-shot from the terminal:
+uv run --no-sync tau-job-application agent fixtures/candidate.txt fixtures/job.txt
+uv run --no-sync tau-job-application agent-team "Do I need a visa to apply in Canada?"
+```
+
+`.env.example` documents configuration; the application does **not** automatically load a `.env` file. Export variables in the shell that launches the app. Never commit real credentials. External API access may require approval, an eligible plan, or payment.
+
+### After changing code or pulling updates
+
+A regular install does not pick up source edits automatically. Repeat once, then restart the server (a browser refresh is not enough):
+
+```bash
+uv sync --no-editable --reinstall-package tau-job-application
+./run.sh
+```
+
+Run from the repository directory: the demo expects `fixtures/`, and the app keeps its local data in `.job_assistant/` (git-ignored, never uploaded).
+
+### Verify the install
+
+```bash
+uv run --no-sync tau-job-application demo    # deterministic demo report
+uv run --no-sync pytest -q                   # full test suite
+```
+
+### Troubleshooting
+
+| Symptom | Fix |
+|---|---|
+| `requires a different Python: 3.9.x` | Old conda/pyenv active → `conda deactivate`, reinstall with `--python 3.12` |
+| `ModuleNotFoundError: tau_job_application` in the browser | Broken editable pointer → rerun the `uv sync --no-editable …` install |
+| Port already in use | `./run.sh` stops the old instance automatically; or `lsof -ti :8506 \| xargs kill` |
+| Browser shows a stale UI after code changes | Reinstall (above) **and** restart Streamlit, then hard-refresh (`Cmd+Shift+R`) |
+| Nothing fetched in company browser | Expected: snapshots load only on the explicit Refresh buttons |
 
 | Setting | Purpose | Required for basic analysis? |
 |---|---|---|

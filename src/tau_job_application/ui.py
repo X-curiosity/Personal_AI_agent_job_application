@@ -57,7 +57,9 @@ from tau_job_application.role_discovery import (
     SourceSnapshot,
     canonicalize_url,
     opening_matches_filters,
+    opening_matches_period,
     opening_sources,
+    PERIOD_CHOICES,
     rank_openings,
     suggest_role_aliases,
 )
@@ -1358,19 +1360,43 @@ def _role_discovery_filters(run, career_track_id: str, thread_id: str) -> None:
         }
     )
     matches = [match for match in run.matches if opening_matches_filters(match.opening, filtered_query)]
-    search, order = st.columns((3, 2))
+    search, period, order = st.columns((3, 2, 2))
     with search:
         search_text = st.text_input(
             "Search these official openings",
             placeholder="Company, title, location, or source",
             key=f"role-filter-search:{thread_id}",
         ).strip().casefold()
+    with period:
+        period_choice = st.selectbox(
+            "Period",
+            list(PERIOD_CHOICES),
+            key=f"role-filter-period:{thread_id}",
+            help="Matches only the employer's stated wording (e.g. “Summer 2026 internship”). Openings without period wording are excluded while a period is set.",
+        )
+        specific_period = ""
+        if period_choice == "Specific period…":
+            specific_period = st.text_input(
+                "Specific period",
+                placeholder="Summer 2026, 2027, Q3…",
+                max_chars=100,
+                key=f"role-filter-period-specific:{thread_id}",
+            )
     with order:
         sort_order = st.selectbox(
             "Order by",
             ["Role relevance", "Source timestamp", "Company A–Z"],
             key=f"role-filter-order:{thread_id}",
         )
+    if period_choice != "Any time":
+        matches = [
+            match for match in matches
+            if opening_matches_period(
+                match.opening,
+                season="" if period_choice == "Specific period…" else period_choice,
+                specific=specific_period if period_choice == "Specific period…" else "",
+            )
+        ]
     if search_text:
         matches = [
             match

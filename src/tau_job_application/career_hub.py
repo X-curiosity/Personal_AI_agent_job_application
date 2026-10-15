@@ -18,6 +18,14 @@ FIELDS = {
         "Software engineering": ("Software Engineer", "Backend Engineer", "Frontend Engineer", "Embedded Software Engineer", "Machine Learning Engineer"),
         "Robotics & systems": ("Robotics Engineer", "Controls Engineer", "Hardware Engineer", "Machine Learning Engineer"),
         "Civil & energy": ("Civil Engineer", "Energy Engineer", "Process Engineer"),
+        "Aerospace & defense": ("Aerospace Engineer", "Avionics Engineer", "Systems Engineer", "Mechanical Engineer"),
+        "Chemical & materials": ("Chemical Engineer", "Materials Scientist", "Process Engineer"),
+    },
+    "Data & AI": {
+        "Machine learning": ("Machine Learning Engineer", "Applied Scientist", "Research Engineer", "Data Scientist"),
+        "Data engineering": ("Data Engineer", "Analytics Engineer", "Backend Engineer"),
+        "Data analysis": ("Data Analyst", "Data Scientist", "Business Intelligence Analyst"),
+        "AI product & safety": ("AI Product Manager", "AI Safety Researcher", "Machine Learning Engineer"),
     },
     "Finance": {
         "Private equity": ("Private Equity Analyst", "Investment Analyst"),
@@ -25,6 +33,8 @@ FIELDS = {
         "Venture capital": ("Venture Capital Analyst", "Investment Analyst"),
         "Markets & quantitative finance": ("Quantitative Researcher", "Quantitative Developer", "Risk Analyst", "Machine Learning Engineer"),
         "Corporate finance": ("Financial Analyst", "FP&A Analyst", "Treasury Analyst"),
+        "Accounting & audit": ("Auditor", "Accountant", "Financial Controller"),
+        "Fintech & payments": ("Fintech Analyst", "Payments Product Manager", "Risk Analyst"),
     },
     "Marketing": {
         "Growth & performance": ("Growth Marketer", "Performance Marketing Analyst", "Marketing Analyst"),
@@ -35,14 +45,44 @@ FIELDS = {
         "Strategy & consulting": ("Strategy Analyst", "Business Analyst", "Management Consultant"),
         "Product & operations": ("Product Manager", "Operations Analyst", "Business Analyst"),
         "Sales & partnerships": ("Business Development Representative", "Account Executive", "Partnerships Associate"),
+        "People & HR": ("HR Associate", "Recruiter", "People Operations Analyst"),
+        "Supply chain & logistics": ("Supply Chain Analyst", "Logistics Coordinator", "Procurement Analyst"),
     },
     "Science & research": {
         "Computer science & AI": ("Machine Learning Engineer", "Research Engineer", "Applied Scientist", "Data Scientist"),
         "Neuroscience & Neuro-X": ("Machine Learning Engineer", "Neurotechnology Engineer", "Research Engineer"),
         "Economics & statistics": ("Economist", "Data Scientist", "Quantitative Researcher", "Machine Learning Engineer"),
         "Life sciences": ("Bioinformatics Scientist", "Research Scientist", "Biomedical Engineer"),
+        "Physics & quantum": ("Research Scientist", "Quantum Engineer", "Data Scientist"),
     },
-    "Design": {"Product & experience": ("Product Designer", "UX Researcher", "UX Designer")},
+    "Healthcare & biotech": {
+        "Biotech & pharma": ("Biomedical Engineer", "Research Scientist", "Clinical Data Analyst"),
+        "Clinical & care": ("Clinical Research Coordinator", "Medical Affairs Associate", "Registered Nurse"),
+        "Public health": ("Public Health Analyst", "Epidemiologist", "Health Policy Analyst"),
+    },
+    "Law & policy": {
+        "Legal": ("Paralegal", "Legal Associate", "Contracts Analyst"),
+        "Compliance & regulatory": ("Compliance Analyst", "Regulatory Affairs Associate", "Risk Analyst"),
+        "Public policy": ("Policy Analyst", "Government Affairs Associate", "Economist"),
+    },
+    "Media & creative": {
+        "Games & interactive": ("Game Designer", "Gameplay Engineer", "Technical Artist"),
+        "Film & content": ("Video Editor", "Content Producer", "Content Marketer"),
+        "Music & audio": ("Audio Engineer", "Music Producer", "Sound Designer"),
+    },
+    "Sustainability & climate": {
+        "Climate tech": ("Climate Analyst", "Energy Engineer", "Sustainability Consultant"),
+        "Environment": ("Environmental Scientist", "ESG Analyst", "Conservation Scientist"),
+    },
+    "Education": {
+        "Teaching & academia": ("Teacher", "Teaching Assistant", "Research Assistant"),
+        "EdTech & learning design": ("Instructional Designer", "EdTech Product Manager", "Learning Experience Designer"),
+    },
+    "Design": {
+        "Product & experience": ("Product Designer", "UX Researcher", "UX Designer"),
+        "Visual & brand": ("Visual Designer", "Brand Designer", "Graphic Designer"),
+        "Industrial design": ("Industrial Designer", "Hardware Engineer", "CAD Designer"),
+    },
     "Other": {"Explore a different path": ()},
 }
 
@@ -53,7 +93,7 @@ def suggested_roles(subfields: list[str]) -> list[str]:
 
 
 class Interests(BaseModel):
-    fields: list[str] = Field(default_factory=list, max_length=10)
+    fields: list[str] = Field(default_factory=list, max_length=15)
     subfields: list[str] = Field(default_factory=list, max_length=30)
     roles: list[str] = Field(min_length=1, max_length=20)
 

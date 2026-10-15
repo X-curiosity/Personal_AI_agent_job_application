@@ -204,3 +204,61 @@ def test_role_discovery_shortlist_is_local_and_never_marks_an_application(tmp_pa
     )[0].status is RoleMarketStatus.HIDDEN
     rendered = " ".join(item.value for item in app.markdown if item.value)
     assert 'aria-label="Figma"' not in rendered
+
+
+def test_role_market_filters_openings_by_period(tmp_path, monkeypatch):
+    from tau_job_application import ui
+    from tau_job_application.monitoring import JobMonitor
+    from tau_job_application.requirement_memory import RequirementMemory
+    from tau_job_application.role_discovery import RoleDiscoveryStore
+    from tau_job_application.storage import LocalStore
+    from tau_job_application.workspaces import WorkspaceStore
+
+    database = tmp_path / "period-market.sqlite"
+    monkeypatch.setattr(ui, "WORKSPACES", WorkspaceStore(database))
+    monkeypatch.setattr(ui, "STORE", LocalStore(database))
+    monkeypatch.setattr(ui, "MONITOR", JobMonitor(database))
+    monkeypatch.setattr(ui, "REQUIREMENT_MEMORY", RequirementMemory(database))
+    monkeypatch.setattr(ui, "ROLE_DISCOVERY", RoleDiscoveryStore(database))
+
+    def fake_fetch(source: str, identifier: str, *, company: str):
+        if company == "Figma":
+            return [
+                {"source": source, "source_id": "figma-intern-1", "board_identifier": identifier,
+                 "company": company, "title": "Backend Engineer Intern — Summer 2026",
+                 "location": "New York, NY", "url": "https://boards.greenhouse.io/figma/jobs/intern-1",
+                 "description": "Join our summer internship program.", "published_at": "2026-10-04T08:00:00Z"},
+                {"source": source, "source_id": "figma-backend-1", "board_identifier": identifier,
+                 "company": company, "title": "Backend Engineer",
+                 "location": "San Francisco, CA", "url": "https://boards.greenhouse.io/figma/jobs/backend-1",
+                 "description": "Build Python services.", "published_at": "2026-10-04T08:00:00Z"},
+            ]
+        return []
+
+    monkeypatch.setattr(ui, "fetch_public_board_openings", fake_fetch)
+    app = AppTest.from_string("from tau_job_application.ui import main\nmain()", default_timeout=30).run()
+
+    next(item for item in app.text_input if item.label == "Role to explore").set_value("Backend Engineer")
+    next(item for item in app.button if item.label == "Discover matching openings").click()
+    app.run()
+    assert not app.exception
+    visible = next(item for item in app.metric if item.label == "Visible openings")
+    assert visible.value == "2"
+    rendered = " ".join(item.value for item in app.markdown if item.value)
+    assert "Backend Engineer Intern — Summer 2026" in rendered
+
+    period = next(item for item in app.selectbox if item.label == "Period")
+    assert list(period.options)[0] == "Any time"
+    period.select("Summer")
+    app.run()
+    assert not app.exception
+    visible = next(item for item in app.metric if item.label == "Visible openings")
+    assert visible.value == "1"
+    rendered = " ".join(item.value for item in app.markdown if item.value)
+    assert "Backend Engineer Intern — Summer 2026" in rendered
+
+    period = next(item for item in app.selectbox if item.label == "Period")
+    period.select("Winter")
+    app.run()
+    visible = next(item for item in app.metric if item.label == "Visible openings")
+    assert visible.value == "0"

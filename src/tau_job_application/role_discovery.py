@@ -569,6 +569,38 @@ def opening_sources(opening: DiscoveredOpening) -> tuple[str, ...]:
     return _unique_text(provenance.source for provenance in opening.provenance)
 
 
+SEASON_TERMS = {
+    "Summer": ("summer",),
+    "Fall / Autumn": ("fall", "autumn"),
+    "Winter": ("winter",),
+    "Spring": ("spring",),
+}
+PERIOD_CHOICES = ("Any time", *SEASON_TERMS.keys(), "Specific period…")
+
+
+def opening_matches_period(opening: DiscoveredOpening, *, season: str = "", specific: str = "") -> bool:
+    """Deterministic period filter over the listing's own stated text.
+
+    Only employer-stated wording in the title/description is matched; an
+    opening without period wording is excluded while a period filter is set.
+    Seasons use word boundaries, but wording heuristics can still misfire
+    (for example ``Spring`` also matches the Spring framework).
+    """
+    specific = specific.strip()[:100]
+    if specific:
+        haystack = " ".join(filter(None, [opening.title, opening.description])).casefold()
+        return specific.casefold() in haystack
+    if season:
+        if season not in SEASON_TERMS:
+            raise ValueError(f"Unknown season filter: {season}")
+        haystack = " ".join(filter(None, [opening.title, opening.description])).casefold()
+        return any(
+            re.search(rf"\b{re.escape(term)}\b", haystack)
+            for term in SEASON_TERMS[season]
+        )
+    return True
+
+
 def opening_matches_filters(opening: DiscoveredOpening, query: RoleQuery) -> bool:
     """Apply only selected filters; selecting ``Unknown`` includes unknown facts."""
     facts = opening.company

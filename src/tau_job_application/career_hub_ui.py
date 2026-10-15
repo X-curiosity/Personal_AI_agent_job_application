@@ -18,7 +18,14 @@ from tau_job_application.company_catalog import fetch_companies_marketcap, fetch
 from tau_job_application.hiring_match import calculate_evidence_match
 from tau_job_application.parsing import parse_candidate_text
 from tau_job_application.pipeline import analyze_texts
-from tau_job_application.role_discovery import DEFAULT_VETTED_COMPANY_BOARDS, CompanyFacts, VettedCompanyBoard, suggest_role_aliases
+from tau_job_application.role_discovery import (
+    DEFAULT_VETTED_COMPANY_BOARDS,
+    PERIOD_CHOICES,
+    CompanyFacts,
+    VettedCompanyBoard,
+    opening_matches_period,
+    suggest_role_aliases,
+)
 
 
 PORTAL_BOARDS = (*DEFAULT_VETTED_COMPANY_BOARDS, VettedCompanyBoard(
@@ -226,12 +233,22 @@ def _role(api, store, track):
     st.caption(f"Last checked: {run.created_at} · {len(run.matches)} related listings · official-board coverage: {coverage}. Unmapped catalogue companies do not produce vacancy claims.")
     for error in run.errors:
         st.warning(error)
-    controls = st.columns(3)
+    controls = st.columns(4)
     company = controls[0].selectbox("Company", ["All companies", *sorted({match.opening.company.name for match in run.matches})])
     location = controls[1].text_input("Location", placeholder="City, country, or remote")
-    order = controls[2].selectbox("Order", ["Recently published", "Role relevance"])
+    period = controls[2].selectbox("Period", list(PERIOD_CHOICES),
+                                   help="Matches only the employer's stated wording (e.g. “Summer 2026 internship”).")
+    order = controls[3].selectbox("Order", ["Recently published", "Role relevance"])
+    specific_period = ""
+    if period == "Specific period…":
+        specific_period = st.text_input("Specific period", placeholder="Summer 2026, 2027, Q3…", max_chars=100, key=f"hub-period:{thread}")
     matches = [match for match in run.matches if (company == "All companies" or match.opening.company.name == company)
-               and (not location or location.casefold() in (match.opening.location or "").casefold())]
+               and (not location or location.casefold() in (match.opening.location or "").casefold())
+               and (period == "Any time" or opening_matches_period(
+                   match.opening,
+                   season="" if period == "Specific period…" else period,
+                   specific=specific_period,
+               ))]
     if order == "Recently published":
         # Never present an update time or the collection time as a publication date.
         matches.sort(key=lambda match: match.opening.source_timestamp if match.opening.source_timestamp_kind == "published" and match.opening.source_timestamp else "", reverse=True)

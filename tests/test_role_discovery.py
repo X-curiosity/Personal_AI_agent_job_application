@@ -336,3 +336,36 @@ def test_store_persists_latest_run_per_career_track_and_workspace(tmp_path: Path
         sources=(SourceSnapshot(source="Greenhouse", identifier="acme", opening_count=0),),
     )
     assert store.latest_run(career_track_id="engineering", workspace_id="backend-role-page") == replacement
+
+
+def _period_opening(title, description=None):
+    return DiscoveredOpening(
+        title=title, company=CompanyFacts(name="Example Co"), source="Greenhouse",
+        description=description,
+    )
+
+
+def test_period_filter_matches_employer_stated_seasons():
+    summer = _period_opening("Software Engineering Intern — Summer 2026", "Join us for the summer.")
+    autumn = _period_opening("Graduate Intern (Autumn intake)", "Starts in autumn 2026.")
+    plain = _period_opening("Backend Engineer", "Build services year round.")
+    from tau_job_application.role_discovery import opening_matches_period
+    assert opening_matches_period(summer, season="Summer")
+    assert not opening_matches_period(plain, season="Summer")
+    assert opening_matches_period(autumn, season="Fall / Autumn")
+    # Any time keeps everything, including openings without period wording.
+    assert opening_matches_period(plain)
+
+
+def test_period_filter_uses_word_boundaries_and_specific_text():
+    from tau_job_application.role_discovery import opening_matches_period
+    # "falling" must not match the Fall season.
+    falling = _period_opening("Reliability Engineer", "Prevent systems from falling over.")
+    assert not opening_matches_period(falling, season="Fall / Autumn")
+    spring_fw = _period_opening("Java Developer", "We use the Spring framework.")
+    assert opening_matches_period(spring_fw, season="Spring")  # documented heuristic limit
+    specific = _period_opening("Quant Intern", "Summer 2027 program in London.")
+    assert opening_matches_period(specific, specific="summer 2027")
+    assert not opening_matches_period(specific, specific="winter 2026")
+    with pytest.raises(ValueError):
+        opening_matches_period(specific, season="Monsoon")
