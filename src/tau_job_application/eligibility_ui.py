@@ -90,7 +90,7 @@ def render_eligibility(api, track: str) -> None:
     result = st.session_state.get(f"eligibility-result:{track}")
     if not result:
         return
-    st.markdown(f"**Pathway: {_PATHWAY_LABELS.get(result['pathway'], result['pathway'])}** — {result['job_country']}")
+    st.markdown(f"**Pathway: {_PATHWAY_LABELS.get(result['pathway'], result['pathway'])}** · {result['job_country']}")
     st.write(result["summary"])
     for item in result["items"]:
         with st.container(border=True):

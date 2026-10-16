@@ -19,6 +19,8 @@ from tau_job_application.application_tracker_ui import render_application_tracke
 from tau_job_application.career_hub import HubStore
 from tau_job_application.career_hub_ui import render_portal, render_onboarding
 from tau_job_application.career_hub_ui import go as _hub_go
+from tau_job_application.accounts import ConnectedAccountStore
+from tau_job_application.accounts_ui import render_accounts
 from tau_job_application.agents_ui import render_agents_console
 from tau_job_application.company_branding import CompanyBrandStore, validate_public_https_logo_url
 from tau_job_application.company_catalog import CompanyCatalogStore
@@ -115,6 +117,7 @@ YC_DIRECTORY = YCDirectoryStore(ROOT / ".job_assistant" / "assistant.sqlite")
 ATLAS = AtlasStore(ROOT / ".job_assistant" / "assistant.sqlite")
 RESIDENCY = ResidencyStore(ROOT / ".job_assistant" / "assistant.sqlite")
 HIRING_INDEX = HiringIndexStore(ROOT / ".job_assistant" / "assistant.sqlite")
+ACCOUNTS = ConnectedAccountStore(ROOT / ".job_assistant" / "assistant.sqlite")
 
 
 def _application_store() -> ApplicationTrackerStore:
@@ -189,6 +192,15 @@ def _hiring_index_store() -> HiringIndexStore:
         HIRING_INDEX
         if HIRING_INDEX.path == WORKSPACES.path
         else HiringIndexStore(WORKSPACES.path)
+    )
+
+
+def _account_store() -> ConnectedAccountStore:
+    """Use the active workspace database in UI tests as well as in the app."""
+    return (
+        ACCOUNTS
+        if ACCOUNTS.path == WORKSPACES.path
+        else ConnectedAccountStore(WORKSPACES.path)
     )
 
 
@@ -285,30 +297,39 @@ div[data-testid="stExpander"] {background: rgba(255,255,252,.66); border: 1px so
 .role-feed-reason {font-size: .8rem; color: #5b7164; margin: .15rem 0 0;}
 .role-market-note {background: #f6f1e3; border-left: 3px solid #d2b66c; border-radius: 5px 10px 10px 5px; color: #5e5333; padding: .68rem .85rem; font-size: .84rem; margin: .6rem 0 .9rem;}
 /* Sticky top app bar, the usual browser-app navigation format. */
-div[data-testid="stHorizontalBlock"]:has(.topnav-brand) {
+div[data-testid="stHorizontalBlock"]:has(.topnav-brand-mark) {
     position: sticky; top: 0; z-index: 999;
     background: linear-gradient(120deg, #173a31 0%, #234f42 90%);
-    margin: -1.3rem -1rem 1.15rem; padding: .5rem 1.2rem;
+    margin: -1.3rem -1rem 1.15rem; padding: .45rem 1.2rem;
     border-radius: 0 0 16px 16px; box-shadow: 0 8px 22px rgba(25,53,46,.16);
     align-items: center; row-gap: 0;
 }
-.topnav-brand {color: #fbfbf3; font-weight: 800; font-size: 1.14rem; letter-spacing: .02em; white-space: nowrap; line-height: 2.2;}
-.topnav-brand span {color: #d6bd70;}
-div[data-testid="stHorizontalBlock"]:has(.topnav-brand) [data-testid="stSegmentedControl"] {justify-content: flex-end;}
-div[data-testid="stHorizontalBlock"]:has(.topnav-brand) [data-testid="stSegmentedControl"] > div,
-div[data-testid="stHorizontalBlock"]:has(.topnav-brand) [data-testid="stSegmentedControl"] [role="radiogroup"] {background: transparent; border: none; gap: .15rem;}
-div[data-testid="stHorizontalBlock"]:has(.topnav-brand) [data-testid="stSegmentedControl"] button,
-div[data-testid="stHorizontalBlock"]:has(.topnav-brand) [data-testid="stSegmentedControl"] label {
-    background: transparent !important; border: none !important; color: #cfddd0 !important;
-    font-weight: 650 !important; box-shadow: none !important; border-radius: 999px !important;
+.topnav-brand-mark {display: none;}
+/* Brand button: looks like a wordmark, acts like a link home. */
+div[data-testid="stColumn"]:has(.topnav-brand-mark) button {
+    background: transparent !important; border: none !important; box-shadow: none !important;
+    color: #fbfbf3 !important; font-size: 1.16rem; font-weight: 800; letter-spacing: .02em;
+    padding: .1rem 0 !important; white-space: nowrap; text-align: left; min-height: 0;
 }
-div[data-testid="stHorizontalBlock"]:has(.topnav-brand) [data-testid="stSegmentedControl"] button:hover,
-div[data-testid="stHorizontalBlock"]:has(.topnav-brand) [data-testid="stSegmentedControl"] label:hover {color: #fffef8 !important;}
-div[data-testid="stHorizontalBlock"]:has(.topnav-brand) [data-testid="stSegmentedControl"] [aria-checked="true"],
-div[data-testid="stHorizontalBlock"]:has(.topnav-brand) [data-testid="stSegmentedControl"] button[aria-checked="true"] {
-    background: #d6bd70 !important; color: #173a31 !important;
+div[data-testid="stColumn"]:has(.topnav-brand-mark) button * {color: #fbfbf3 !important; white-space: nowrap;}
+div[data-testid="stColumn"]:has(.topnav-brand-mark) button:hover,
+div[data-testid="stColumn"]:has(.topnav-brand-mark) button:hover * {color: #d6bd70 !important;}
+/* Nav pills: never wrap or clip; scroll sideways instead. */
+div[data-testid="stHorizontalBlock"]:has(.topnav-brand-mark) [data-testid="stSegmentedControl"] {justify-content: flex-end; overflow-x: auto;}
+div[data-testid="stHorizontalBlock"]:has(.topnav-brand-mark) [data-testid="stSegmentedControl"] > div,
+div[data-testid="stHorizontalBlock"]:has(.topnav-brand-mark) [data-testid="stSegmentedControl"] [role="radiogroup"] {
+    background: transparent; border: none; gap: .2rem; flex-wrap: nowrap; overflow-x: auto;
 }
-div[data-testid="stHorizontalBlock"]:has(.topnav-brand) [data-testid="stSegmentedControl"] [aria-checked="true"] * {color: #173a31 !important;}
+div[data-testid="stHorizontalBlock"]:has(.topnav-brand-mark) [data-testid="stSegmentedControl"] label {
+    background: transparent !important; border: none !important; box-shadow: none !important;
+    border-radius: 999px !important; font-weight: 650 !important; white-space: nowrap;
+}
+div[data-testid="stHorizontalBlock"]:has(.topnav-brand-mark) [data-testid="stSegmentedControl"] label * {color: #cfddd0 !important;}
+div[data-testid="stHorizontalBlock"]:has(.topnav-brand-mark) [data-testid="stSegmentedControl"] label:hover * {color: #fffef8 !important;}
+div[data-testid="stHorizontalBlock"]:has(.topnav-brand-mark) [data-testid="stSegmentedControl"] label:has(input:checked) {background: #d6bd70 !important;}
+div[data-testid="stHorizontalBlock"]:has(.topnav-brand-mark) [data-testid="stSegmentedControl"] label:has(input:checked) * {color: #173a31 !important;}
+/* Streamlit Cloud chrome has no place in this local app. */
+[data-testid="stToolbar"] {display: none;}
 </style>
 """
 
@@ -321,6 +342,7 @@ _NAV_ITEMS = {
     "Companies": "companies",
     "Eligibility": "eligibility",
     "Agent team": "agents",
+    "Accounts": "account",
 }
 
 
@@ -333,10 +355,13 @@ def _top_nav() -> None:
         "career": "Role pages", "onboarding": "Role pages", "role": "Role pages",
         "application": "Applications", "applications": "Applications",
         "companies": "Companies", "eligibility": "Eligibility", "agents": "Agent team",
+        "account": "Accounts",
     }
     current_label = view_aliases.get(current, "Workspace")
-    bar = st.columns((1.35, 6))
-    bar[0].markdown('<div class="topnav-brand"><span>◒</span> Co-Apply GPT</div>', unsafe_allow_html=True)
+    bar = st.columns((2.1, 5.9))
+    bar[0].markdown('<span class="topnav-brand-mark"></span>', unsafe_allow_html=True)
+    if bar[0].button("◒ Co-Apply GPT", key="topnav-brand", help="Back to the product home"):
+        _navigate(view="landing")
     bar[1].segmented_control(
         "Navigate", labels, default=current_label,
         label_visibility="collapsed", key="topnav", on_change=_on_nav_change,
@@ -358,7 +383,7 @@ def main() -> None:
         _product_landing()
         return
 
-    workspace_id, thread_id = choose_scope(WORKSPACES, compact=_route_value("view") in {"career", "onboarding", "role", "application", "companies", "eligibility", "agents"})
+    workspace_id, thread_id = choose_scope(WORKSPACES, compact=_route_value("view") in {"career", "onboarding", "role", "application", "companies", "eligibility", "agents", "account"})
     _top_nav()
     with st.sidebar:
         st.caption("Your career track and job workspace live here. Everything else is in the top bar.")
@@ -370,6 +395,9 @@ def main() -> None:
         return
     if _route_value("view") == "agents":
         render_agents_console(sys.modules[__name__], workspace_id)
+        return
+    if _route_value("view") == "account":
+        render_accounts(sys.modules[__name__], workspace_id)
         return
     if _route_value("view") == "applications":
         _my_applications(workspace_id)
@@ -437,7 +465,7 @@ def _product_landing() -> None:
     )
     if st.button("My applications", key="landing-application-tracker"):
         _navigate(view="applications")
-    with st.expander("What this page does—and does not—do", expanded=False):
+    with st.expander("What this page does and does not do", expanded=False):
         st.write(
             "This product home reads only your local workspace and latest saved public-board snapshots. "
             "It does not refresh a job board, upload your CV, submit an application, or contact anyone."
@@ -604,7 +632,7 @@ def _job_workspace_dashboard(workspace_id: str, thread_id: str) -> None:
         with st.container(border=True):
             if missing_to_build:
                 st.write(" · ".join(missing_to_build[:8]))
-                st.caption("These are gaps in the available evidence—not a judgment of your ability or a prediction of hiring.")
+                st.caption("These are gaps in the available evidence, not a judgment of your ability or a prediction of hiring.")
             elif missing:
                 st.write("Your completed project proof covers the remaining CV evidence gap(s).")
             else:
@@ -712,7 +740,7 @@ def _quickstart(workspace_id: str, thread_id: str) -> None:
     st.caption(f"Job workspace: {thread['name']}. Text inputs auto-save locally. This role keeps its own profile snapshot, analysis, interview practice, and coaching history.")
     upload_error = False
     with st.container(border=True):
-        st.subheader("1. Your profile — CV, GitHub, and portfolio")
+        st.subheader("1. Your profile: CV, GitHub / Portfolio")
         st.caption("Your CV is needed for role-specific guidance. Add your GitHub profile and/or portfolio when available; they are optional, remain local, and are never assumed to prove skills or ownership.")
         left, right = st.columns([1, 1])
         with left:
@@ -821,7 +849,7 @@ def _cv_studio(workspace_id: str, thread_id: str) -> None:
     thread = WORKSPACES.thread(workspace_id, thread_id)
     result = thread["analysis"] if not thread["stale"] else None
     st.subheader("CV studio")
-    st.caption("Refine your narrative for this role without inventing employers, skills, dates, or outcomes. This workspace currently provides guidance—not a finished CV editor.")
+    st.caption("Refine your narrative for this role without inventing employers, skills, dates, or outcomes. This workspace currently provides guidance, not a finished CV editor.")
     if thread["stale"]:
         st.warning("Refresh the Job brief first. CV guidance is held back while its underlying evidence is stale.")
         return
@@ -833,7 +861,7 @@ def _cv_studio(workspace_id: str, thread_id: str) -> None:
     with left:
         st.markdown("<div class='section-kicker'>Document readiness</div>", unsafe_allow_html=True)
         if result.cv_score:
-            _metric_card(st, "CV guidance", f"{result.cv_score.score}%", "Clarity and evidence readiness—not a hiring prediction")
+            _metric_card(st, "CV guidance", f"{result.cv_score.score}%", "Clarity and evidence readiness, not a hiring prediction")
             for component in result.cv_score.components:
                 st.progress(component.score / 100, text=f"{component.name}: {component.score}/100")
             if result.cv_score.next_actions:
@@ -942,7 +970,7 @@ def _evidence_match(workspace_id: str, thread_id: str) -> None:
         title = st.text_input("Completed project title", placeholder="For example: Incident analytics API")
         contribution = st.text_area(
             "Your concrete contribution",
-            placeholder="What you personally designed, built, or validated—not a team-wide claim.",
+            placeholder="What you personally designed, built, or validated, not a team-wide claim.",
         )
         skills = st.text_input("Skills demonstrated", placeholder="For example: Python, Docker, PostgreSQL")
         proof_kind = st.selectbox(
@@ -1175,7 +1203,7 @@ def _open_job_thread(job, key: str) -> None:
         wid = st.session_state["active_scope"][0]
         draft = {**WORKSPACES.shared_profile(), "job_title": job.title, "company": job.company,
                  "job_url": job.url or "", "job_text": job.description or ""}
-        tid = WORKSPACES.create_thread(wid, f"{job.title} — {job.company}"[:100], draft)
+        tid = WORKSPACES.create_thread(wid, f"{job.title} · {job.company}"[:100], draft)
         st.session_state[f"pending_thread:{wid}"] = tid
         st.rerun()
 
@@ -1300,7 +1328,7 @@ def _company_mark_manager(company_names: set[str], thread_id: str) -> None:
             "or a logo image you explicitly add below. Your mapping stays on this device."
         )
         st.caption(
-            "Logo images load directly in your browser—not through this app's server. "
+            "Logo images load directly in your browser, not through this app's server. "
             "Use only a public HTTPS image URL you trust and are allowed to display."
         )
         choice = st.selectbox(
@@ -1518,7 +1546,7 @@ def _role_discovery_filters(run, career_track_id: str, thread_id: str) -> None:
         "<div class=\"role-market-note\">"
         "<strong>Role relevance</strong> combines the role family with optional local CV-skill overlap. "
         "It is not a prediction of eligibility, interview odds, or hiring likelihood. "
-        "Availability can change—verify every role on its official listing."
+        "Availability can change; verify every role on its official listing."
         "</div>",
         unsafe_allow_html=True,
     )
@@ -2039,7 +2067,7 @@ def _create_discovered_job_workspace(career_track_id: str, opening: DiscoveredOp
         "job_url": opening.source_url or "",
         "job_text": job_text,
     }
-    return WORKSPACES.create_thread(career_track_id, f"{opening.title} — {opening.company.name}"[:100], draft)
+    return WORKSPACES.create_thread(career_track_id, f"{opening.title} · {opening.company.name}"[:100], draft)
 
 
 def _open_discovered_job_workspace(match, career_track_id: str, key: str) -> None:
@@ -2188,7 +2216,7 @@ def _role_location_map(matches, thread_id: str) -> None:
     else:
         st.info("The matching openings did not state a location. The app will not replace it with a company HQ.")
     for location, location_matches in by_location.items():
-        st.markdown(f"- **{location}** — " + "; ".join(match.opening.title for match in location_matches))
+        st.markdown(f"- **{location}** · " + "; ".join(match.opening.title for match in location_matches))
 
 
 def _permitted_sources() -> None:
@@ -2342,14 +2370,14 @@ def _company_explorer(workspace_id: str, thread_id: str) -> None:
         recommendations,
         key=lambda item: (-len(company_footprint(item.company)), -len(item.matching_skills), item.company.casefold()),
     )
-    options = {f"{item.company} — {item.city}, {item.country}": item for item in footprint_order}
+    options = {f"{item.company} · {item.city}, {item.country}": item for item in footprint_order}
     selected_label = st.selectbox("Inspect a company's footprint", list(options), key=f"explorer-company:{thread_id}")
     selected = options[selected_label]
     with st.container(border=True):
         st.markdown(f"#### {selected.company} · {selected.city}, {selected.country}")
         st.write(selected.focus)
         st.write("Why it appears here: your profile overlaps with " + ", ".join(selected.matching_skills) + ".")
-        st.caption("Review the company and current openings yourself. Skill overlap is only a research starting point—not evidence that a role fits, is open, or is accessible to you.")
+        st.caption("Review the company and current openings yourself. Skill overlap is only a research starting point, not evidence that a role fits, is open, or is accessible to you.")
         st.link_button(f"Open {selected.company} careers page", selected.careers_url, type="secondary")
 
     _company_footprint(selected, thread_id)
@@ -2467,7 +2495,7 @@ def _interview(workspace_id: str, thread_id: str) -> None:
     else:
         st.info("Your first saved rehearsal will create a private practice history for this role.")
     questions = build_interview_questions(result.candidate, result.job, level=level)
-    selected = st.selectbox("Question", questions, format_func=lambda question: f"{question.category.title()} — {question.question}", key=f"interview-question:{thread_id}")
+    selected = st.selectbox("Question", questions, format_func=lambda question: f"{question.category.title()} · {question.question}", key=f"interview-question:{thread_id}")
     scope = f"{thread_id}:{selected.id}"
     st.write("A strong answer should include: " + "; ".join(selected.what_good_evidence_looks_like))
     answer = st.text_area("Your answer (type it, or transcribe an optional recording below)", height=160, key=f"interview-answer:{scope}")
@@ -2512,7 +2540,7 @@ def _interview(workspace_id: str, thread_id: str) -> None:
                 new_level = difficulty_level(WORKSPACES.interview_attempts(workspace_id, thread_id))
                 if new_level > level:
                     st.balloons()
-                    st.success(f"Level up! You reached level {new_level} — {LEVEL_NAMES[new_level]}. Questions just got harder.")
+                    st.success(f"Level up! You reached level {new_level}: {LEVEL_NAMES[new_level]}. Questions just got harder.")
                 st.metric("Practice evidence score", f"{feedback.score}/100", help="Checks answer structure, not technical correctness.")
                 st.write("**Strengths:** " + (" ".join(feedback.strengths) or "Not enough evidence yet."))
                 st.write("**Improve:** " + " ".join(feedback.missing))

@@ -75,7 +75,8 @@ uv run --no-sync tau-job-application ui
 | Product home | `?view=landing` (sidebar: Product home) |
 | Role pages (listings + company browser) | sidebar: Find my roles → pick a role; the Startups / Big companies browser is at the bottom of each role page |
 | Company database | sidebar: Company database |
-| Work eligibility checklists | sidebar: Work eligibility |
+| Work eligibility checklists | top bar: Eligibility |
+| Connected accounts (GitHub, LinkedIn, Gmail) | top bar: Accounts |
 | Agent team (optional, needs credentials) | sidebar: Agent team |
 | Application dashboard | sidebar: My applications |
 
@@ -87,7 +88,7 @@ First use of the company browser: click **Refresh startups** / **Refresh big com
 |---|---|---|
 | `OPENAI_API_KEY` | Optional Tau provider and explicitly requested audio transcription | No |
 | `MODEL_NAME` | Model used by the optional Tau CLI command, agent team, and read-only UI coach | No |
-| `LINKEDIN_ACCESS_TOKEN` | Official identity endpoint for the authorized LinkedIn account | No |
+| `LINKEDIN_CLIENT_ID` / `LINKEDIN_CLIENT_SECRET` / `LINKEDIN_REDIRECT_URI` | Your own registered LinkedIn app, for the official OpenID Connect sign-in on the Accounts screen | No |
 | `X_BEARER_TOKEN` | Official X recent-post search, subject to account access and limits | No |
 | SmartRecruiters token | Entered in the UI for the current connector | No |
 
@@ -135,7 +136,7 @@ uv run --no-sync pytest -q                   # full test suite
 |---|---|---|
 | `OPENAI_API_KEY` | Optional Tau provider and explicitly requested audio transcription | No |
 | `MODEL_NAME` | Model used by the optional Tau CLI command and read-only UI coach | No |
-| `LINKEDIN_ACCESS_TOKEN` | Official identity endpoint for the authorized LinkedIn account | No |
+| `LINKEDIN_CLIENT_ID` / `LINKEDIN_CLIENT_SECRET` / `LINKEDIN_REDIRECT_URI` | Your own registered LinkedIn app, for the official OpenID Connect sign-in on the Accounts screen | No |
 | `X_BEARER_TOKEN` | Official X recent-post search, subject to account access and limits | No |
 | SmartRecruiters token | Entered in the UI for the current connector | No |
 

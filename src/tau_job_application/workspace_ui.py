@@ -82,7 +82,7 @@ def choose_scope(store: WorkspaceStore, *, compact: bool = False) -> tuple[str, 
         _show_workspace_status(selected)
         with st.expander("Add a job workspace"):
             with st.form(f"create-thread:{wid}"):
-                thread_name = st.text_input("Job workspace name", placeholder="Product designer — Northstar")
+                thread_name = st.text_input("Job workspace name", placeholder="Product designer · Northstar")
                 if st.form_submit_button("Create job workspace"):
                     try:
                         new_id = store.create_thread(wid, thread_name)
@@ -137,7 +137,7 @@ def _show_workspace_status(thread: dict) -> None:
 def show_direction(store: WorkspaceStore, workspace_id: str):
     name = next(w["name"] for w in store.list_workspaces() if w["id"] == workspace_id)
     summary = direction_summary(store.list_threads(workspace_id))
-    st.subheader(f"{name} — Career track")
+    st.subheader(f"{name} · Career track")
     st.caption("This optional view compares related Job Workspaces by evidence, not by title alone. You do not need every skill from every role.")
     if summary["stale_count"]:
         st.warning(f"{summary['stale_count']} old analysis snapshot(s) excluded because inputs or reviewed requirements changed. Rebuild those thread plans.")
@@ -153,7 +153,7 @@ def show_direction(store: WorkspaceStore, workspace_id: str):
                    "Uncertain in": len(e["uncertain"]), "Where": ", ".join(names[i] for i in e["threads"])}
                   for e in summary["skills"]], hide_index=True)
     st.markdown("**Career-track learning priorities**")
-    st.caption("Prioritized by missing required coverage, then other missing coverage across current workspaces—not by job title. These remain template plans.")
+    st.caption("Prioritized by missing required coverage, then other missing coverage across current workspaces, not by job title. These remain template plans.")
     for node in summary["gaps"]:
         with st.expander(node.skill):
             st.write(node.reason)
@@ -182,7 +182,7 @@ def show_direction(store: WorkspaceStore, workspace_id: str):
 
 def show_chat(store: WorkspaceStore, workspace_id: str, thread_id: str):
     thread = store.thread(workspace_id, thread_id)
-    st.subheader(f"Coach — {thread['name']}")
+    st.subheader(f"Coach · {thread['name']}")
     st.caption("This coaching history belongs only to this Job Workspace. Career-track comparisons use aggregate results, not other workspaces' conversations.")
     use_model = st.checkbox("Use AI coaching instead of the local report guide", key=f"chat-model:{thread_id}")
     consent = False

@@ -47,8 +47,8 @@ def render_agents_console(api, track: str) -> None:
         unsafe_allow_html=True,
     )
     st.write(
-        "One coordinator routes your request to a single specialist — company scout, eligibility advisor, "
-        "or application prep — each limited to its own typed tools, a turn limit, and a tool-call budget."
+        "One coordinator routes your request to a single specialist (company scout, eligibility advisor, "
+        "or application prep), each limited to its own typed tools, a turn limit, and a tool-call budget."
     )
     st.caption(
         "Specialists never message anyone, submit applications, scrape LinkedIn/X, or invent facts. "
@@ -75,11 +75,11 @@ def render_agents_console(api, track: str) -> None:
     )
 
     labels = {"Automatic routing (recommended)": None}
-    labels.update({f"{spec.name} — {spec.description}": spec.key for spec in AGENT_SPECS})
+    labels.update({f"{spec.name}: {spec.description}": spec.key for spec in AGENT_SPECS})
     choice = st.selectbox("Specialist", list(labels), key=f"agents-specialist:{track}")
     request = st.text_area(
         "Your request", max_chars=4000, key=f"agents-request:{track}",
-        placeholder="Examples: “Which active YC startups in fintech are hiring?” · “I live in France and want to apply in Canada — what do I need?”",
+        placeholder="Examples: “Which active YC startups in fintech are hiring?” · “I live in France and want to apply in Canada: what do I need?”",
     )
 
     preview = route_request(request) if request.strip() and labels[choice] is None else None

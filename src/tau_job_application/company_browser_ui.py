@@ -238,4 +238,4 @@ def render_company_browser(api, *, role: str | None = None, key_prefix: str = "c
     else:
         _startup_browser(api, key_prefix)
     if role:
-        st.caption(f"Research leads for your {role} preparation — verify openings on each company's official job board.")
+        st.caption(f"Research leads for your {role} preparation; verify openings on each company's official job board.")

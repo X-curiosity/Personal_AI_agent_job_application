@@ -123,7 +123,7 @@ def render_application_tracker(
             st.caption("No actions due in the next seven days. Add a next step to any application below.")
         for record in due[:3]:
             st.text(f"{due_label(record.progress.next_step_on, today)} · {record.progress.next_step}\n"
-                    f"{record.opening.company.name} — {record.opening.title}")
+                    f"{record.opening.company.name} · {record.opening.title}")
         if len(due) > 3:
             st.caption(f"{len(due) - 3} more · choose Next action below to see the full queue.")
     with deadline_column.container(border=True):
@@ -202,7 +202,7 @@ def _application_card(store, career_track_id, record, today, thread_names, *, lo
                            and progress.stage is not ApplicationStage.CLOSED)
             st.markdown(f'<div class="tracker-next {"overdue" if overdue else ""}">'
                         f'<b>{"Overdue action" if overdue else "Next step"}</b> · {escape(progress.next_step)}'
-                        + (f' <span>— {escape(due_label(progress.next_step_on, today))}</span>'
+                        + (f' <span>· {escape(due_label(progress.next_step_on, today))}</span>'
                            if progress.next_step_on else '') + '</div>', unsafe_allow_html=True)
         if on_open and st.button("Documents, contacts & replies", key=f"{key}:open", use_container_width=True):
             on_open(record)

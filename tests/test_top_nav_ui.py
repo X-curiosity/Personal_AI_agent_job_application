@@ -22,6 +22,7 @@ def setup_ui(tmp_path, monkeypatch):
         "YC_DIRECTORY": YCDirectoryStore(path), "RESIDENCY": ResidencyStore(path),
         "COMPANY_CATALOG": CompanyCatalogStore(path), "APPLICATIONS": ApplicationTrackerStore(path),
         "ATLAS": AtlasStore(path), "HIRING_INDEX": HiringIndexStore(path),
+        "ACCOUNTS": __import__("tau_job_application.accounts", fromlist=["ConnectedAccountStore"]).ConnectedAccountStore(path),
     }.items():
         monkeypatch.setattr(ui, name, store)
     return ui
@@ -33,7 +34,7 @@ def test_top_nav_bar_renders_and_navigates(tmp_path, monkeypatch):
     app.run()
     assert not app.exception
     nav = app.segmented_control[0]
-    assert set(nav.options) == {"Home", "Workspace", "Role pages", "Applications", "Companies", "Eligibility", "Agent team"}
+    assert set(nav.options) == {"Home", "Workspace", "Role pages", "Applications", "Companies", "Eligibility", "Agent team", "Accounts"}
     assert nav.value == "Workspace"
     nav.set_value("Companies").run()
     assert not app.exception

@@ -22,7 +22,7 @@ def test_profile_company_explorer_renders_an_accessible_map_and_company_picker(t
 
     assert not app.exception
     picker = next(item for item in app.selectbox if item.label == "Inspect a company's footprint")
-    picker.select("NVIDIA — Santa Clara, United States")
+    picker.select("NVIDIA · Santa Clara, United States")
     app.run()
     assert not app.exception
     assert "NVIDIA footprint" in " ".join(item.value for item in app.markdown if item.value)

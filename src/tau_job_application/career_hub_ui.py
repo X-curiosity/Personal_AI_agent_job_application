@@ -569,7 +569,7 @@ def _people(opening):
         st.link_button(f"Find {role}", url)
     public_emails = sorted(set(re.findall(r"[\w.+-]+@[\w.-]+\.[A-Za-z]{2,}", opening.description or "")))
     for address in public_emails[:5]:
-        st.text(f"Address mentioned in the advert: {address} — check its purpose before contacting")
+        st.text(f"Address mentioned in the advert: {address} · check its purpose before contacting")
     with st.expander("Infer an address from an observed company pattern"):
         st.warning("An address hypothesis is not verified. Do not send to it until independently confirmed. No mailbox probing or bulk outreach is performed.")
         name = st.text_input("Public contact name")
@@ -607,7 +607,7 @@ def _replies(api, track, record):
         return
     token_name = "GMAIL_ACCESS_TOKEN" if binding["source"] == "gmail" else "SLACK_BOT_TOKEN"
     configured = bool(os.environ.get(token_name))
-    st.caption(f"{token_name}: {'configured' if configured else 'not configured — see the setup report'}")
+    st.caption(f"{token_name}: {'configured' if configured else 'not configured; see the setup report'}")
     consent = st.checkbox("Allow reading this bound conversation on this device", key=f"hub-read:{record.id}")
     polling = st.checkbox("Check every 60 seconds while this page is open", disabled=not configured or not consent, key=f"hub-poll:{record.id}")
 

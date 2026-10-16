@@ -166,7 +166,7 @@ def render_landing_page(
     st.caption(
         "Live counters come from local snapshots of public employer boards. "
         "They do not mean an application was submitted, a person was contacted, "
-        "or a role is still available—verify each role on its official listing."
+        "or a role is still available; verify each role on its official listing."
     )
 
 
