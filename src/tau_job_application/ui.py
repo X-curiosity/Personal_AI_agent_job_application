@@ -284,8 +284,71 @@ div[data-testid="stExpander"] {background: rgba(255,255,252,.66); border: 1px so
 .role-feed-relevance span {display: block; color: #d4e3d5; font-size: .66rem; letter-spacing: .04em; text-transform: uppercase; margin-top: .23rem;}
 .role-feed-reason {font-size: .8rem; color: #5b7164; margin: .15rem 0 0;}
 .role-market-note {background: #f6f1e3; border-left: 3px solid #d2b66c; border-radius: 5px 10px 10px 5px; color: #5e5333; padding: .68rem .85rem; font-size: .84rem; margin: .6rem 0 .9rem;}
+/* Sticky top app bar, the usual browser-app navigation format. */
+div[data-testid="stHorizontalBlock"]:has(.topnav-brand) {
+    position: sticky; top: 0; z-index: 999;
+    background: linear-gradient(120deg, #173a31 0%, #234f42 90%);
+    margin: -1.3rem -1rem 1.15rem; padding: .5rem 1.2rem;
+    border-radius: 0 0 16px 16px; box-shadow: 0 8px 22px rgba(25,53,46,.16);
+    align-items: center; row-gap: 0;
+}
+.topnav-brand {color: #fbfbf3; font-weight: 800; font-size: 1.14rem; letter-spacing: .02em; white-space: nowrap; line-height: 2.2;}
+.topnav-brand span {color: #d6bd70;}
+div[data-testid="stHorizontalBlock"]:has(.topnav-brand) [data-testid="stSegmentedControl"] {justify-content: flex-end;}
+div[data-testid="stHorizontalBlock"]:has(.topnav-brand) [data-testid="stSegmentedControl"] > div,
+div[data-testid="stHorizontalBlock"]:has(.topnav-brand) [data-testid="stSegmentedControl"] [role="radiogroup"] {background: transparent; border: none; gap: .15rem;}
+div[data-testid="stHorizontalBlock"]:has(.topnav-brand) [data-testid="stSegmentedControl"] button,
+div[data-testid="stHorizontalBlock"]:has(.topnav-brand) [data-testid="stSegmentedControl"] label {
+    background: transparent !important; border: none !important; color: #cfddd0 !important;
+    font-weight: 650 !important; box-shadow: none !important; border-radius: 999px !important;
+}
+div[data-testid="stHorizontalBlock"]:has(.topnav-brand) [data-testid="stSegmentedControl"] button:hover,
+div[data-testid="stHorizontalBlock"]:has(.topnav-brand) [data-testid="stSegmentedControl"] label:hover {color: #fffef8 !important;}
+div[data-testid="stHorizontalBlock"]:has(.topnav-brand) [data-testid="stSegmentedControl"] [aria-checked="true"],
+div[data-testid="stHorizontalBlock"]:has(.topnav-brand) [data-testid="stSegmentedControl"] button[aria-checked="true"] {
+    background: #d6bd70 !important; color: #173a31 !important;
+}
+div[data-testid="stHorizontalBlock"]:has(.topnav-brand) [data-testid="stSegmentedControl"] [aria-checked="true"] * {color: #173a31 !important;}
 </style>
 """
+
+
+_NAV_ITEMS = {
+    "Home": "landing",
+    "Workspace": "",
+    "Role pages": "career",
+    "Applications": "applications",
+    "Companies": "companies",
+    "Eligibility": "eligibility",
+    "Agent team": "agents",
+}
+
+
+def _top_nav() -> None:
+    """The sticky top app bar used across every view (usual browser-app format)."""
+
+    current = _route_value("view")
+    labels = list(_NAV_ITEMS)
+    view_aliases = {
+        "career": "Role pages", "onboarding": "Role pages", "role": "Role pages",
+        "application": "Applications", "applications": "Applications",
+        "companies": "Companies", "eligibility": "Eligibility", "agents": "Agent team",
+    }
+    current_label = view_aliases.get(current, "Workspace")
+    bar = st.columns((1.35, 6))
+    bar[0].markdown('<div class="topnav-brand"><span>◒</span> Co-Apply GPT</div>', unsafe_allow_html=True)
+    bar[1].segmented_control(
+        "Navigate", labels, default=current_label,
+        label_visibility="collapsed", key="topnav", on_change=_on_nav_change,
+    )
+
+
+def _on_nav_change() -> None:
+    """Navigate only on a genuine user pick; programmatic routing just re-syncs the pill."""
+
+    choice = st.session_state.get("topnav")
+    if choice in _NAV_ITEMS:
+        _navigate(view=_NAV_ITEMS[choice] or None)
 
 
 def main() -> None:
@@ -296,23 +359,9 @@ def main() -> None:
         return
 
     workspace_id, thread_id = choose_scope(WORKSPACES, compact=_route_value("view") in {"career", "onboarding", "role", "application", "companies", "eligibility", "agents"})
+    _top_nav()
     with st.sidebar:
-        st.divider()
-        if st.button("Find my roles", key="open-career-hub", use_container_width=True):
-            _navigate(view="career")
-        if st.button("My applications", key="open-application-tracker", use_container_width=True):
-            _navigate(view="applications")
-        if st.button("Company database", key="open-company-database", use_container_width=True):
-            _navigate(view="companies")
-        if st.button("Work eligibility", key="open-eligibility", use_container_width=True):
-            _navigate(view="eligibility")
-        if st.button("Agent team", key="open-agent-team", use_container_width=True):
-            _navigate(view="agents")
-        if _route_value("view") == "applications" and st.button("Back to workspace", use_container_width=True):
-            _navigate()
-        if st.button("Product home", key="open-product-home", use_container_width=True):
-            _navigate(view="landing")
-        st.caption("Open the separate live landing page for a market-level view of your local progress.")
+        st.caption("Your career track and job workspace live here. Everything else is in the top bar.")
     if _route_value("view") in {"career", "onboarding", "role", "application", "companies"}:
         render_portal(sys.modules[__name__], workspace_id, _route_value("view"))
         return
@@ -374,6 +423,7 @@ def _navigate(*, view: str | None = None, focus: str | None = None) -> None:
         st.query_params["view"] = view
     if focus:
         st.query_params["focus"] = focus
+    st.session_state.pop("topnav", None)
     st.rerun()
 
 
@@ -516,10 +566,10 @@ def _job_workspace_dashboard(workspace_id: str, thread_id: str) -> None:
     coverage_note = f"{len(matched)} CV shown · {len(missing_to_build)} to build"
     cards = st.columns(5)
     _metric_card(cards[0], "Requirement evidence coverage", f"{result.match.score}%", coverage_note)
-    _metric_card(cards[1], "CV guidance", f"{result.cv_score.score if result.cv_score else '—'}%", "Document readiness, not a hiring prediction")
-    _metric_card(cards[2], "Interview practice", f"{practice_average if practice_average is not None else '—'}", f"{len(attempts)} saved rehearsal{'s' if len(attempts) != 1 else ''}")
+    _metric_card(cards[1], "CV guidance", f"{result.cv_score.score if result.cv_score else 'n/a'}%", "Document readiness, not a hiring prediction")
+    _metric_card(cards[2], "Interview practice", f"{practice_average if practice_average is not None else 'n/a'}", f"{len(attempts)} saved rehearsal{'s' if len(attempts) != 1 else ''}")
     _metric_card(cards[3], "Proof gaps", str(len(missing_to_build)), "Requirements without CV or eligible project proof")
-    evidence_value = f"{evidence_match.score}%" if evidence_match.score is not None else "—"
+    evidence_value = f"{evidence_match.score}%" if evidence_match.score is not None else "n/a"
     evidence_note = (
         "CV + completed project evidence" if evidence_match.score is not None
         else "Add verified completed project evidence"
@@ -848,9 +898,9 @@ def _evidence_match(workspace_id: str, thread_id: str) -> None:
     projects = evidence_store.list_projects(workspace_id, thread_id)
     assessment = calculate_evidence_match(result.candidate, result.job, projects)
     metrics = st.columns(4)
-    metrics[0].metric("Evidence match", f"{assessment.score}%" if assessment.score is not None else "—")
+    metrics[0].metric("Evidence match", f"{assessment.score}%" if assessment.score is not None else "n/a")
     metrics[1].metric("Confirmed CV coverage", f"{assessment.role_coverage}%")
-    metrics[2].metric("Completed-project proof", f"{assessment.project_coverage}%" if assessment.project_coverage is not None else "—")
+    metrics[2].metric("Completed-project proof", f"{assessment.project_coverage}%" if assessment.project_coverage is not None else "n/a")
     metrics[3].metric("Company benchmark", f"{assessment.pattern_coverage}%" if assessment.pattern_coverage is not None else "Unavailable")
     if assessment.score is not None:
         st.info(
@@ -874,7 +924,7 @@ def _evidence_match(workspace_id: str, thread_id: str) -> None:
                     "Role requirement": item.skill,
                     "Importance": "Required" if item.required else "Preferred",
                     "Project support": f"{round(item.support * 100)}%",
-                    "Completed project": " · ".join(item.project_titles) or "—",
+                    "Completed project": " · ".join(item.project_titles),
                     "Reason": item.explanation,
                 }
                 for item in assessment.requirement_supports
@@ -2407,7 +2457,7 @@ def _interview(workspace_id: str, thread_id: str) -> None:
     if level >= MAX_LEVEL:
         level_cols[1].caption("Maximum level reached: cross-examination. Keep defending your evidence.")
     else:
-        level_cols[1].progress(passed / needed, text=f"{passed}/{needed} rehearsals scored 75+ toward level {level + 1} — questions get harder as you prove yourself")
+        level_cols[1].progress(passed / needed, text=f"{passed}/{needed} rehearsals scored 75+ toward level {level + 1} · questions get harder as you prove yourself")
     if attempts:
         average = round(sum(attempt["score"] for attempt in attempts) / len(attempts))
         history_metrics = st.columns(3)

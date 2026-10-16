@@ -37,6 +37,7 @@ PORTAL_BOARDS = (*DEFAULT_VETTED_COMPANY_BOARDS, VettedCompanyBoard(
 def go(view, **params):
     st.query_params.clear()
     st.query_params.update({"view": view, **params})
+    st.session_state.pop("topnav", None)
     st.rerun()
 
 
@@ -66,15 +67,6 @@ def render_onboarding(api, track, *, standalone=True):
 def render_portal(api, track, view):
     st.markdown(_STYLE, unsafe_allow_html=True)
     store = HubStore(api.WORKSPACES.path)
-    navigation = st.columns(4)
-    if navigation[0].button("My role pages", use_container_width=True):
-        go("career")
-    if navigation[1].button("Application dashboard", use_container_width=True):
-        go("applications")
-    if navigation[2].button("Company database", use_container_width=True):
-        go("companies")
-    if navigation[3].button("Edit my interests", use_container_width=True):
-        go("onboarding")
     if view == "onboarding" or (view == "career" and not store.interests(track)):
         render_onboarding(api, track)
     elif view == "career":
@@ -101,7 +93,7 @@ def _hiring_index(api):
     st.divider()
     st.subheader("Actively hiring index")
     st.caption(
-        "Built from the local YC snapshot (Active + hiring flag — the data behind vclense-style YC globe views) "
+        "Built from the local YC snapshot (Active + hiring flag, the data behind vclense-style YC globe views) "
         "and live checks against reviewed official job boards. LinkedIn is never scraped or automated: "
         "live rows read the same employer ATS postings LinkedIn mirrors, through the boards' official feeds."
     )
@@ -119,7 +111,7 @@ def _hiring_index(api):
             st.caption(f"Freshness: {max(1, int(age_hours))}h old · auto-refreshes every 6h via the installed schedule (log: .job_assistant/refresh.log)")
     if header[1].button("Build / refresh index", use_container_width=True):
         if api._yc_directory_store().snapshot() is None:
-            st.error("Refresh the startup snapshot on a role page first — the index is built from it.")
+            st.error("Refresh the startup snapshot on a role page first; the index is built from it.")
         else:
             with st.spinner("Building the index (live board checks are capped at 25 per build)…"):
                 entries, board_errors = build_hiring_index(
@@ -162,10 +154,10 @@ def _hiring_index(api):
             {
                 "Company": entry.name,
                 "Signal": _SIGNAL_LABELS[entry.signal],
-                "Openings": str(entry.openings_count) if entry.openings_count is not None else "—",
-                "Sample roles": " · ".join(entry.sample_titles[:3]) or "—",
-                "Industry": entry.industry or "—",
-                "Batch": entry.yc_batch or "—",
+                "Openings": str(entry.openings_count) if entry.openings_count is not None else "",
+                "Sample roles": " · ".join(entry.sample_titles[:3]),
+                "Industry": entry.industry or "",
+                "Batch": entry.yc_batch or "",
                 "Source": entry.source_label,
             }
             for entry in entries
@@ -280,8 +272,11 @@ def _companies(api):
 
 def _home(api, store, track):
     interests = store.interests(track)
-    st.markdown('<div class="section-kicker">Your next chapter</div><h1>Good work starts with a direction.</h1>', unsafe_allow_html=True)
-    st.write("Explore your roles. Build the evidence. Keep every application in one place.")
+    header = st.columns((5, 1))
+    header[0].markdown('<div class="section-kicker">Your next chapter</div><h1>Good work starts with a direction.</h1>', unsafe_allow_html=True)
+    header[0].write("Explore your roles. Build the evidence. Keep every application in one place.")
+    if header[1].button("Edit my interests", use_container_width=True):
+        go("onboarding")
     columns = st.columns(2)
     for i, role in enumerate(interests.roles):
         with columns[i % 2]:
@@ -429,7 +424,7 @@ def _role_company_browser(api, role, thread):
     )
     st.caption(
         "Pick a startup from the local YC directory snapshot or a big company from the Global Capital "
-        "Atlas snapshot. Entries are research leads, not vacancy claims — verify openings on official boards."
+        "Atlas snapshot. Entries are research leads, not vacancy claims; verify openings on official boards."
     )
     render_company_browser(api, role=role, key_prefix=f"role-browser:{thread}")
 
