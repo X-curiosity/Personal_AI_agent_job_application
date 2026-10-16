@@ -480,7 +480,7 @@ def _application(api, store, track):
     with tab_docs:
         _documents(api, store, track, record)
     with tab_evidence:
-        api._evidence_match(track, thread)
+        api._project_evidence(track, thread)
         api._project_studio(track, thread)
     with tab_people:
         _people(opening)

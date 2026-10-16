@@ -407,7 +407,7 @@ def main() -> None:
             render_onboarding(sys.modules[__name__], workspace_id, standalone=False)
     _workspace_hero(WORKSPACES.thread(workspace_id, thread_id))
     tab_labels = [
-        "Overview", "Job brief", "CV studio", "Evidence match", "Proof projects",
+        "Overview", "Job brief", "CV studio", "Proof projects",
         "Interview lab", "Career track", "Role market", "Coach",
     ]
     focus = _route_value("focus")
@@ -420,10 +420,9 @@ def main() -> None:
         _quickstart(workspace_id, thread_id)
     with tabs["CV studio"]:
         _cv_studio(workspace_id, thread_id)
-    with tabs["Evidence match"]:
-        _evidence_match(workspace_id, thread_id)
     with tabs["Proof projects"]:
         _project_studio(workspace_id, thread_id)
+        _project_evidence(workspace_id, thread_id)
     with tabs["Interview lab"]:
         _interview(workspace_id, thread_id)
     with tabs["Career track"]:
@@ -591,18 +590,29 @@ def _job_workspace_dashboard(workspace_id: str, thread_id: str) -> None:
         if support.support > 0
     }
     missing_to_build = [skill for skill in missing if normalize_skill(skill) not in project_backed]
+
+    match_score = evidence_match.score if evidence_match.score is not None else result.match.score
+    project_note = (
+        f"completed-project proof {evidence_match.project_coverage}%"
+        if evidence_match.project_coverage is not None
+        else "no completed project proof yet"
+    )
+    st.markdown("<div class='section-kicker'>Your match for this role</div>", unsafe_allow_html=True)
+    st.progress(
+        match_score / 100,
+        text=f"{match_score}% · skills coverage {result.match.score}% · CV readiness {result.cv_score.score if result.cv_score else 'n/a'}% · {project_note}",
+    )
+    st.caption(
+        "Deterministic evidence coverage on a 100 scale, not a hiring prediction. It rises as you load your CV, "
+        "verify GitHub signals, and mark projects completed with proof. Planned work never counts."
+    )
+
     coverage_note = f"{len(matched)} CV shown · {len(missing_to_build)} to build"
-    cards = st.columns(5)
+    cards = st.columns(4)
     _metric_card(cards[0], "Requirement evidence coverage", f"{result.match.score}%", coverage_note)
     _metric_card(cards[1], "CV guidance", f"{result.cv_score.score if result.cv_score else 'n/a'}%", "Document readiness, not a hiring prediction")
     _metric_card(cards[2], "Interview practice", f"{practice_average if practice_average is not None else 'n/a'}", f"{len(attempts)} saved rehearsal{'s' if len(attempts) != 1 else ''}")
     _metric_card(cards[3], "Proof gaps", str(len(missing_to_build)), "Requirements without CV or eligible project proof")
-    evidence_value = f"{evidence_match.score}%" if evidence_match.score is not None else "n/a"
-    evidence_note = (
-        "CV + completed project evidence" if evidence_match.score is not None
-        else "Add verified completed project evidence"
-    )
-    _metric_card(cards[4], "Evidence match", evidence_value, evidence_note)
 
     st.markdown("<div class='section-kicker'>Your next best move</div>", unsafe_allow_html=True)
     next_action, destination, reason = _next_action(result, attempts, standout_plans)
@@ -905,18 +915,19 @@ def _cv_studio(workspace_id: str, thread_id: str) -> None:
                 st.caption(section.candidate_action)
 
 
-def _evidence_match(workspace_id: str, thread_id: str) -> None:
-    """Show candidate-owned project proof beside, never inside, a hiring prediction."""
+def _project_evidence(workspace_id: str, thread_id: str) -> None:
+    """Candidate-owned completed project proof; the score itself lives in the Overview match bar."""
     thread = WORKSPACES.thread(workspace_id, thread_id)
     result = thread["analysis"] if not thread["stale"] else None
-    st.subheader("Evidence match")
+    st.divider()
+    st.subheader("Your completed project evidence")
     st.caption(
         "Not a hiring prediction. This compares the published role requirements with the "
         "confirmed CV and completed project evidence you choose. It does not search employee "
         "profiles, infer who was hired, or scrape LinkedIn."
     )
     if thread["stale"]:
-        st.warning("Refresh the Job brief first. Evidence match is held back while the role evidence is stale.")
+        st.warning("Refresh the Job brief first. Project evidence is held back while the role evidence is stale.")
         return
     if not result:
         st.info("Analyze this job in Job brief to compare its sourced requirements with your completed project evidence.")
@@ -925,18 +936,8 @@ def _evidence_match(workspace_id: str, thread_id: str) -> None:
     evidence_store = _evidence_store()
     projects = evidence_store.list_projects(workspace_id, thread_id)
     assessment = calculate_evidence_match(result.candidate, result.job, projects)
-    metrics = st.columns(4)
-    metrics[0].metric("Evidence match", f"{assessment.score}%" if assessment.score is not None else "n/a")
-    metrics[1].metric("Confirmed CV coverage", f"{assessment.role_coverage}%")
-    metrics[2].metric("Completed-project proof", f"{assessment.project_coverage}%" if assessment.project_coverage is not None else "n/a")
-    metrics[3].metric("Company benchmark", f"{assessment.pattern_coverage}%" if assessment.pattern_coverage is not None else "Unavailable")
-    if assessment.score is not None:
-        st.info(
-            "This partial evidence score combines confirmed CV coverage and completed-project proof. "
-            "It is not an estimate of your odds of being hired."
-        )
-    elif assessment.project_status == "not_provided":
-        st.info("Add a completed, verifiable project below to calculate the project-evidence component. Missing inputs are not treated as a zero.")
+    if assessment.project_status == "not_provided":
+        st.info("Add a completed, verifiable project below to raise the project-proof component of your match bar.")
     elif assessment.project_status == "no_eligible_projects":
         st.warning("Saved project records need a completed status, your confirmation, a proof reference, and an observable outcome/test before they can contribute.")
     elif assessment.project_status == "no_matching_project_evidence":
@@ -961,7 +962,7 @@ def _evidence_match(workspace_id: str, thread_id: str) -> None:
             use_container_width=True,
         )
 
-    st.markdown("#### Your completed project evidence")
+    st.markdown("#### Add completed work")
     st.caption(
         "Add only work you have completed and can explain. Use a public or otherwise non-confidential "
         "reference; this app stores the reference locally and does not fetch it. Planned briefs in Proof projects never count here."

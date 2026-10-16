@@ -19,15 +19,27 @@ from tau_job_application.accounts import (
 )
 
 
-def _account_card(icon: str, title: str, account, disconnect_key: str, on_disconnect) -> bool:
-    """Render one provider's status; returns True when connected."""
+_BRAND_LOGOS = {
+    "github": ("https://cdn.simpleicons.org/github/173a31", "GH"),
+    "linkedin": ("https://cdn.simpleicons.org/linkedin/0a66c2", "in"),
+}
 
+
+def _account_card(provider: str, title: str, account, disconnect_key: str, on_disconnect) -> bool:
+    """Render one provider's status with its real brand logo; returns True when connected."""
+
+    logo_url, monogram = _BRAND_LOGOS[provider]
     with st.container(border=True):
         header = st.columns((1, 5, 1))
-        if account and account.avatar_url and st.session_state.get("account-logos"):
-            header[0].image(account.avatar_url, width=42)
+        if st.session_state.get("account-logos"):
+            image = account.avatar_url if account and account.avatar_url else logo_url
+            header[0].image(image, width=42)
         else:
-            header[0].markdown(f"### {icon}")
+            header[0].markdown(
+                f'<div style="width:42px;height:42px;border-radius:10px;background:#eef2ea;border:1px solid #dce4d9;'
+                f'display:grid;place-items:center;font-weight:800;color:#173a31">{monogram}</div>',
+                unsafe_allow_html=True,
+            )
         if account:
             header[1].markdown(f"**{title}** · connected")
             header[1].caption(
@@ -53,15 +65,15 @@ def render_accounts(api, track: str) -> None:
     )
     st.caption("No token is ever stored. LinkedIn is used through its official OpenID Connect sign-in only; nothing is scraped or automated.")
     st.checkbox(
-        "Load remote avatars", key="account-logos",
-        help="Off by default: loading a remote avatar shares your IP address with its host.",
+        "Load remote avatars and brand logos", key="account-logos",
+        help="Off by default: loading a remote image shares your IP address with its host (account avatar or the Simple Icons CDN for brand logos).",
     )
 
     github = store.get("github")
     linkedin = store.get("linkedin")
 
     st.subheader("GitHub")
-    if not _account_card("🐙", "GitHub", github, "unlink-github", lambda: store.remove("github")):
+    if not _account_card("github", "GitHub", github, "unlink-github", lambda: store.remove("github")):
         username = st.text_input("GitHub username", placeholder="octocat", max_chars=100, key="github-username")
         if st.button("Connect GitHub", type="primary", key="connect-github"):
             try:
@@ -106,7 +118,7 @@ def render_accounts(api, track: str) -> None:
             except (RuntimeError, ValueError) as exc:
                 st.error(str(exc))
 
-    if not _account_card("💼", "LinkedIn", linkedin, "unlink-linkedin", lambda: store.remove("linkedin")):
+    if not _account_card("linkedin", "LinkedIn", linkedin, "unlink-linkedin", lambda: store.remove("linkedin")):
         client_id = os.environ.get("LINKEDIN_CLIENT_ID", "")
         redirect_uri = os.environ.get("LINKEDIN_REDIRECT_URI", "")
         if client_id and os.environ.get("LINKEDIN_CLIENT_SECRET") and redirect_uri:
