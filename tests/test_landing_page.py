@@ -86,7 +86,7 @@ render_landing_page(data, on_enter_workspace=enter_workspace, on_open_role_marke
     assert "Run your job search like a thoughtful campaign" in html
     assert "&lt;script&gt;untrusted&lt;/script&gt;" in html
     assert "javascript:alert" not in html
-    next(button for button in app.button if button.label == "Enter Career Workspace").click()
+    next(button for button in app.button if button.label == "Enter Co-Apply GPT").click()
     app.run()
     assert app.session_state["entered"]
     next(button for button in app.button if button.label == "See live role markets").click()

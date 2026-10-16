@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Career Workspace — one-command local launcher.
+# Co-Apply GPT — one-command local launcher.
 # Uses the project's own .venv (Python 3.12), ignoring any active conda/pyenv
 # environment, so no global install or uv sync is needed.
 set -euo pipefail
@@ -27,7 +27,7 @@ if lsof -ti ":${PORT}" >/dev/null 2>&1; then
     sleep 1
 fi
 
-echo "Starting Career Workspace at ${URL}"
+echo "Starting Co-Apply GPT at ${URL}"
 ( sleep 3 && open "${URL}" ) &
 
 exec .venv/bin/python -m streamlit run src/tau_job_application/ui.py \

@@ -1,4 +1,4 @@
-# Personal AI Agent — Job Readiness and Learning Assistant
+# Co-Apply GPT — Job Readiness and Learning Assistant
 
 **Goal: help applicants become stronger candidates, not just produce better-looking applications.**
 
@@ -58,7 +58,7 @@ The easiest way — one script, opens the browser for you:
 ./run.sh
 ```
 
-or double-click **`Start Career Workspace.command`** in Finder (macOS). The script always uses the project's own Python 3.12 environment, restarts any previous instance, and opens http://127.0.0.1:8506. Press `Ctrl+C` in the terminal to stop.
+or double-click **`Start Co-Apply GPT.command`** in Finder (macOS). The script always uses the project's own Python 3.12 environment, restarts any previous instance, and opens http://127.0.0.1:8506. Press `Ctrl+C` in the terminal to stop.
 
 Manual alternative:
 

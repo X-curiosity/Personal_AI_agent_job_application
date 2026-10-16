@@ -33,6 +33,7 @@ def _parser() -> argparse.ArgumentParser:
     team = commands.add_parser("agent-team", help="Route one request through the optional multi-agent team (requires model credentials)")
     team.add_argument("request", type=str)
     team.add_argument("--specialist", choices=["company_scout", "eligibility_advisor", "application_prep"], default=None)
+    commands.add_parser("refresh-data", help="Refresh company snapshots and rebuild the actively-hiring index (used by the schedule)")
     commands.add_parser("ui", help="Launch the local Streamlit application")
     return parser
 
@@ -47,6 +48,8 @@ def main() -> None:
         subprocess.run([sys.executable, "-m", "streamlit", "run", str(Path(__file__).with_name("ui.py"))], check=True)
     elif args.command == "agent-team":
         asyncio.run(_run_agent_team(args.request, specialist=args.specialist))
+    elif args.command == "refresh-data":
+        _refresh_data()
     else:
         asyncio.run(_run_agent(args.candidate, args.job))
 
@@ -59,6 +62,30 @@ async def _run_agent(candidate_path: Path, job_path: Path) -> None:
 
     async for event in build_agent().prompt(prompt):
         print(event)
+
+
+def _refresh_data() -> None:
+    """Scheduled refresh: snapshots + hiring index. Failures keep previous data."""
+
+    from tau_job_application.capital_atlas import fetch_atlas_companies
+    from tau_job_application.hiring_index import refresh_all_data
+    from tau_job_application.sources import fetch_public_board_openings
+    from tau_job_application.yc_directory import fetch_yc_directory
+
+    database = PROJECT_ROOT / ".job_assistant" / "assistant.sqlite"
+    summary = refresh_all_data(
+        database,
+        yc_fetcher=fetch_yc_directory,
+        atlas_fetcher=fetch_atlas_companies,
+        openings_fetcher=fetch_public_board_openings,
+    )
+    print(
+        f"refresh-data: yc={summary.get('yc_records', 'kept')} "
+        f"atlas={summary.get('atlas_records', 'kept')} "
+        f"indexed={summary.get('indexed', 0)} live={summary.get('live', 0)}"
+    )
+    for error in summary["errors"]:
+        print(f"  warning: {error}")
 
 
 async def _run_agent_team(request: str, *, specialist: str | None = None) -> None:

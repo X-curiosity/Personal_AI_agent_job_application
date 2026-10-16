@@ -1,21 +1,74 @@
-"""Structured interview practice with local, explainable feedback."""
+"""Structured interview practice with local, explainable feedback.
+
+Difficulty is progressive (the Zenply training pillar): every three saved
+rehearsals scored 75+ raise the level, from fundamentals to
+cross-examination. Levels are derived deterministically from the workspace's
+own attempt history — never from model judgement.
+"""
 
 from __future__ import annotations
 
 import re
 from tau_job_application.models import CandidateProfile, InterviewFeedback, InterviewQuestion, JobPosting
 
+MAX_LEVEL = 5
+LEVEL_NAMES = {
+    1: "Fundamentals",
+    2: "Role specifics",
+    3: "Trade-offs & design",
+    4: "Failure & ambiguity",
+    5: "Cross-examination",
+}
+LEVEL_PASS_SCORE = 75
+LEVEL_PASS_COUNT = 3
 
-def build_interview_questions(candidate: CandidateProfile, job: JobPosting) -> list[InterviewQuestion]:
+
+def difficulty_level(attempts: list[dict]) -> int:
+    """1 + one level per three rehearsals at 75+; capped at MAX_LEVEL."""
+
+    passed = sum(1 for attempt in attempts if isinstance(attempt.get("score"), int) and attempt["score"] >= LEVEL_PASS_SCORE)
+    return min(MAX_LEVEL, 1 + passed // LEVEL_PASS_COUNT)
+
+
+def level_progress(attempts: list[dict]) -> tuple[int, int]:
+    """(passed toward next level, needed) for the progress display."""
+
+    passed = sum(1 for attempt in attempts if isinstance(attempt.get("score"), int) and attempt["score"] >= LEVEL_PASS_SCORE)
+    if difficulty_level(attempts) >= MAX_LEVEL:
+        return LEVEL_PASS_COUNT, LEVEL_PASS_COUNT
+    return passed % LEVEL_PASS_COUNT, LEVEL_PASS_COUNT
+
+
+def _level_twist(level: int, skill: str, job_title: str) -> str:
+    if level == 2:
+        return f"Go deeper on {skill}: design a small component of a {job_title} system that relies on it. What are the interfaces, invariants, and limits?"
+    if level == 3:
+        return f"Defend a design choice involving {skill}: what alternative did you reject, what would you measure, and when would the simpler option win?"
+    if level == 4:
+        return f"Tell me about a time something involving {skill} failed or requirements changed mid-way. How did you diagnose it, and what did you change?"
+    if level >= 5:
+        return f"Cross-examination on {skill}: justify every assumption in your approach. Why is it not over-engineered? What are you still uncertain about?"
+    return f"Walk me through how you have used {skill}, or how you would approach a small task requiring it."
+
+
+def build_interview_questions(candidate: CandidateProfile, job: JobPosting, *, level: int = 1) -> list[InterviewQuestion]:
+    if not 1 <= level <= MAX_LEVEL:
+        raise ValueError(f"Interview level must be between 1 and {MAX_LEVEL}")
     questions = [
         InterviewQuestion(id="motivation", category="motivation", question=f"Why this {job.title} role at {job.company}, and why now?", what_good_evidence_looks_like=["Specific company/role research", "A truthful connection to candidate experience", "A learning goal without overstating ability"]),
         InterviewQuestion(id="impact", category="behavioral", question="Tell me about a project or experience where you improved something. What was your contribution and how did you know it worked?", what_good_evidence_looks_like=["Situation and responsibility", "Specific actions", "Observable result or honest limitation", "Reflection"]),
     ]
+    if level >= 4:
+        questions.append(InterviewQuestion(
+            id="ambiguity", category="behavioral",
+            question="Describe a situation where the goal was unclear or kept changing. What did you decide, and how did you make progress without perfect information?",
+            what_good_evidence_looks_like=["Explicit assumptions", "Small reversible steps", "Honest uncertainty", "A checkpoint with stakeholders"],
+        ))
     for index, requirement in enumerate(job.requirements[:5], start=1):
         if requirement.required:
             questions.append(InterviewQuestion(
                 id=f"technical-{index}", category="technical",
-                question=f"Walk me through how you have used {requirement.skill}, or how you would approach a small task requiring it.",
+                question=_level_twist(level, requirement.skill, job.title),
                 what_good_evidence_looks_like=["Clear assumptions", "Concrete steps", "Validation or testing", "Trade-offs and limits"],
             ))
     return questions

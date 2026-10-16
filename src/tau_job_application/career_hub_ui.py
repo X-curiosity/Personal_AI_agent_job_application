@@ -15,6 +15,7 @@ from tau_job_application.career_inbox import InboxStore, read_gmail, read_slack
 from tau_job_application.capital_atlas import fetch_capital_atlas
 from tau_job_application.company_browser_ui import render_company_browser
 from tau_job_application.company_catalog import fetch_companies_marketcap, fetch_yc_hiring
+from tau_job_application.hiring_index import build_hiring_index
 from tau_job_application.hiring_match import calculate_evidence_match
 from tau_job_application.parsing import parse_candidate_text
 from tau_job_application.pipeline import analyze_texts
@@ -86,6 +87,94 @@ def render_portal(api, track, view):
         _companies(api)
 
 
+_SIGNAL_LABELS = {
+    "live_openings": "✓ Live openings (official board)",
+    "directory_flag": "Directory flag (unverified)",
+}
+
+
+def _hiring_index(api):
+    """Internal actively-hiring index: live official boards + YC directory flags."""
+
+    store = api._hiring_index_store()
+    run = store.run()
+    st.divider()
+    st.subheader("Actively hiring index")
+    st.caption(
+        "Built from the local YC snapshot (Active + hiring flag — the data behind vclense-style YC globe views) "
+        "and live checks against reviewed official job boards. LinkedIn is never scraped or automated: "
+        "live rows read the same employer ATS postings LinkedIn mirrors, through the boards' official feeds."
+    )
+    header = st.columns((3, 1))
+    header[0].caption(
+        f"Built {str(run['built_at'])[:16].replace('T', ' ')} UTC · {run['entry_count']} companies · {run['live_count']} with live board checks"
+        if run else "No hiring index yet."
+    )
+    if run:
+        from datetime import UTC, datetime
+        age_hours = (datetime.now(UTC) - datetime.fromisoformat(str(run["built_at"]))).total_seconds() / 3600
+        if age_hours > 48:
+            st.warning(f"The index is {int(age_hours)} hours old. It refreshes automatically every 6 hours when the schedule is installed (./install_schedule.sh), or rebuild it now.")
+        else:
+            st.caption(f"Freshness: {max(1, int(age_hours))}h old · auto-refreshes every 6h via the installed schedule (log: .job_assistant/refresh.log)")
+    if header[1].button("Build / refresh index", use_container_width=True):
+        if api._yc_directory_store().snapshot() is None:
+            st.error("Refresh the startup snapshot on a role page first — the index is built from it.")
+        else:
+            with st.spinner("Building the index (live board checks are capped at 25 per build)…"):
+                entries, board_errors = build_hiring_index(
+                    yc_store=api._yc_directory_store(),
+                    catalog_store=api._company_catalog_store(),
+                    fetch_openings=api.fetch_public_board_openings,
+                )
+                store.save_run(entries)
+            if board_errors:
+                st.warning("Some boards could not be checked; they were skipped, not zeroed: " + " · ".join(board_errors))
+            live = sum(1 for entry in entries if entry.signal == "live_openings")
+            st.success(f"Indexed {len(entries)} companies flagged as hiring ({live} verified against live boards).")
+            st.rerun()
+    if run is None:
+        st.info("Build the index once to list actively hiring companies. Live verification uses only reviewed board mappings and the vetted registry.")
+        return
+
+    controls = st.columns(4)
+    signal = controls[0].selectbox(
+        "Signal", ["All signals", "live_openings", "directory_flag"],
+        format_func=lambda value: _SIGNAL_LABELS.get(value, value),
+        key="hiring-index-signal",
+    )
+    industries = store.facets()["industries"]
+    industry = controls[1].selectbox("Industry", ["All industries", *industries], key="hiring-index-industry")
+    region = controls[2].text_input("Region contains", placeholder="Germany, USA, remote…", key="hiring-index-region")
+    query = controls[3].text_input("Search", placeholder="company, role, industry", max_chars=200, key="hiring-index-query")
+
+    entries = store.entries(
+        signal="" if signal == "All signals" else signal,
+        industry="" if industry == "All industries" else industry,
+        region=region, query=query, limit=200,
+    )
+    st.caption(f"{len(entries)} companies listed")
+    if not entries:
+        st.info("No companies match these filters in the current index.")
+        return
+    st.dataframe(
+        [
+            {
+                "Company": entry.name,
+                "Signal": _SIGNAL_LABELS[entry.signal],
+                "Openings": str(entry.openings_count) if entry.openings_count is not None else "—",
+                "Sample roles": " · ".join(entry.sample_titles[:3]) or "—",
+                "Industry": entry.industry or "—",
+                "Batch": entry.yc_batch or "—",
+                "Source": entry.source_label,
+            }
+            for entry in entries
+        ],
+        hide_index=True, use_container_width=True,
+    )
+    st.caption("“Live openings” counts come from the company's reviewed official board at build time. “Directory flag” means the YC directory claims hiring; verify on the company's own careers page.")
+
+
 def _portal_boards(api):
     """Combine built-in reviewed boards with user-reviewed catalogue mappings."""
     boards = [*PORTAL_BOARDS, *api._company_catalog_store().boards()]
@@ -136,6 +225,8 @@ def _companies(api):
                 st.error("The Global Capital Atlas could not be refreshed. Nothing was replaced; try again later.")
         st.caption("YC Globe inspired this view. The import uses the smaller, inspectable yc-oss hiring JSON rather than reverse-engineering VCLense’s interactive dashboard. "
                    "Global Capital Atlas (capital.theojaffee.net) is read once per explicit import from its published page asset; a valuation is not a vacancy signal.")
+
+    _hiring_index(api)
 
     controls = st.columns((2, 1, 1))
     query = controls[0].text_input("Search the database", placeholder="company, industry, place, ticker")
@@ -197,6 +288,64 @@ def _home(api, store, track):
             st.markdown(f'<article class="hub-tile"><h2>{escape(role)}</h2><p>Live employer listings · tailored documents · project evidence</p><small>YOUR ROLE PAGE</small></article>', unsafe_allow_html=True)
             if st.button(f"Explore {role}", key=f"hub-open:{role}", use_container_width=True):
                 go("role", role=role)
+    _structured_profile(api, store, track)
+
+
+def _structured_profile(api, store, track):
+    """Zenply's core asset: the structured, recruiter-queryable candidate profile."""
+
+    from tau_job_application.structured_profile import (
+        RecruiterCriteria,
+        build_structured_profile,
+        evaluate_recruiter_query,
+    )
+
+    st.divider()
+    st.markdown('<div class="section-kicker">What recruiters will query</div><h2>Your structured profile</h2>', unsafe_allow_html=True)
+    st.caption(
+        "Recruiters filter on structured data; candidates only have unstructured, self-reported documents. "
+        "This is your data, organised: confirmed skills, completed evidence, declared eligibility, rehearsal level. "
+        "Nothing leaves this device unless you download it yourself."
+    )
+    profile = build_structured_profile(
+        workspaces=api.WORKSPACES, hub_store=store,
+        residency_store=api._residency_store(), evidence_store=api._evidence_store(),
+        application_store=api._application_store(), track=track,
+    )
+    completed = sum(1 for project in profile.evidence_projects if project.status == "completed")
+    metrics = st.columns(4)
+    metrics[0].metric("Confirmed skills", len(profile.skills))
+    metrics[1].metric("Completed evidence projects", completed)
+    metrics[2].metric("Interview level", f"Lv {profile.interview.current_level}")
+    metrics[3].metric("Applications tracked", sum(profile.applications_by_stage.values()))
+    if not profile.residence_country:
+        st.caption("Add your residency profile (sidebar → Work eligibility) so recruiters can filter you on work authorization.")
+
+    with st.expander("Run a recruiter-style filter on yourself", expanded=False):
+        criteria_cols = st.columns(4)
+        skills_text = criteria_cols[0].text_input("Required skills (comma-separated)", placeholder="Python, SQL", key=f"profile-criteria-skills:{track}")
+        min_projects = criteria_cols[1].number_input("Min completed projects", min_value=0, max_value=50, value=0, key=f"profile-criteria-projects:{track}")
+        min_level = criteria_cols[2].slider("Min interview level", min_value=1, max_value=5, value=1, key=f"profile-criteria-level:{track}")
+        countries = ["Any country", "Germany", "France", "Switzerland", "United Kingdom", "United States", "Canada", "Netherlands", "Spain"]
+        job_country = criteria_cols[3].selectbox("Job country", countries, key=f"profile-criteria-country:{track}")
+        result = evaluate_recruiter_query(profile, RecruiterCriteria(
+            skills_all=tuple(part.strip() for part in skills_text.split(",") if part.strip()),
+            min_completed_projects=int(min_projects), min_interview_level=int(min_level),
+            job_country=None if job_country == "Any country" else job_country,
+        ))
+        if result.qualified:
+            st.success("Qualified for this filter." + (" " + " ".join(result.reasons) if result.reasons != ("All criteria satisfied.",) else ""))
+        else:
+            st.error("Filtered out: " + " ".join(result.reasons))
+        st.caption("Deterministic rules, not a hiring prediction. Sponsorship needs are flags, not rejections.")
+
+    st.download_button(
+        "Download my structured profile (JSON)",
+        data=profile.model_dump_json(indent=2),
+        file_name="coapply_structured_profile.json",
+        mime="application/json",
+        key=f"profile-download:{track}",
+    )
 
 
 def _role(api, store, track):

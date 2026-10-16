@@ -26,13 +26,22 @@ from tau_job_application.eligibility import ResidencyStore
 from tau_job_application.eligibility_ui import render_eligibility
 from tau_job_application.company_explorer import COMPANY_PINS, company_footprint, detected_profile_skills, recommend_companies
 from tau_job_application.evidence_match_store import EvidenceMatchStore
+from tau_job_application.hiring_index import HiringIndexStore
 from tau_job_application.hiring_match import (
     ProjectProof,
     ProjectProofKind,
     ProjectStatus,
     calculate_evidence_match,
 )
-from tau_job_application.interview import build_interview_questions, evaluate_answer, transcribe_openai_audio
+from tau_job_application.interview import (
+    LEVEL_NAMES,
+    MAX_LEVEL,
+    build_interview_questions,
+    difficulty_level,
+    evaluate_answer,
+    level_progress,
+    transcribe_openai_audio,
+)
 from tau_job_application.job_pages import fetch_job_url
 from tau_job_application.landing_page import (
     LandingOpportunity,
@@ -105,6 +114,7 @@ COMPANY_CATALOG = CompanyCatalogStore(ROOT / ".job_assistant" / "assistant.sqlit
 YC_DIRECTORY = YCDirectoryStore(ROOT / ".job_assistant" / "assistant.sqlite")
 ATLAS = AtlasStore(ROOT / ".job_assistant" / "assistant.sqlite")
 RESIDENCY = ResidencyStore(ROOT / ".job_assistant" / "assistant.sqlite")
+HIRING_INDEX = HiringIndexStore(ROOT / ".job_assistant" / "assistant.sqlite")
 
 
 def _application_store() -> ApplicationTrackerStore:
@@ -170,6 +180,15 @@ def _atlas_store() -> AtlasStore:
         ATLAS
         if ATLAS.path == WORKSPACES.path
         else AtlasStore(WORKSPACES.path)
+    )
+
+
+def _hiring_index_store() -> HiringIndexStore:
+    """Use the active workspace database in UI tests as well as in the app."""
+    return (
+        HIRING_INDEX
+        if HIRING_INDEX.path == WORKSPACES.path
+        else HiringIndexStore(WORKSPACES.path)
     )
 
 
@@ -270,7 +289,7 @@ div[data-testid="stExpander"] {background: rgba(255,255,252,.66); border: 1px so
 
 
 def main() -> None:
-    st.set_page_config(page_title="Career Workspace", page_icon="◒", layout="wide")
+    st.set_page_config(page_title="Co-Apply GPT", page_icon="◒", layout="wide")
     st.markdown(STYLES, unsafe_allow_html=True)
     if _route_value("view") == "landing":
         _product_landing()
@@ -374,7 +393,7 @@ def _product_landing() -> None:
             "It does not refresh a job board, upload your CV, submit an application, or contact anyone."
         )
         st.write(
-            "Openings remain observations from their official sources. Use the Career Workspace to inspect "
+            "Openings remain observations from their official sources. Use Co-Apply GPT to inspect "
             "provenance, prepare a role, and choose the next action yourself."
         )
 
@@ -2380,6 +2399,15 @@ def _interview(workspace_id: str, thread_id: str) -> None:
         st.info("Analyze this job in Job brief to get evidence-aware, role-specific interview questions.")
         return
     attempts = WORKSPACES.interview_attempts(workspace_id, thread_id)
+    level = difficulty_level(attempts)
+    passed, needed = level_progress(attempts)
+    level_cols = st.columns((1, 3))
+    level_cols[0].metric("Difficulty", f"Lv {level}")
+    level_cols[1].markdown(f"**{LEVEL_NAMES[level]}**  ")
+    if level >= MAX_LEVEL:
+        level_cols[1].caption("Maximum level reached: cross-examination. Keep defending your evidence.")
+    else:
+        level_cols[1].progress(passed / needed, text=f"{passed}/{needed} rehearsals scored 75+ toward level {level + 1} — questions get harder as you prove yourself")
     if attempts:
         average = round(sum(attempt["score"] for attempt in attempts) / len(attempts))
         history_metrics = st.columns(3)
@@ -2388,7 +2416,7 @@ def _interview(workspace_id: str, thread_id: str) -> None:
         history_metrics[2].metric("Question areas covered", len({attempt["category"] for attempt in attempts}))
     else:
         st.info("Your first saved rehearsal will create a private practice history for this role.")
-    questions = build_interview_questions(result.candidate, result.job)
+    questions = build_interview_questions(result.candidate, result.job, level=level)
     selected = st.selectbox("Question", questions, format_func=lambda question: f"{question.category.title()} — {question.question}", key=f"interview-question:{thread_id}")
     scope = f"{thread_id}:{selected.id}"
     st.write("A strong answer should include: " + "; ".join(selected.what_good_evidence_looks_like))
@@ -2431,6 +2459,10 @@ def _interview(workspace_id: str, thread_id: str) -> None:
                     missing=feedback.missing,
                 )
                 st.success("Rehearsal saved in this job workspace.")
+                new_level = difficulty_level(WORKSPACES.interview_attempts(workspace_id, thread_id))
+                if new_level > level:
+                    st.balloons()
+                    st.success(f"Level up! You reached level {new_level} — {LEVEL_NAMES[new_level]}. Questions just got harder.")
                 st.metric("Practice evidence score", f"{feedback.score}/100", help="Checks answer structure, not technical correctness.")
                 st.write("**Strengths:** " + (" ".join(feedback.strengths) or "Not enough evidence yet."))
                 st.write("**Improve:** " + " ".join(feedback.missing))

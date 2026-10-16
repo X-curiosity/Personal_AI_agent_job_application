@@ -41,7 +41,7 @@ Interests are many-to-many navigation, not degree/eligibility rules. A role may 
 
 ## Recent additions
 
-Multi-agent team (`agents.py`, `agent_tools_extended.py`, `agents_ui.py`, CLI `agent-team`), role-page company browser (`company_browser_ui.py`, `yc_directory.py`, `capital_atlas.py` with `AtlasStore`), work eligibility (`eligibility*.py`), and the Global Capital Atlas import: see [delivery report](docs/MULTI_AGENT_FRAMEWORK.md).
+Product display name is **Co-Apply GPT** (package stays `tau_job_application`). Multi-agent team (`agents.py`, `agent_tools_extended.py`, `agents_ui.py`, CLI `agent-team`), role-page company browser (`company_browser_ui.py`, `yc_directory.py`, `capital_atlas.py` with `AtlasStore`), work eligibility (`eligibility*.py`), actively-hiring index (`hiring_index.py`: boards-first live checks + YC directory flags, `refresh-data` CLI, 6-hour launchd schedule via `install_schedule.sh`), period filters on role feeds, expanded interest taxonomy, progressive interview levels (`interview.py`: level = 1 + one per three 75+ rehearsals), and the structured candidate profile (`structured_profile.py`: on-demand assembly, recruiter-style deterministic query, JSON export). LinkedIn is never scraped or automated; live hiring rows read official ATS boards only. See [delivery report](docs/MULTI_AGENT_FRAMEWORK.md).
 
 ## Next engineering work
 

@@ -1,4 +1,4 @@
-"""A small, data-injected public-facing landing page for Career Workspace.
+"""A small, data-injected public-facing landing page for Co-Apply GPT.
 
 The application keeps job-preparation data local.  This renderer deliberately
 does not reach into the database, inspect session state, or make network
@@ -120,7 +120,7 @@ def render_landing_page(
     primary, secondary = st.columns((1.35, 1))
     with primary:
         st.button(
-            "Enter Career Workspace",
+            "Enter Co-Apply GPT",
             type="primary",
             key=f"{key_prefix}:enter-workspace",
             on_click=on_enter_workspace,
@@ -139,7 +139,7 @@ def render_landing_page(
             on_click=on_open_role_market,
             disabled=on_open_role_market is None,
             help=(
-                "A saved role market will open in your Career Workspace."
+                "A saved role market will open in Co-Apply GPT."
                 if on_open_role_market is None
                 else None
             ),
@@ -236,7 +236,7 @@ def _hero_markup(data: LandingPageData) -> str:
         "<div class=\"campaign-hero-orbit campaign-hero-orbit-one\"></div>"
         "<div class=\"campaign-hero-orbit campaign-hero-orbit-two\"></div>"
         "<div class=\"campaign-hero-content\">"
-        "<div class=\"campaign-eyebrow\">Career Workspace</div>"
+        "<div class=\"campaign-eyebrow\">Co-Apply GPT</div>"
         "<h1>Run your job search like a thoughtful campaign.</h1>"
         f"<p>{role_detail}</p>"
         "<div class=\"campaign-hero-promise\">"
