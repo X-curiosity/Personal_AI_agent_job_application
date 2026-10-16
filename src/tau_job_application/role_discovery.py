@@ -19,7 +19,7 @@ import json
 from pathlib import Path
 import re
 import sqlite3
-from typing import Iterable, Literal, Sequence
+from typing import Iterable, Literal, Mapping, Sequence
 from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
 
 from pydantic import BaseModel, Field, field_validator, model_validator
@@ -889,8 +889,95 @@ class RoleDiscoveryStore:
             created_at=row["created_at"],
         )
 
+    def scopes_with_runs(self) -> list[dict[str, str]]:
+        """Every (career track, thread) pair that has a saved run, oldest first."""
+        with self._connect() as connection:
+            rows = connection.execute(
+                "SELECT career_track_id, workspace_id FROM role_discovery_runs ORDER BY created_at"
+            ).fetchall()
+        return [dict(row) for row in rows]
+
     def _connect(self) -> sqlite3.Connection:
         connection = sqlite3.connect(self.database_path)
         connection.row_factory = sqlite3.Row
         connection.execute("PRAGMA foreign_keys=ON")
         return connection
+
+
+def openings_from_board(raw_openings: Iterable[Mapping], board: "VettedCompanyBoard", *, retrieved_at: str) -> list[DiscoveredOpening]:
+    """Map one official board response to openings; the single mapping shared by
+    the interactive role refresh and the scheduled role-market refresh."""
+    return [
+        DiscoveredOpening(
+            title=item["title"] or "Untitled role",
+            company=board.company,
+            source=item["source"] or board.source,
+            source_identifier=item["board_identifier"] or board.board_identifier,
+            external_id=item["source_id"],
+            source_url=item["url"],
+            description=item["description"],
+            location=item["location"],
+            retrieved_at=retrieved_at,
+            workplace_type=item.get("workplace_type") or item.get("work_mode"),
+            employment_type=item.get("employment_type"),
+            source_timestamp=item.get("source_timestamp") or item.get("published_at"),
+            source_timestamp_kind=item.get("source_timestamp_kind"),
+        )
+        for item in raw_openings
+    ]
+
+
+MAX_SCHEDULED_ROLE_REFRESHES = 10
+
+
+def refresh_saved_role_markets(
+    store: "RoleDiscoveryStore",
+    *,
+    boards: Iterable["VettedCompanyBoard"],
+    fetch_openings,
+    max_scopes: int = MAX_SCHEDULED_ROLE_REFRESHES,
+) -> dict[str, object]:
+    """Replay saved role-market queries against registered boards (scheduled path).
+
+    A scope whose feeds all fail keeps its last successful run; failures are
+    reported, never interpreted as closed roles. ``fetch_openings`` matches
+    ``sources.fetch_public_board_openings`` and is injected for tests.
+    """
+    refreshed, kept, errors = 0, 0, []
+    retrieved_at = datetime.now(UTC).isoformat()
+    for scope in store.scopes_with_runs()[:max_scopes]:
+        track, thread = scope["career_track_id"], scope["workspace_id"]
+        previous = store.latest_run(career_track_id=track, workspace_id=thread)
+        if previous is None:
+            continue
+        openings: list[DiscoveredOpening] = []
+        snapshots: list[SourceSnapshot] = []
+        scope_errors: list[str] = []
+        for board in boards:
+            try:
+                raw = fetch_openings(board.source, board.board_identifier, company=board.company.name)
+                openings.extend(openings_from_board(raw, board, retrieved_at=retrieved_at))
+                snapshots.append(SourceSnapshot(
+                    source=f"{board.company.name} · {board.source}",
+                    identifier=board.board_identifier,
+                    opening_count=len(raw),
+                ))
+            except Exception as exc:
+                message = f"{board.company.name} · {board.source}: {str(exc)[:280]}"
+                scope_errors.append(message)
+                snapshots.append(SourceSnapshot(
+                    source=f"{board.company.name} · {board.source}",
+                    identifier=board.board_identifier,
+                    error=str(exc)[:280],
+                ))
+        errors.extend(scope_errors)
+        if snapshots and all(snapshot.error for snapshot in snapshots):
+            kept += 1
+            continue
+        matches = rank_openings(previous.query, openings)
+        store.save_latest_run(
+            career_track_id=track, workspace_id=thread, query=previous.query,
+            matches=matches, sources=snapshots, errors=scope_errors,
+        )
+        refreshed += 1
+    return {"refreshed": refreshed, "kept": kept, "errors": errors}

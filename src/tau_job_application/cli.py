@@ -79,10 +79,12 @@ def _refresh_data() -> None:
         atlas_fetcher=fetch_atlas_companies,
         openings_fetcher=fetch_public_board_openings,
     )
+    role_markets = summary.get("role_markets", {})
     print(
         f"refresh-data: yc={summary.get('yc_records', 'kept')} "
         f"atlas={summary.get('atlas_records', 'kept')} "
-        f"indexed={summary.get('indexed', 0)} live={summary.get('live', 0)}"
+        f"indexed={summary.get('indexed', 0)} live={summary.get('live', 0)} "
+        f"role-boards={role_markets.get('refreshed', 0)} refreshed, {role_markets.get('kept', 0)} kept"
     )
     for error in summary["errors"]:
         print(f"  warning: {error}")

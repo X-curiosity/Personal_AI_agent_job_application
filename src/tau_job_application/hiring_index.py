@@ -152,6 +152,7 @@ def refresh_all_data(
     """
 
     from tau_job_application.capital_atlas import AtlasStore
+    from tau_job_application.role_discovery import RoleDiscoveryStore, refresh_saved_role_markets
 
     summary: dict[str, object] = {"errors": []}
     yc_store = YCDirectoryStore(db_path)
@@ -179,6 +180,14 @@ def refresh_all_data(
     summary["indexed"] = store.save_run(entries)
     summary["live"] = sum(1 for entry in entries if entry.signal == "live_openings")
     summary["errors"].extend(board_errors)
+
+    # Saved role boards (the openings on role pages) refresh on the same schedule.
+    boards = (*DEFAULT_VETTED_COMPANY_BOARDS, *CompanyCatalogStore(db_path).boards())
+    role_summary = refresh_saved_role_markets(
+        RoleDiscoveryStore(db_path), boards=boards, fetch_openings=openings_fetcher,
+    )
+    summary["role_markets"] = role_summary
+    summary["errors"].extend(role_summary["errors"])
     return summary
 
 

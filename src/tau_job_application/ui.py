@@ -70,6 +70,7 @@ from tau_job_application.role_discovery import (
     opening_matches_filters,
     opening_matches_period,
     opening_sources,
+    openings_from_board,
     PERIOD_CHOICES,
     rank_openings,
     suggest_role_aliases,
@@ -1628,28 +1629,9 @@ def _refresh_role_market(
                 board.board_identifier,
                 company=board.company.name,
             )
-            openings.extend(
-                DiscoveredOpening(
-                    title=item["title"] or "Untitled role",
-                    company=board.company,
-                    source=item["source"] or board.source,
-                    source_identifier=item["board_identifier"] or board.board_identifier,
-                    external_id=item["source_id"],
-                    source_url=item["url"],
-                    description=item["description"],
-                    location=item["location"],
-                    retrieved_at=retrieved_at,
-                    # A newer source response carries explicit semantics.  The
-                    # fallback supports old locally stored/test feed shapes,
-                    # but intentionally does not guess whether its timestamp
-                    # was created, published, or updated.
-                    workplace_type=item.get("workplace_type") or item.get("work_mode"),
-                    employment_type=item.get("employment_type"),
-                    source_timestamp=item.get("source_timestamp") or item.get("published_at"),
-                    source_timestamp_kind=item.get("source_timestamp_kind"),
-                )
-                for item in raw_openings
-            )
+            # Shared mapping with the scheduled role-market refresh; timestamp
+            # fallbacks intentionally do not guess created/published/updated.
+            openings.extend(openings_from_board(raw_openings, board, retrieved_at=retrieved_at))
             snapshots.append(SourceSnapshot(
                 source=f"{board.company.name} · {board.source}",
                 identifier=board.board_identifier,

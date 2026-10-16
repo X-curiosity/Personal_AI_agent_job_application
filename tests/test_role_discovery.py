@@ -369,3 +369,63 @@ def test_period_filter_uses_word_boundaries_and_specific_text():
     assert not opening_matches_period(specific, specific="winter 2026")
     with pytest.raises(ValueError):
         opening_matches_period(specific, season="Monsoon")
+
+
+def test_scheduled_role_market_refresh_replays_saved_queries(tmp_path):
+    from tau_job_application.role_discovery import (
+        DEFAULT_VETTED_COMPANY_BOARDS,
+        refresh_saved_role_markets,
+    )
+
+    store = RoleDiscoveryStore(tmp_path / "db.sqlite")
+    query = RoleQuery(title="Backend Engineer", aliases=("Platform Engineer",))
+    store.save_latest_run(career_track_id="track", workspace_id="thread", query=query, matches=[])
+
+    def fake_fetch(source, identifier, *, company):
+        if company == "Figma":
+            return [{"title": "Backend Engineer", "source": source, "source_id": "b-1",
+                     "board_identifier": identifier, "url": "https://boards.greenhouse.io/figma/jobs/1",
+                     "description": "Build Python services.", "location": "NYC", "published_at": "2026-10-16"}]
+        raise RuntimeError("board down")
+
+    summary = refresh_saved_role_markets(store, boards=DEFAULT_VETTED_COMPANY_BOARDS, fetch_openings=fake_fetch)
+    assert summary["refreshed"] == 1 and summary["kept"] == 0
+    assert summary["errors"]  # the two failed boards are reported
+    run = store.latest_run(career_track_id="track", workspace_id="thread")
+    assert [match.opening.title for match in run.matches] == ["Backend Engineer"]
+    assert run.matches[0].opening.source_url == "https://boards.greenhouse.io/figma/jobs/1"
+
+
+def test_scheduled_refresh_keeps_last_successful_run_when_every_feed_fails(tmp_path):
+    from tau_job_application.role_discovery import (
+        DEFAULT_VETTED_COMPANY_BOARDS,
+        refresh_saved_role_markets,
+    )
+
+    store = RoleDiscoveryStore(tmp_path / "db.sqlite")
+    query = RoleQuery(title="Backend Engineer")
+    store.save_latest_run(career_track_id="track", workspace_id="thread", query=query, matches=[])
+    before = store.latest_run(career_track_id="track", workspace_id="thread").created_at
+
+    def broken_fetch(source, identifier, *, company):
+        raise RuntimeError("all feeds down")
+
+    summary = refresh_saved_role_markets(store, boards=DEFAULT_VETTED_COMPANY_BOARDS, fetch_openings=broken_fetch)
+    assert summary["refreshed"] == 0 and summary["kept"] == 1
+    after = store.latest_run(career_track_id="track", workspace_id="thread")
+    assert after.created_at == before  # previous run untouched
+
+
+def test_scopes_with_runs_and_refresh_cap(tmp_path):
+    from tau_job_application.role_discovery import refresh_saved_role_markets
+
+    store = RoleDiscoveryStore(tmp_path / "db.sqlite")
+    for index in range(3):
+        store.save_latest_run(
+            career_track_id="track", workspace_id=f"thread-{index}",
+            query=RoleQuery(title=f"Role {index}"), matches=[],
+        )
+    assert [scope["workspace_id"] for scope in store.scopes_with_runs()] == ["thread-0", "thread-1", "thread-2"]
+    summary = refresh_saved_role_markets(store, boards=(), fetch_openings=lambda *a, **k: [], max_scopes=2)
+    # Empty board list means nothing to fail or refresh; the cap limits work, not correctness.
+    assert summary["refreshed"] + summary["kept"] <= 2
