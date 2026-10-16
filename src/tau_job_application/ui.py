@@ -408,7 +408,7 @@ def main() -> None:
     _workspace_hero(WORKSPACES.thread(workspace_id, thread_id))
     tab_labels = [
         "Overview", "Job brief", "CV studio", "Proof projects",
-        "Interview lab", "Career track", "Role market", "Coach",
+        "Career track", "Role market", "Coach",
     ]
     focus = _route_value("focus")
     if focus in tab_labels:
@@ -423,8 +423,6 @@ def main() -> None:
     with tabs["Proof projects"]:
         _project_studio(workspace_id, thread_id)
         _project_evidence(workspace_id, thread_id)
-    with tabs["Interview lab"]:
-        _interview(workspace_id, thread_id)
     with tabs["Career track"]:
         show_direction(WORKSPACES, workspace_id)
     with tabs["Role market"]:
@@ -566,6 +564,18 @@ def _workspace_hero(thread: dict) -> None:
     )
 
 
+def _metric_link(column, *, key: str, label: str, value: str, note: str, focus: str | None = None, view: str | None = None) -> None:
+    """A metric that navigates to its page when clicked."""
+
+    with column:
+        if st.button(f"**{value}** {label}", key=key, use_container_width=True, help=note):
+            if view:
+                _navigate(view=view)
+            else:
+                _navigate(focus=focus)
+        st.caption(note)
+
+
 def _job_workspace_dashboard(workspace_id: str, thread_id: str) -> None:
     """The role-specific landing view; all downstream work belongs to this thread."""
     thread = WORKSPACES.thread(workspace_id, thread_id)
@@ -597,11 +607,18 @@ def _job_workspace_dashboard(workspace_id: str, thread_id: str) -> None:
         if evidence_match.project_coverage is not None
         else "no completed project proof yet"
     )
-    st.markdown("<div class='section-kicker'>Your match for this role</div>", unsafe_allow_html=True)
-    st.progress(
-        match_score / 100,
-        text=f"{match_score}% · skills coverage {result.match.score}% · CV readiness {result.cv_score.score if result.cv_score else 'n/a'}% · {project_note}",
-    )
+    st.markdown("<div class='section-kicker'>Your match for this role · tap a number to open its page</div>", unsafe_allow_html=True)
+    st.progress(match_score / 100, text=f"{match_score}% match")
+    chips = st.columns(3)
+    if chips[0].button(f"Skills coverage {result.match.score}%", key="match-chip-skills", use_container_width=True,
+                       help="Open the Job brief with the requirement evidence"):
+        _navigate(focus="Job brief")
+    if chips[1].button(f"CV readiness {result.cv_score.score if result.cv_score else 'n/a'}%", key="match-chip-cv", use_container_width=True,
+                       help="Open the CV studio"):
+        _navigate(focus="CV studio")
+    if chips[2].button(f"Project proof {evidence_match.project_coverage if evidence_match.project_coverage is not None else 'n/a'}%", key="match-chip-projects", use_container_width=True,
+                       help="Open your completed project evidence"):
+        _navigate(focus="Proof projects")
     st.caption(
         "Deterministic evidence coverage on a 100 scale, not a hiring prediction. It rises as you load your CV, "
         "verify GitHub signals, and mark projects completed with proof. Planned work never counts."
@@ -609,10 +626,10 @@ def _job_workspace_dashboard(workspace_id: str, thread_id: str) -> None:
 
     coverage_note = f"{len(matched)} CV shown · {len(missing_to_build)} to build"
     cards = st.columns(4)
-    _metric_card(cards[0], "Requirement evidence coverage", f"{result.match.score}%", coverage_note)
-    _metric_card(cards[1], "CV guidance", f"{result.cv_score.score if result.cv_score else 'n/a'}%", "Document readiness, not a hiring prediction")
-    _metric_card(cards[2], "Interview practice", f"{practice_average if practice_average is not None else 'n/a'}", f"{len(attempts)} saved rehearsal{'s' if len(attempts) != 1 else ''}")
-    _metric_card(cards[3], "Proof gaps", str(len(missing_to_build)), "Requirements without CV or eligible project proof")
+    _metric_link(cards[0], key="metric-coverage", label="Requirement evidence coverage", value=f"{result.match.score}%", note=coverage_note, focus="Job brief")
+    _metric_link(cards[1], key="metric-cv", label="CV guidance", value=f"{result.cv_score.score if result.cv_score else 'n/a'}%", note="Document readiness, not a hiring prediction", focus="CV studio")
+    _metric_link(cards[2], key="metric-interview", label="Interview practice", value=f"{practice_average if practice_average is not None else 'n/a'}", note=f"{len(attempts)} saved rehearsal{'s' if len(attempts) != 1 else ''} · lives with the job status now", view="applications")
+    _metric_link(cards[3], key="metric-gaps", label="Proof gaps", value=str(len(missing_to_build)), note="Requirements without CV or eligible project proof", focus="Proof projects")
 
     st.markdown("<div class='section-kicker'>Your next best move</div>", unsafe_allow_html=True)
     next_action, destination, reason = _next_action(result, attempts, standout_plans)

@@ -104,9 +104,14 @@ def test_switch_threads_directions_and_restore_chats(tmp_path, monkeypatch):
 
 
 def test_interview_rehearsal_is_saved_inside_the_selected_job_workspace(tmp_path, monkeypatch):
+    """Rehearsals live in the application workspace (the job status page)."""
+
     from tau_job_application import ui
+    from tau_job_application.application_tracker import ApplicationTrackerStore
     from tau_job_application.monitoring import JobMonitor
+    from tau_job_application.pipeline import analyze_texts
     from tau_job_application.requirement_memory import RequirementMemory
+    from tau_job_application.role_discovery import CompanyFacts, DiscoveredOpening
     from tau_job_application.storage import LocalStore
     from tau_job_application.workspaces import WorkspaceStore
 
@@ -116,6 +121,57 @@ def test_interview_rehearsal_is_saved_inside_the_selected_job_workspace(tmp_path
     monkeypatch.setattr(ui, "MONITOR", JobMonitor(db))
     monkeypatch.setattr(ui, "REQUIREMENT_MEMORY", RequirementMemory(db))
     monkeypatch.setattr(ui, "WORKSPACES", store)
+    monkeypatch.setattr(ui, "APPLICATIONS", ApplicationTrackerStore(db))
+
+    track = store.create_workspace("Platforms")
+    result = analyze_texts("Name: Alex\nSkills: Python", "Title: Platform Engineer\nCompany: Example\nRequired skills: Python, Docker")
+    draft = {
+        "cv_text": result.candidate.raw_cv, "job_title": result.job.title, "company": result.job.company,
+        "job_text": result.job.description, "job_url": result.job.url or "",
+        "github": "", "portfolio": "", "linkedin": "", "x": "",
+    }
+    thread = store.create_thread(track, "Platform Engineer · Example", draft)
+    store.save_analysis(track, thread, result)
+    opening = DiscoveredOpening(
+        title="Platform Engineer", company=CompanyFacts(name="Example"), source="Greenhouse",
+        description="Required skills: Python, Docker",
+        source_identifier="example", external_id="platform-1",
+    )
+    record = ui.APPLICATIONS.save(track, thread, opening)
+
+    app = AppTest.from_string("from tau_job_application.ui import main\nmain()", default_timeout=30)
+    app.query_params.update({"view": "application", "application": str(record.id)})
+    app.run()
+    assert not app.exception
+
+    def widget(kind, label):
+        return next(w for w in getattr(app, kind) if w.label == label)
+
+    widget("text_area", "Your answer (type it, or transcribe an optional recording below)").set_value(
+        "I built a small service, tested its critical path, and used the result to improve it."
+    )
+    widget("button", "Score and save this rehearsal").click()
+    app.run()
+    assert not app.exception
+
+    saved = store.interview_attempts(track, thread)
+    assert len(saved) == 1
+    assert saved[0]["question"]
+    assert saved[0]["answer"].startswith("I built a small service")
+
+
+def test_match_bar_chips_and_metric_cards_navigate(tmp_path, monkeypatch):
+    from tau_job_application import ui
+    from tau_job_application.monitoring import JobMonitor
+    from tau_job_application.requirement_memory import RequirementMemory
+    from tau_job_application.storage import LocalStore
+    from tau_job_application.workspaces import WorkspaceStore
+
+    db = tmp_path / "match-nav.sqlite"
+    monkeypatch.setattr(ui, "STORE", LocalStore(db))
+    monkeypatch.setattr(ui, "MONITOR", JobMonitor(db))
+    monkeypatch.setattr(ui, "REQUIREMENT_MEMORY", RequirementMemory(db))
+    monkeypatch.setattr(ui, "WORKSPACES", WorkspaceStore(db))
     app = AppTest.from_string("from tau_job_application.ui import main\nmain()", default_timeout=30).run()
 
     def widget(kind, label):
@@ -127,16 +183,24 @@ def test_interview_rehearsal_is_saved_inside_the_selected_job_workspace(tmp_path
     widget("text_area", "Job description").set_value("Required skills: Python, Docker")
     widget("button", "Analyze this job").click()
     app.run()
+    app.run()  # the Overview renders on the pass after the analysis is saved
     assert not app.exception
 
-    widget("text_area", "Your answer (type it, or transcribe an optional recording below)").set_value(
-        "I built a small service, tested its critical path, and used the result to improve it."
-    )
-    widget("button", "Score and save this rehearsal").click()
-    app.run()
+    # The match bar exists with clickable breakdown chips instead of a separate page.
+    assert not any(t.label == "Interview lab" for t in app.tabs)
+    chip = next(b for b in app.button if b.label.startswith("Skills coverage"))
+    chip.click().run()
+    assert not app.exception
+    assert app.query_params["focus"] == ["Job brief"]
 
-    workspace_id, thread_id = app.session_state["active_scope"]
-    saved = store.interview_attempts(workspace_id, thread_id)
-    assert len(saved) == 1
-    assert saved[0]["question"]
-    assert saved[0]["answer"].startswith("I built a small service")
+    app.query_params.clear()
+    app.run()
+    cv_chip = next(b for b in app.button if b.label.startswith("CV readiness"))
+    cv_chip.click().run()
+    assert app.query_params["focus"] == ["CV studio"]
+
+    app.query_params.clear()
+    app.run()
+    interview_card = next(b for b in app.button if "Interview practice" in b.label)
+    interview_card.click().run()
+    assert app.query_params["view"] == ["applications"]

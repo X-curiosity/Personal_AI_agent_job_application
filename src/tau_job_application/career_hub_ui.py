@@ -476,12 +476,16 @@ def _application(api, store, track):
         st.text(opening.description or "The feed did not provide an advert description.")
         if opening.canonical_url:
             st.link_button("Verify this vacancy at the employer", opening.canonical_url)
-    tab_docs, tab_evidence, tab_people, tab_replies, tab_apply = st.tabs(["Documents & fit", "Project evidence", "People to contact", "Replies & status", "Apply"])
+    tab_docs, tab_evidence, tab_practice, tab_people, tab_replies, tab_apply = st.tabs(
+        ["Documents & fit", "Project evidence", "Interview practice", "People to contact", "Replies & status", "Apply"]
+    )
     with tab_docs:
         _documents(api, store, track, record)
     with tab_evidence:
         api._project_evidence(track, thread)
         api._project_studio(track, thread)
+    with tab_practice:
+        api._interview(track, thread)
     with tab_people:
         _people(opening)
     with tab_replies:
