@@ -90,6 +90,7 @@ First use of the company browser: click **Refresh startups** / **Refresh big com
 | `MODEL_NAME` | Model used by the optional Tau CLI command, agent team, and read-only UI coach | No |
 | `LINKEDIN_CLIENT_ID` / `LINKEDIN_CLIENT_SECRET` / `LINKEDIN_REDIRECT_URI` | Your own registered LinkedIn app, for the official OpenID Connect sign-in on the Accounts screen | No |
 | `X_BEARER_TOKEN` | Official X recent-post search, subject to account access and limits | No |
+| `JEV_API_KEY` / `JEV_API_URL` | Optional Jev decision model, used only to settle **ambiguous** skill pairs behind an opt-in checkbox on Overview. Only the two skill labels are sent; canonical scores never depend on it. See [Jev notes](docs/JEV_NOTES.md) | No |
 | SmartRecruiters token | Entered in the UI for the current connector | No |
 
 ```bash
@@ -139,6 +140,7 @@ uv run --no-sync pytest -q                   # full test suite
 | `LINKEDIN_CLIENT_ID` / `LINKEDIN_CLIENT_SECRET` / `LINKEDIN_REDIRECT_URI` | Your own registered LinkedIn app, for the official OpenID Connect sign-in on the Accounts screen | No |
 | `X_BEARER_TOKEN` | Official X recent-post search, subject to account access and limits | No |
 | SmartRecruiters token | Entered in the UI for the current connector | No |
+| `JEV_API_KEY` | Optional Jev decision model for ambiguous skill pairs; see [docs/JEV_NOTES.md](docs/JEV_NOTES.md) | No |
 
 ```bash
 export OPENAI_API_KEY="your-key"
@@ -179,7 +181,7 @@ uv run --no-sync tau-job-application agent fixtures/candidate.txt fixtures/job.t
 | Optional agent | Bounded Tau CLI harness with domain tools; one-turn, tool-free UI coaching | Quick start scoring remains deterministic; no autonomous research subagents |
 | Persistence | Shared profile, job-workspace inputs, analysis/CV guidance, chats, interview practice, application progress and history, plus legacy snapshots, audit events, and source-watch records in SQLite | Local storage; no multi-user service or cross-device sync |
 
-The [Jobright comparison](docs/JOBRIGHT_IMPROVEMENT_REPORT.md) contains the detailed code review and product backlog. It distinguishes Jobright's advertised features from independently verified behavior; marketing performance claims are not benchmarks for this project. The [Whali-inspired Role-market direction](docs/WHALI_INSPIRED_PRODUCT_DIRECTION.md) separately records which job-board interaction patterns fit this product and which outreach-automation patterns are intentionally excluded.
+The [Jobright comparison](docs/JOBRIGHT_IMPROVEMENT_REPORT.md) contains the detailed code review and product backlog. It distinguishes Jobright's advertised features from independently verified behavior; marketing performance claims are not benchmarks for this project. The [Whali-inspired Role-market direction](docs/WHALI_INSPIRED_PRODUCT_DIRECTION.md) separately records which job-board interaction patterns fit this product and which outreach-automation patterns are intentionally excluded. The [Jev notes](docs/JEV_NOTES.md) document the implemented decision-model skill matching: a deterministic local model (always on, advisory) plus an optional Jev escalation for ambiguous skill pairs, with the canonical evidence score left untouched.
 
 ## 3. How to use the interface
 
