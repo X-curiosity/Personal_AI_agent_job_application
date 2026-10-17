@@ -38,10 +38,12 @@ def _openings_fetch(boards: dict[str, list]):
 
 def test_index_contains_active_hiring_and_never_scrapes_linkedin(tmp_path):
     _, yc, catalog = _stores(tmp_path)
-    entries, errors = build_hiring_index(
+    build = build_hiring_index(
         yc_store=yc, catalog_store=catalog,
         fetch_openings=_openings_fetch({}),  # every board check fails honestly
     )
+    entries, errors = build.entries, build.errors
+    assert build.live_checks == 0 and len(build.failed_board_keys) == 3
     names = {entry.name for entry in entries}
     assert {"Alpha AI", "Beta Health", "Gamma Pay"} <= names  # Inactive / not-hiring excluded
     assert "Delta Old" not in names and "Epsilon Calm" not in names
@@ -58,7 +60,9 @@ def test_vetted_and_reviewed_boards_become_live_rows(tmp_path):
         "Figma": [{"title": "Backend Engineer", "location": "San Francisco, CA"},
                   {"title": "Data Scientist", "location": "New York, NY"}],
     })
-    entries, errors = build_hiring_index(yc_store=yc, catalog_store=catalog, fetch_openings=fetch)
+    build = build_hiring_index(yc_store=yc, catalog_store=catalog, fetch_openings=fetch)
+    entries, errors = build.entries, build.errors
+    assert build.live_checks == 1
     live = {entry.name: entry for entry in entries if entry.signal == "live_openings"}
     assert "Figma" in live
     figma = live["Figma"]
@@ -80,7 +84,7 @@ def test_yc_candidate_matching_a_live_board_is_enriched_not_duplicated(tmp_path)
     row = catalog.list_companies(query="Alpha AI")[0]
     catalog.register_board(int(row["id"]), "Lever", "alphaai")
     fetch = _openings_fetch({"Alpha AI": [{"title": "Platform Engineer", "location": "Berlin, Germany"}]})
-    entries, _ = build_hiring_index(yc_store=yc, catalog_store=catalog, fetch_openings=fetch)
+    entries = build_hiring_index(yc_store=yc, catalog_store=catalog, fetch_openings=fetch).entries
     alpha_entries = [entry for entry in entries if entry.name == "Alpha AI"]
     assert len(alpha_entries) == 1
     alpha = alpha_entries[0]
@@ -110,11 +114,11 @@ def test_live_checks_are_capped_per_build(tmp_path):
 
     def counting_fetch(provider, identifier, *, company):
         checks.append(company)
-        return []
+        return [{"title": "Engineer", "location": "New York, NY"}]
 
-    entries, _ = build_hiring_index(yc_store=yc, catalog_store=catalog, fetch_openings=counting_fetch)
+    build = build_hiring_index(yc_store=yc, catalog_store=catalog, fetch_openings=counting_fetch)
     assert len(checks) == MAX_LIVE_CHECKS_PER_BUILD  # vetted boards first, then reviewed ones
-    live = [entry for entry in entries if entry.signal == "live_openings"]
+    live = [entry for entry in build.entries if entry.signal == "live_openings"]
     assert len(live) == MAX_LIVE_CHECKS_PER_BUILD
 
 
@@ -124,7 +128,7 @@ def test_store_roundtrip_filters_and_bounds(tmp_path):
     assert store.run() is None
     with pytest.raises(ValueError):
         store.save_run([])
-    entries, _ = build_hiring_index(yc_store=yc, catalog_store=catalog, fetch_openings=_openings_fetch({}))
+    entries = build_hiring_index(yc_store=yc, catalog_store=catalog, fetch_openings=_openings_fetch({})).entries
     store.save_run(entries)
     run = store.run()
     assert run["entry_count"] == len(entries)
@@ -166,7 +170,7 @@ def test_refresh_all_data_updates_snapshots_and_index(tmp_path):
 
 def test_refresh_all_data_never_destroys_previous_data_on_failure(tmp_path):
     database, yc, catalog = _stores(tmp_path)
-    entries, _ = build_hiring_index(yc_store=yc, catalog_store=catalog, fetch_openings=_openings_fetch({}))
+    entries = build_hiring_index(yc_store=yc, catalog_store=catalog, fetch_openings=_openings_fetch({})).entries
     HiringIndexStore(database).save_run(entries)
     before = yc.snapshot()["record_count"]
 
@@ -179,4 +183,60 @@ def test_refresh_all_data_never_destroys_previous_data_on_failure(tmp_path):
     )
     assert yc.snapshot()["record_count"] == before
     assert any("kept previous data" in error for error in summary["errors"])
-    assert summary["indexed"] == len(entries)  # index still rebuilt from the kept snapshot
+    # Every board check failed: the previous index is kept, not replaced.
+    assert summary["indexed"] == 0 and summary["index_kept"] is True
+    assert any("previous hiring index kept" in error for error in summary["errors"])
+    assert len(HiringIndexStore(database).entries(limit=MAX_INDEX_ENTRIES)) == len(entries)
+
+
+def test_duplicate_default_and_catalog_boards_are_checked_once(tmp_path):
+    database, yc, catalog = _stores(tmp_path)
+    catalog.import_companies([CatalogCompany(
+        source="CompaniesMarketCap", source_key="figma", name="Figma",
+        source_url="https://companiesmarketcap.com/figma/marketcap/",
+    )])
+    row = catalog.list_companies(query="Figma")[0]
+    catalog.register_board(int(row["id"]), "Greenhouse", "figma")
+
+    calls = []
+
+    def fetch(provider, identifier, *, company):
+        calls.append((provider, identifier))
+        return [{"title": "PM", "location": "New York, NY"}]
+
+    build = build_hiring_index(yc_store=yc, catalog_store=catalog, fetch_openings=fetch)
+    assert calls.count(("Greenhouse", "figma")) == 1
+    assert sum(1 for entry in build.entries if entry.company_key == "board:Greenhouse:figma") == 1
+
+
+def test_empty_board_response_is_not_a_live_hiring_row(tmp_path):
+    _, yc, catalog = _stores(tmp_path)
+    build = build_hiring_index(
+        yc_store=yc, catalog_store=catalog,
+        fetch_openings=lambda provider, identifier, *, company: [],
+    )
+    assert build.live_checks == 3  # the checks happened and succeeded
+    assert not build.errors
+    assert all(entry.signal == "directory_flag" for entry in build.entries)
+
+
+def test_role_markets_refresh_even_without_a_yc_snapshot(tmp_path):
+    database = tmp_path / "db.sqlite"
+    from tau_job_application.role_discovery import RoleDiscoveryStore, RoleQuery
+
+    RoleDiscoveryStore(database).save_latest_run(
+        career_track_id="track", workspace_id="thread",
+        query=RoleQuery(title="Backend Engineer"), matches=[],
+    )
+
+    def openings(provider, identifier, *, company):
+        return [{"title": "Backend Engineer", "source": provider, "source_id": "1",
+                 "board_identifier": identifier, "url": f"https://boards.example.com/{identifier}/1",
+                 "description": "Build Python services.", "location": "New York, NY"}]
+
+    summary = refresh_all_data(database, yc_fetcher=None, atlas_fetcher=None, openings_fetcher=openings)
+    assert summary["indexed"] == 0
+    assert any("No YC snapshot" in error for error in summary["errors"])
+    assert summary["role_markets"]["refreshed"] == 1
+    run = RoleDiscoveryStore(database).latest_run(career_track_id="track", workspace_id="thread")
+    assert run.matches  # official boards refreshed despite the missing YC snapshot

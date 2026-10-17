@@ -177,3 +177,23 @@ async def test_optional_chat_requires_consent_and_has_no_tools():
     assert reply == "Review the source evidence."
     assert provider.calls[0][3] == []
     assert "Embedded Systems" in provider.calls[0][2][0].text
+
+
+def test_deleting_a_thread_prunes_its_role_market_run(tmp_path):
+    from tau_job_application.role_discovery import RoleDiscoveryStore, RoleQuery
+
+    database = tmp_path / "db.sqlite"
+    workspaces = WorkspaceStore(database)
+    discovery = RoleDiscoveryStore(database)
+    track = workspaces.create_workspace("Engineering")
+    backend = workspaces.create_thread(track, "Backend roles")
+    frontend = workspaces.create_thread(track, "Frontend roles")
+    query = RoleQuery(title="Backend Engineer")
+    discovery.save_latest_run(career_track_id=track, workspace_id=backend, query=query, matches=[])
+    discovery.save_latest_run(career_track_id=track, workspace_id=frontend, query=query, matches=[])
+
+    workspaces.delete_thread(track, backend)
+
+    assert discovery.latest_run(career_track_id=track, workspace_id=backend) is None
+    assert discovery.latest_run(career_track_id=track, workspace_id=frontend) is not None
+    assert [scope["workspace_id"] for scope in discovery.scopes_with_runs()] == [frontend]

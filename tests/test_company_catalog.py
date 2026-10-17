@@ -58,3 +58,22 @@ def test_store_upserts_catalog_and_requires_reviewed_supported_board(tmp_path):
     board = store.register_board(rows[0]["id"], "Greenhouse", "circuithub")
     assert board.board_url == "https://boards.greenhouse.io/circuithub"
     assert store.boards()[0].company.name == "CircuitHub"
+
+
+def test_search_and_hiring_filters_apply_before_the_limit(tmp_path):
+    store = CompanyCatalogStore(tmp_path / "db.sqlite")
+    for batch in range(3):
+        store.import_companies([
+            CatalogCompany(
+                source="YC community API", source_key=f"co-{batch}-{index}",
+                name=f"Company {batch * 100 + index:03d}",
+                source_url="https://www.ycombinator.com/companies/x",
+                hiring=(batch * 100 + index == 299),
+            )
+            for index in range(100)
+        ])
+    # 300 stored companies; the match sorts beyond the default 200-row window.
+    hits = store.list_companies(query="Company 299")
+    assert [row["company"].name for row in hits] == ["Company 299"]
+    hiring = store.list_companies(hiring_only=True)
+    assert [row["company"].name for row in hiring] == ["Company 299"]

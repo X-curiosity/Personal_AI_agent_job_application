@@ -890,11 +890,32 @@ class RoleDiscoveryStore:
         )
 
     def scopes_with_runs(self) -> list[dict[str, str]]:
-        """Every (career track, thread) pair that has a saved run, oldest first."""
+        """Every (career track, thread) pair with a saved run, oldest first.
+
+        Runs whose owning thread was deleted are pruned and skipped, so the
+        scheduler never spends its bounded refreshes on dead workspaces.
+        """
         with self._connect() as connection:
-            rows = connection.execute(
-                "SELECT career_track_id, workspace_id FROM role_discovery_runs ORDER BY created_at"
-            ).fetchall()
+            tables = {row[0] for row in connection.execute("SELECT name FROM sqlite_master WHERE type='table'")}
+            if "career_threads" in tables:
+                orphans = connection.execute(
+                    "SELECT career_track_id, workspace_id FROM role_discovery_runs r "
+                    "WHERE NOT EXISTS (SELECT 1 FROM career_threads t WHERE t.id = r.workspace_id)"
+                ).fetchall()
+                for orphan in orphans:
+                    connection.execute(
+                        "DELETE FROM role_discovery_runs WHERE career_track_id=? AND workspace_id=?",
+                        (orphan["career_track_id"], orphan["workspace_id"]),
+                    )
+                rows = connection.execute(
+                    "SELECT r.career_track_id, r.workspace_id FROM role_discovery_runs r "
+                    "WHERE EXISTS (SELECT 1 FROM career_threads t WHERE t.id = r.workspace_id) "
+                    "ORDER BY r.created_at"
+                ).fetchall()
+            else:
+                rows = connection.execute(
+                    "SELECT career_track_id, workspace_id FROM role_discovery_runs ORDER BY created_at"
+                ).fetchall()
         return [dict(row) for row in rows]
 
     def _connect(self) -> sqlite3.Connection:
@@ -939,8 +960,10 @@ def refresh_saved_role_markets(
 ) -> dict[str, object]:
     """Replay saved role-market queries against registered boards (scheduled path).
 
-    A scope whose feeds all fail keeps its last successful run; failures are
-    reported, never interpreted as closed roles. ``fetch_openings`` matches
+    A scope whose feeds fail — all of them or only some — keeps its last
+    complete successful run. Failures are reported, never interpreted as
+    closed roles: replacing the board with partial data would silently drop
+    every opening from the unreachable employers. ``fetch_openings`` matches
     ``sources.fetch_public_board_openings`` and is injected for tests.
     """
     refreshed, kept, errors = 0, 0, []
@@ -971,7 +994,7 @@ def refresh_saved_role_markets(
                     error=str(exc)[:280],
                 ))
         errors.extend(scope_errors)
-        if snapshots and all(snapshot.error for snapshot in snapshots):
+        if snapshots and any(snapshot.error for snapshot in snapshots):
             kept += 1
             continue
         matches = rank_openings(previous.query, openings)

@@ -51,20 +51,40 @@ def test_build_lists_active_hiring_companies_with_honest_signals(tmp_path, monke
         {"slug": "beta-health", "name": "Beta Health", "status": "Active", "isHiring": True},
         {"slug": "delta-old", "name": "Delta Old", "status": "Inactive", "isHiring": True},
     ]))
+    def fake_fetch(source, identifier, *, company):
+        if company == "Figma":
+            return [{"title": "Backend Engineer", "location": "New York, NY"}]
+        raise RuntimeError("no network in tests")
+
+    monkeypatch.setattr(ui, "fetch_public_board_openings", fake_fetch)
+    app = _app()
+    app.run()
+    next(item for item in app.button if item.label == "Build / refresh index").click().run()
+    assert not app.exception
+    run = ui.HIRING_INDEX.run()
+    assert run["entry_count"] == 3  # one live row plus two directory flags
+    captions = " ".join(item.value for item in app.caption)
+    assert "never scraped or automated" in captions
+    table = app.dataframe[0].value
+    assert set(table["Company"]) == {"Alpha AI", "Beta Health", "Figma"}
+    assert "Directory flag (unverified)" in set(table["Signal"])
+    # Signal filter isolates the live-openings bucket.
+    signal = next(item for item in app.selectbox if item.label == "Signal")
+    signal.select("live_openings").run()
+    table = app.dataframe[0].value
+    assert set(table["Company"]) == {"Figma"}
+
+
+def test_build_keeps_previous_index_when_every_board_fails(tmp_path, monkeypatch):
+    ui = setup_ui(tmp_path, monkeypatch)
+    ui.YC_DIRECTORY.refresh(parse_yc_directory([
+        {"slug": "alpha-ai", "name": "Alpha AI", "status": "Active", "isHiring": True},
+    ]))
     monkeypatch.setattr(ui, "fetch_public_board_openings",
                         lambda *args, **kwargs: (_ for _ in ()).throw(RuntimeError("no network in tests")))
     app = _app()
     app.run()
     next(item for item in app.button if item.label == "Build / refresh index").click().run()
     assert not app.exception
-    run = ui.HIRING_INDEX.run()
-    assert run["entry_count"] == 2
-    captions = " ".join(item.value for item in app.caption)
-    assert "never scraped or automated" in captions
-    table = app.dataframe[0].value
-    assert set(table["Company"]) == {"Alpha AI", "Beta Health"}
-    assert set(table["Signal"]) == {"Directory flag (unverified)"}
-    # Signal filter isolates the live-openings bucket (empty here).
-    signal = next(item for item in app.selectbox if item.label == "Signal")
-    signal.select("live_openings").run()
-    assert any("No companies match" in item.body for item in app.info)
+    assert ui.HIRING_INDEX.run() is None  # nothing fabricated from failed feeds
+    assert any("previous index was kept" in item.body for item in app.info)

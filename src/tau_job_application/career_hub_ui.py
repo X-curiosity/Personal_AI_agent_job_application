@@ -114,17 +114,21 @@ def _hiring_index(api):
             st.error("Refresh the startup snapshot on a role page first; the index is built from it.")
         else:
             with st.spinner("Building the index (live board checks are capped at 25 per build)…"):
-                entries, board_errors = build_hiring_index(
+                from tau_job_application.hiring_index import persist_index_build
+                build = build_hiring_index(
                     yc_store=api._yc_directory_store(),
                     catalog_store=api._company_catalog_store(),
                     fetch_openings=api.fetch_public_board_openings,
                 )
-                store.save_run(entries)
-            if board_errors:
-                st.warning("Some boards could not be checked; they were skipped, not zeroed: " + " · ".join(board_errors))
-            live = sum(1 for entry in entries if entry.signal == "live_openings")
-            st.success(f"Indexed {len(entries)} companies flagged as hiring ({live} verified against live boards).")
-            st.rerun()
+                indexed, outcome = persist_index_build(store, build)
+            if build.errors:
+                st.warning("Some boards could not be checked; they were skipped, not zeroed: " + " · ".join(build.errors))
+            if outcome == "saved":
+                live = sum(1 for entry in build.entries if entry.signal == "live_openings")
+                st.success(f"Indexed {indexed} companies flagged as hiring ({live} verified against live boards).")
+                st.rerun()
+            else:
+                st.info("The previous index was kept: no verified hiring entries could be built this time.")
     if run is None:
         st.info("Build the index once to list actively hiring companies. Live verification uses only reviewed board mappings and the vetted registry.")
         return
@@ -377,12 +381,18 @@ def _role(api, store, track):
     st.caption(f"Last checked: {run.created_at} · {len(run.matches)} related listings · official-board coverage: {coverage}. Unmapped catalogue companies do not produce vacancy claims.")
     for error in run.errors:
         st.warning(error)
+    st.checkbox(
+        "Load remote company logos", key="remote-logos-opt-in",
+        help="Off by default: loading a remote image shares your IP address with its host.",
+    )
+    # Filter keys are scoped to this role thread so one role's filters never
+    # leak into another role page through Streamlit's widget state.
     controls = st.columns(4)
-    company = controls[0].selectbox("Company", ["All companies", *sorted({match.opening.company.name for match in run.matches})])
-    location = controls[1].text_input("Location", placeholder="City, country, or remote")
-    period = controls[2].selectbox("Period", list(PERIOD_CHOICES),
+    company = controls[0].selectbox("Company", ["All companies", *sorted({match.opening.company.name for match in run.matches})], key=f"hub-company:{thread}")
+    location = controls[1].text_input("Location", placeholder="City, country, or remote", key=f"hub-location:{thread}")
+    period = controls[2].selectbox("Period", list(PERIOD_CHOICES), key=f"hub-period-choice:{thread}",
                                    help="Matches only the employer's stated wording (e.g. “Summer 2026 internship”).")
-    order = controls[3].selectbox("Order", ["Recently published", "Role relevance"])
+    order = controls[3].selectbox("Order", ["Recently published", "Role relevance"], key=f"hub-order:{thread}")
     specific_period = ""
     if period == "Specific period…":
         specific_period = st.text_input("Specific period", placeholder="Summer 2026, 2027, Q3…", max_chars=100, key=f"hub-period:{thread}")
@@ -408,6 +418,9 @@ def _role(api, store, track):
                 # must not accidentally belong to the entire discovery cluster.
                 target = api._prepared_discovered_workspace(track, opening) or api._create_discovered_job_workspace(track, opening)
                 record = api._application_store().save(track, target, opening, relevance=match.score)
+                # The application route resolves records inside the selected
+                # track; select this role's track before navigating.
+                st.session_state["pending_workspace"] = track
                 go("application", application=record.id)
     if not matches:
         st.info("No related positions in these employer feeds match your filters. Try an alias or use the existing Role market to bring a permitted source.")

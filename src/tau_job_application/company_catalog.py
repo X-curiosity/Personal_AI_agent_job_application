@@ -301,8 +301,10 @@ class CompanyCatalogStore:
         rows_query = "SELECT id,payload_json,imported_at FROM company_catalog"
         if clauses:
             rows_query += " WHERE " + " AND ".join(clauses)
-        rows_query += " ORDER BY name COLLATE NOCASE LIMIT ?"
-        values.append(limit)
+        # Text and hiring filters run before the limit: limiting first would
+        # hide matching records that sort beyond the first page alphabetically.
+        # The hard scan cap keeps a huge local catalogue bounded in memory.
+        rows_query += " ORDER BY name COLLATE NOCASE LIMIT 10000"
         needle = query.strip().casefold()
         with self._connect() as db:
             rows = db.execute(rows_query, values).fetchall()
@@ -314,6 +316,8 @@ class CompanyCatalogStore:
             if (needle and needle not in searchable) or (hiring_only and company.hiring is not True):
                 continue
             result.append({"id": row["id"], "company": company, "imported_at": row["imported_at"], "board_count": board_counts.get(row["id"], 0)})
+            if len(result) >= limit:
+                break
         return result
 
     def register_board(self, company_id: int, provider: str, identifier: str) -> VettedCompanyBoard:

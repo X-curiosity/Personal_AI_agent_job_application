@@ -342,7 +342,7 @@ _LANDING_STYLES = """
 .campaign-metric {height:100%; background:rgba(255,255,252,.84); border:1px solid #dce4d9; border-radius:15px; padding:1rem 1rem .9rem; box-shadow:0 5px 16px rgba(25,53,46,.045);}
 .campaign-metric-value {color:#173a31; font-size:clamp(1.55rem,3vw,2.25rem); line-height:1; font-weight:790; letter-spacing:-.035em;}
 .campaign-metric-label {color:#27483c; font-size:.85rem; font-weight:700; margin-top:.45rem;}
-.campaign-metric-note {color:#697c72; font-size:.74rem; line-height:1.3; margin-top:.18rem;}
+.campaign-metric-note {color:#5c6f65; font-size:.74rem; line-height:1.3; margin-top:.18rem;}
 .campaign-pulse-kicker {margin-top:2rem; margin-bottom:.25rem;}
 .campaign-pulse-copy {color:#51685d; margin:.05rem 0 .75rem;}
 .campaign-empty-pulse {background:#f8f4e8; color:#5d583c; border:1px solid #e7dab4; border-radius:14px; padding:1rem 1.1rem; line-height:1.45;}

@@ -20,7 +20,7 @@ from __future__ import annotations
 import sqlite3
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Callable, Literal
+from typing import Callable, Iterable, Literal
 
 from pydantic import BaseModel, Field
 
@@ -56,6 +56,33 @@ class HiringEntry(BaseModel):
     source_url: str
 
 
+class IndexBuild(BaseModel):
+    """Result of one index build: entries plus the audit facts callers need."""
+
+    entries: list["HiringEntry"]
+    errors: list[str]
+    live_checks: int = 0
+    failed_board_keys: list[str] = Field(default_factory=list)
+
+
+def _unique_boards(boards: Iterable) -> list:
+    """One live check per normalized (provider, identifier); first record wins.
+
+    The built-in registry and the user-reviewed catalogue can name the same
+    board. Checking it twice would duplicate ``company_key`` values and crash
+    persistence with a primary-key violation.
+    """
+    seen: set[tuple[str, str]] = set()
+    result: list = []
+    for board in boards:
+        key = (board.source.casefold(), board.board_identifier.casefold())
+        if key in seen:
+            continue
+        seen.add(key)
+        result.append(board)
+    return result
+
+
 def _samples(openings: list) -> tuple[tuple[str, ...], tuple[str, ...]]:
     titles = tuple(
         str(opening.get("title") or "").strip()[:120]
@@ -76,13 +103,15 @@ def build_hiring_index(
     catalog_store: CompanyCatalogStore,
     fetch_openings: Callable[..., list],
     max_live_checks: int = MAX_LIVE_CHECKS_PER_BUILD,
-) -> tuple[list[HiringEntry], list[str]]:
+) -> IndexBuild:
     """Rebuild the index: boards-first live checks, then YC directory flags.
 
     Live rows come from the built-in vetted registry and user-reviewed board
     mappings (these include big companies, whose ATS postings are the ones
     LinkedIn mirrors). A failed board check never fabricates an opening count:
-    the board is skipped and reported in the returned error list. YC
+    the board is skipped and reported in the returned error list. A board that
+    responds successfully with zero openings is a checked board with no live
+    roles, not an "actively hiring" row, so it produces no live entry. YC
     Active+hiring companies without a verified board stay directory-flagged.
 
     ``fetch_openings`` matches ``sources.fetch_public_board_openings`` and is
@@ -91,21 +120,28 @@ def build_hiring_index(
 
     entries: list[HiringEntry] = []
     errors: list[str] = []
+    failed_board_keys: list[str] = []
     live_names: set[str] = set()
     checks = 0
-    for board in (*DEFAULT_VETTED_COMPANY_BOARDS, *catalog_store.boards()):
+    live_checks = 0
+    for board in _unique_boards((*DEFAULT_VETTED_COMPANY_BOARDS, *catalog_store.boards())):
         if checks >= max_live_checks:
             break
         checks += 1
+        board_key = f"board:{board.source}:{board.board_identifier}"
         try:
             openings = fetch_openings(board.source, board.board_identifier, company=board.company.name)
         except (RuntimeError, ValueError) as exc:
             errors.append(f"{board.company.name} ({board.source}): {type(exc).__name__}")
+            failed_board_keys.append(board_key)
+            continue
+        live_checks += 1
+        if not openings:
             continue
         titles, locations = _samples(openings)
         live_names.add(board.company.name.casefold())
         entries.append(HiringEntry(
-            company_key=f"board:{board.source}:{board.board_identifier}",
+            company_key=board_key,
             name=board.company.name, signal="live_openings",
             openings_count=len(openings), sample_titles=titles, sample_locations=locations,
             board_provider=board.source, board_url=board.board_url,
@@ -135,7 +171,7 @@ def build_hiring_index(
             yc_batch=company.batch, team_size=company.team_size,
             source_label="YC directory flag (unverified)", source_url=company.directory_url,
         ))
-    return entries, errors
+    return IndexBuild(entries=entries, errors=errors, live_checks=live_checks, failed_board_keys=failed_board_keys)
 
 
 def refresh_all_data(
@@ -167,28 +203,66 @@ def refresh_all_data(
             summary["atlas_records"] = atlas_store.refresh(atlas_fetcher())
         except (RuntimeError, ValueError) as exc:
             summary["errors"].append(f"Atlas snapshot kept previous data: {type(exc).__name__}")
+    catalog_store = CompanyCatalogStore(db_path)
     if yc_store.snapshot() is None:
+        # Only the YC-dependent index build is skipped. Saved role markets use
+        # official boards alone and still refresh below.
         summary["errors"].append("No YC snapshot available; hiring index not rebuilt")
         summary["indexed"] = 0
-        return summary
-    entries, board_errors = build_hiring_index(
-        yc_store=yc_store,
-        catalog_store=CompanyCatalogStore(db_path),
-        fetch_openings=openings_fetcher,
-    )
-    store = HiringIndexStore(db_path)
-    summary["indexed"] = store.save_run(entries)
-    summary["live"] = sum(1 for entry in entries if entry.signal == "live_openings")
-    summary["errors"].extend(board_errors)
+    else:
+        build = build_hiring_index(
+            yc_store=yc_store,
+            catalog_store=catalog_store,
+            fetch_openings=openings_fetcher,
+        )
+        indexed, outcome = persist_index_build(HiringIndexStore(db_path), build)
+        summary["indexed"] = indexed
+        if outcome == "kept_all_failed":
+            summary["errors"].append("All official board checks failed; previous hiring index kept")
+            summary["index_kept"] = True
+        elif outcome == "kept_empty":
+            summary["errors"].append("Hiring index build produced no entries; previous index kept")
+            summary["index_kept"] = True
+        else:
+            summary["live"] = sum(1 for entry in build.entries if entry.signal == "live_openings")
+        summary["errors"].extend(build.errors)
 
     # Saved role boards (the openings on role pages) refresh on the same schedule.
-    boards = (*DEFAULT_VETTED_COMPANY_BOARDS, *CompanyCatalogStore(db_path).boards())
+    boards = _unique_boards((*DEFAULT_VETTED_COMPANY_BOARDS, *catalog_store.boards()))
     role_summary = refresh_saved_role_markets(
         RoleDiscoveryStore(db_path), boards=boards, fetch_openings=openings_fetcher,
     )
     summary["role_markets"] = role_summary
     summary["errors"].extend(role_summary["errors"])
     return summary
+
+
+def persist_index_build(store: "HiringIndexStore", build: IndexBuild) -> tuple[int, str]:
+    """Save a build unless saving it would destroy verified information.
+
+    Returns ``(entry_count, outcome)``:
+
+    - ``saved`` — the build replaced the index. When some boards failed, the
+      previous live rows for exactly those boards are retained first, because
+      an unreachable feed is never evidence that roles closed.
+    - ``kept_all_failed`` — every board check failed; the complete previous
+      index stays untouched.
+    - ``kept_empty`` — the build produced no entries at all; the previous
+      index stays untouched.
+    """
+    if build.errors and build.live_checks == 0:
+        return 0, "kept_all_failed"
+    entries = list(build.entries)
+    if build.failed_board_keys:
+        previous = {entry.company_key: entry for entry in store.entries(limit=MAX_INDEX_ENTRIES)}
+        present = {entry.company_key for entry in entries}
+        for key in build.failed_board_keys:
+            if key not in present and key in previous:
+                entries.append(previous[key])
+        entries = entries[:MAX_INDEX_ENTRIES]
+    if not entries:
+        return 0, "kept_empty"
+    return store.save_run(entries), "saved"
 
 
 class HiringIndexStore:

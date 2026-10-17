@@ -18,6 +18,8 @@ discarded after the identity call, and Gmail tokens live outside the app.
 """
 from __future__ import annotations
 
+import base64
+import hashlib
 import json
 import secrets
 import sqlite3
@@ -25,7 +27,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Callable, Literal
 from urllib.parse import urlencode, urlparse
-from urllib.request import Request, urlopen
+from urllib.request import HTTPRedirectHandler, Request, build_opener
 
 from pydantic import BaseModel, Field, field_validator
 
@@ -39,6 +41,21 @@ GITHUB_API = "https://api.github.com"
 MAX_RESPONSE_BYTES = 1_000_000
 
 Provider = Literal["github", "linkedin", "gmail"]
+
+
+class _NoRedirect(HTTPRedirectHandler):
+    """Refuse redirects on credential-bearing calls.
+
+    urllib's default redirect handler re-sends request headers — including a
+    bearer token — to the redirect target. Refusing redirects guarantees a
+    token can never leave the fixed, expected host.
+    """
+
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        return None
+
+
+_opener = build_opener(_NoRedirect())
 
 
 class ConnectedAccount(BaseModel):
@@ -66,7 +83,7 @@ def _https_json(url: str, *, expected_host: str, method: str = "GET", data: byte
     request = Request(url, data=data, method=method,
                       headers={"Accept": "application/json", "User-Agent": "CoApplyGPT/0.2 (+local account link)", **(headers or {})})
     try:
-        with urlopen(request, timeout=15) as response:  # noqa: S310 - fixed allow-listed endpoints
+        with _opener.open(request, timeout=15) as response:  # noqa: S310 - fixed allow-listed endpoints
             if urlparse(response.geturl()).hostname != expected_host:
                 raise ValueError("Account endpoint redirected to an unexpected host")
             body = response.read(MAX_RESPONSE_BYTES + 1)
@@ -109,42 +126,95 @@ def connect_github(username: str, *, fetcher: Callable[..., dict] = _https_json)
     )
 
 
-def linkedin_authorization_url(*, client_id: str, redirect_uri: str, state: str) -> str:
-    """Build the official authorization URL; state is generated per attempt."""
+def linkedin_authorization_url(*, client_id: str, redirect_uri: str, state: str,
+                               nonce: str | None = None, code_challenge: str | None = None) -> str:
+    """Build the official authorization URL; state is generated per attempt.
+
+    ``nonce`` binds the returned OIDC identity to this attempt and
+    ``code_challenge`` (S256) protects the authorization code from
+    interception on the localhost redirect.
+    """
 
     if not client_id.strip() or len(client_id) > 100:
         raise ValueError("LinkedIn client id looks invalid")
     if not _optional_https(redirect_uri) and not redirect_uri.startswith("http://127.0.0.1") and not redirect_uri.startswith("http://localhost"):
         raise ValueError("Redirect URI must be HTTPS (or localhost for local development)")
-    return f"{LINKEDIN_AUTH_URL}?{urlencode({
+    params = {
         'response_type': 'code', 'client_id': client_id, 'redirect_uri': redirect_uri,
         'state': state, 'scope': LINKEDIN_SCOPE,
-    })}"
+    }
+    if nonce:
+        params['nonce'] = nonce
+    if code_challenge:
+        params['code_challenge'] = code_challenge
+        params['code_challenge_method'] = 'S256'
+    return f"{LINKEDIN_AUTH_URL}?{urlencode(params)}"
 
 
 def new_oauth_state() -> str:
     return secrets.token_urlsafe(24)
 
 
+def new_pkce_verifier() -> str:
+    """High-entropy PKCE verifier within the RFC 7636 length bounds."""
+
+    return secrets.token_urlsafe(64)[:128]
+
+
+def pkce_challenge(verifier: str) -> str:
+    """S256 code challenge for a PKCE verifier."""
+
+    digest = hashlib.sha256(verifier.encode("ascii")).digest()
+    return base64.urlsafe_b64encode(digest).rstrip(b"=").decode("ascii")
+
+
+def _id_token_claims(id_token: str) -> dict:
+    """Decode id_token claims to bind the OIDC nonce.
+
+    The token arrives over the authenticated TLS back-channel from LinkedIn's
+    fixed token endpoint, and the identity claims used by this app are read
+    independently from the userinfo endpoint. The nonce comparison here binds
+    that back-channel identity to the browser attempt that requested it.
+    """
+
+    parts = id_token.split(".")
+    if len(parts) < 2:
+        return {}
+    padding = "=" * (-len(parts[1]) % 4)
+    try:
+        claims = json.loads(base64.urlsafe_b64decode(parts[1] + padding))
+    except (ValueError, json.JSONDecodeError):
+        return {}
+    return claims if isinstance(claims, dict) else {}
+
+
 def complete_linkedin_signin(
     *, code: str, client_id: str, client_secret: str, redirect_uri: str,
+    code_verifier: str | None = None, nonce: str | None = None,
     poster: Callable[..., dict] = _https_json, fetcher: Callable[..., dict] = _https_json,
 ) -> ConnectedAccount:
     """Exchange the authorization code, read identity claims, discard the token."""
 
     if not code.strip() or len(code) > 2_000:
         raise ValueError("The LinkedIn authorization code looks invalid")
+    form = {
+        "grant_type": "authorization_code", "code": code,
+        "redirect_uri": redirect_uri, "client_id": client_id, "client_secret": client_secret,
+    }
+    if code_verifier:
+        form["code_verifier"] = code_verifier
     token = poster(
         LINKEDIN_TOKEN_URL, expected_host="www.linkedin.com", method="POST",
-        data=urlencode({
-            "grant_type": "authorization_code", "code": code,
-            "redirect_uri": redirect_uri, "client_id": client_id, "client_secret": client_secret,
-        }).encode(),
+        data=urlencode(form).encode(),
         headers={"Content-Type": "application/x-www-form-urlencoded"},
     )
     access_token = str(token.get("access_token") or "")
     if not access_token:
         raise RuntimeError("LinkedIn did not return an access token; check the app credentials and redirect URI")
+    if nonce and token.get("id_token"):
+        claims = _id_token_claims(str(token["id_token"]))
+        if claims.get("nonce") != nonce:
+            raise RuntimeError("LinkedIn identity did not match this sign-in attempt; start again")
     claims = fetcher(LINKEDIN_USERINFO_URL, expected_host="api.linkedin.com",
                      headers={"Authorization": f"Bearer {access_token}"})
     subject = str(claims.get("sub") or "")

@@ -6,7 +6,10 @@ __pycache__/
 .ruff_cache/
 *.py[cod]
 *.db
+*.sqlite
 *.sqlite3
+*.sqlite-wal
+*.sqlite-shm
 coverage.xml
 htmlcov/
 output/

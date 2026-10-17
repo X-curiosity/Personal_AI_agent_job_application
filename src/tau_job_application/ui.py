@@ -9,6 +9,7 @@ from datetime import UTC, datetime
 from html import escape
 from pathlib import Path
 import tempfile
+from typing import Callable
 from urllib.parse import quote_plus
 
 import pydeck as pdk
@@ -250,7 +251,7 @@ div[data-testid="stTextInput"] label, div[data-testid="stTextArea"] label, div[d
 div[data-baseweb="input"] > div, div[data-baseweb="textarea"] {background-color: #fffef9 !important; border-color: #c9d7c9 !important; color: #19352e !important;}
 div[data-baseweb="input"] input, div[data-baseweb="textarea"] textarea {background-color: transparent !important; color: #19352e !important; caret-color: #19352e !important;}
 div[data-testid="stTextInput"] input, div[data-testid="stTextArea"] textarea {background-color: #fffef9 !important; color: #19352e !important; caret-color: #19352e !important; border: 1px solid #c9d7c9 !important;}
-div[data-testid="stTextInput"] input::placeholder, div[data-testid="stTextArea"] textarea::placeholder {color: #718278 !important; opacity: 1 !important;}
+div[data-testid="stTextInput"] input::placeholder, div[data-testid="stTextArea"] textarea::placeholder {color: #5f7168 !important; opacity: 1 !important;}
 div[data-testid="stFileUploader"] section {background: #fffef9 !important; border-color: #c9d7c9 !important; color: #19352e !important;}
 div[data-testid="stFileUploader"] small, div[data-testid="stFileUploader"] span {color: #4e655a !important;}
 button[data-testid="stBaseButton-primary"] {background: #1f5041 !important; border-color: #1f5041 !important; color: #fffef8 !important;}
@@ -412,6 +413,14 @@ def main() -> None:
         "Career track", "Role market", "Coach",
     ]
     focus = _route_value("focus")
+    # Redirects for tabs that moved: Evidence match merged into Proof projects
+    # and Interview lab moved into each application workspace.
+    legacy_focus = {"Evidence match": "Proof projects"}
+    if focus in legacy_focus:
+        focus = legacy_focus[focus]
+    elif focus == "Interview lab":
+        st.info("Interview practice now lives in each application workspace, beside the job status. Open My applications.")
+        focus = None
     if focus in tab_labels:
         tab_labels = [focus, *(label for label in tab_labels if label != focus)]
     tabs = dict(zip(tab_labels, st.tabs(tab_labels), strict=True))
@@ -463,6 +472,10 @@ def _product_landing() -> None:
     )
     if st.button("My applications", key="landing-application-tracker"):
         _navigate(view="applications")
+    st.checkbox(
+        "Load remote company logos", key="remote-logos-opt-in",
+        help="Off by default: loading a remote image shares your IP address with its host.",
+    )
     with st.expander("What this page does and does not do", expanded=False):
         st.write(
             "This product home reads only your local workspace and latest saved public-board snapshots. "
@@ -519,6 +532,7 @@ def _landing_page_data():
         for state in state_by_opening_key.values()
     )
     logo_store = _company_brand_store()
+    allow_remote_logos = _remote_logos_allowed()
     opportunities = tuple(
         LandingOpportunity(
             title=match.opening.title,
@@ -531,7 +545,7 @@ def _landing_page_data():
                 else "Official listing"
             ),
             relevance=match.score,
-            logo_url=logo_store.logo_for(match.opening.company.name),
+            logo_url=logo_store.logo_for(match.opening.company.name) if allow_remote_logos else None,
         )
         for match in visible_matches[:6]
     )
@@ -565,12 +579,76 @@ def _workspace_hero(thread: dict) -> None:
     )
 
 
-def _metric_link(column, *, key: str, label: str, value: str, note: str, focus: str | None = None, view: str | None = None) -> None:
+def _advisory_skill_refinement(result) -> None:
+    """Advisory skill-match decisions from the local model, optionally Jev.
+
+    The canonical score above stays deterministic and unchanged; this block only
+    reports what a typed decision model concludes about skill equivalence, with
+    ambiguous pairs optionally escalated to Jev when the user has configured it.
+    """
+
+    requirements = [item for item in result.job.requirements if item.importance != "uncertain"]
+    skills = list(result.candidate.skills)
+    if not requirements or not skills:
+        return
+    from tau_job_application.jev_client import jev_available, jev_resolver
+    from tau_job_application.skill_decision import refine_requirement_matches
+
+    with st.expander("Advisory: decision-model skill matching", expanded=False):
+        st.caption(
+            "A typed decision model compares each requirement with your CV skills and reports how sure it is "
+            "that two labels mean the same capability (for example k8s and Kubernetes). Advisory only: the "
+            "match score above remains deterministic evidence coverage."
+        )
+        use_jev = st.checkbox(
+            "Ask Jev about ambiguous skill pairs",
+            key="jev-skill-decisions",
+            disabled=not jev_available(),
+            help=(
+                "Opt-in. Only the two skill labels and a fixed question leave this machine; no CV text, "
+                "adverts, or account data. Requires JEV_API_KEY and JEV_API_URL (docs/JEV_NOTES.md)."
+                if jev_available() else
+                "Set JEV_API_KEY and JEV_API_URL to enable. The local decision model is used until then."
+            ),
+        )
+        resolver = jev_resolver(WORKSPACES.path) if (use_jev and jev_available()) else None
+        refinement = refine_requirement_matches(skills, requirements, resolver=resolver)
+        delta = refinement.refined_score - result.match.score
+        cols = st.columns(3)
+        cols[0].metric("Canonical coverage", f"{result.match.score}%")
+        cols[1].metric("Decision-model coverage", f"{refinement.refined_score}%", delta=f"{delta:+d}" if delta else None)
+        cols[2].metric("Ambiguous pairs", len(refinement.ambiguous_skills))
+        if refinement.changed_requirements:
+            st.write("Recognised as the same skill beyond exact spelling: " + " · ".join(refinement.changed_requirements[:8]))
+        if refinement.ambiguous_skills:
+            st.write("Undecided (needs your review): " + " · ".join(refinement.ambiguous_skills[:8]))
+            if not jev_available():
+                st.caption("Jev can settle these pairs once configured; your review is the fallback.")
+        with st.expander("Every decision and its reason", expanded=False):
+            st.dataframe(
+                [
+                    {"Requirement": item.left, "Best CV skill": item.right,
+                     "Probability": item.probability, "Verdict": item.verdict,
+                     "Method": item.method, "Why": item.explanation}
+                    for item in refinement.decisions
+                ],
+                hide_index=True, use_container_width=True,
+            )
+        st.caption(
+            f"Decision source: {'Jev (with local fallback)' if refinement.source == 'jev' else 'local deterministic model'} "
+            f"· {refinement.escalated_to_jev} pair(s) escalated to Jev."
+        )
+
+
+def _metric_link(column, *, key: str, label: str, value: str, note: str, focus: str | None = None,
+                 view: str | None = None, go: Callable[[], None] | None = None) -> None:
     """A metric that navigates to its page when clicked."""
 
     with column:
         if st.button(f"**{value}** {label}", key=key, use_container_width=True, help=note):
-            if view:
+            if go:
+                go()
+            elif view:
                 _navigate(view=view)
             else:
                 _navigate(focus=focus)
@@ -624,12 +702,27 @@ def _job_workspace_dashboard(workspace_id: str, thread_id: str) -> None:
         "Deterministic evidence coverage on a 100 scale, not a hiring prediction. It rises as you load your CV, "
         "verify GitHub signals, and mark projects completed with proof. Planned work never counts."
     )
+    _advisory_skill_refinement(result)
 
     coverage_note = f"{len(matched)} CV shown · {len(missing_to_build)} to build"
     cards = st.columns(4)
     _metric_link(cards[0], key="metric-coverage", label="Requirement evidence coverage", value=f"{result.match.score}%", note=coverage_note, focus="Job brief")
     _metric_link(cards[1], key="metric-cv", label="CV guidance", value=f"{result.cv_score.score if result.cv_score else 'n/a'}%", note="Document readiness, not a hiring prediction", focus="CV studio")
-    _metric_link(cards[2], key="metric-interview", label="Interview practice", value=f"{practice_average if practice_average is not None else 'n/a'}", note=f"{len(attempts)} saved rehearsal{'s' if len(attempts) != 1 else ''} · lives with the job status now", view="applications")
+    application = next(iter(_application_store().list_records(workspace_id, thread_id=thread_id)), None)
+    if application:
+        _metric_link(
+            cards[2], key="metric-interview", label="Interview practice",
+            value=f"{practice_average if practice_average is not None else 'n/a'}",
+            note=f"{len(attempts)} saved rehearsal{'s' if len(attempts) != 1 else ''} · opens this role's application workspace",
+            go=lambda: _open_application(workspace_id, application.id),
+        )
+    else:
+        _metric_link(
+            cards[2], key="metric-interview", label="Interview practice",
+            value=f"{practice_average if practice_average is not None else 'n/a'}",
+            note="Track this role in My applications to unlock interview practice beside its status",
+            view="applications",
+        )
     _metric_link(cards[3], key="metric-gaps", label="Proof gaps", value=str(len(missing_to_build)), note="Requirements without CV or eligible project proof", focus="Proof projects")
 
     st.markdown("<div class='section-kicker'>Your next best move</div>", unsafe_allow_html=True)
@@ -718,7 +811,7 @@ def _next_action(result, attempts: list[dict], standout_plans) -> tuple[str, str
         plan = standout_plans[0]
         return (f"Build standout evidence: {plan.title}.", "Proof projects", f"It is the clearest next chance to build evidence for {', '.join(plan.skills_practised[:2])}.")
     if not attempts:
-        return ("Complete your first role-specific rehearsal.", "Interview lab", "The question bank is grounded in this job's current requirements.")
+        return ("Complete your first role-specific rehearsal.", "My applications", "Interview practice lives beside the job status in this role's application workspace, grounded in its current requirements.")
     if result.cv_score and result.cv_score.next_actions:
         return (result.cv_score.next_actions[0], "CV studio", "Review the evidence-aware guidance before changing your CV.")
     return ("Review your evidence and choose one thing to strengthen.", "CV studio", "Keep every claim grounded in work you can explain and support.")
@@ -746,7 +839,7 @@ def _weekly_actions(result, attempts: list[dict], standout_plans) -> list[str]:
         plan = standout_plans[0]
         actions.append(f"Choose the first milestone for “{plan.title}” and define its proof of completion.")
     if not attempts:
-        actions.append("Practice one job-specific interview question and save the feedback in Interview lab.")
+        actions.append("Practice one job-specific interview question and save the feedback in the application workspace's Interview practice tab.")
     else:
         actions.append("Rehearse a different question category than your last saved attempt.")
     return actions[:3]
@@ -855,7 +948,7 @@ def _quickstart(workspace_id: str, thread_id: str) -> None:
     if not result:
         return
 
-    st.success("This job workspace is ready. Use CV studio, Proof projects, and Interview lab to act on the plan for this exact role.")
+    st.success("This job workspace is ready. Use CV studio, Proof projects, and Interview practice in the application workspace to act on the plan for this exact role.")
     with st.expander("Review the role evidence used in this plan"):
         evidence = {item.id: item for item in result.job.evidence}
         for requirement in result.job.requirements:
@@ -1074,7 +1167,7 @@ def _project_studio(workspace_id: str, thread_id: str) -> None:
     projects = _evidence_store().list_projects(workspace_id, thread_id)
     assessment = calculate_evidence_match(result.candidate, result.job, projects)
     st.markdown("#### Your completed project evidence")
-    st.caption("Only completed, candidate-confirmed projects with a proof reference and observable outcome can support Evidence match. Add or edit them in the Evidence match tab.")
+    st.caption("Only completed, candidate-confirmed projects with a proof reference and observable outcome can support the evidence score. Add or edit them here in Proof projects.")
     if projects:
         for project in projects:
             project_skills = " · ".join(project.skills)
@@ -1089,7 +1182,7 @@ def _project_studio(workspace_id: str, thread_id: str) -> None:
         elif assessment.project_status == "no_matching_project_evidence":
             st.info("These completed projects are retained as your evidence inventory, but none is being used for this role's score.")
     else:
-        st.info("No completed project evidence has been added for this Job Workspace. Add real, finished work in Evidence match; planned briefs below do not count.")
+        st.info("No completed project evidence has been added for this Job Workspace. Add real, finished work here in Proof projects; planned briefs below do not count.")
     standout_plans = _standout_plans(result, assessment)
     if not standout_plans:
         st.success("The current job analysis did not identify an evidence gap that needs a standout project.")
@@ -1569,6 +1662,10 @@ def _role_discovery_filters(run, career_track_id: str, thread_id: str) -> None:
         "</div>",
         unsafe_allow_html=True,
     )
+    st.checkbox(
+        "Load remote company logos", key="remote-logos-opt-in",
+        help="Off by default: loading a remote image shares your IP address with its host.",
+    )
     if run.errors:
         st.warning("Some registered feeds could not be refreshed: " + " · ".join(run.errors))
     with st.expander("Refresh audit", expanded=False):
@@ -1718,10 +1815,23 @@ def _company_monogram(name: str) -> str:
     return f"{words[0][0]}{words[1][0]}".upper()
 
 
+def _remote_logos_allowed() -> bool:
+    """Remote images load only after an explicit, per-session opt-in.
+
+    Loading a remote logo shares the browser's IP address with the logo host,
+    so role pages and the product home render local monograms until the user
+    ticks the checkbox on that page.
+    """
+    try:
+        return bool(st.session_state.get("remote-logos-opt-in", False))
+    except Exception:
+        return False
+
+
 def _company_mark_markup(company_name: str) -> str:
     """Render a managed image mark above a resilient local monogram fallback."""
 
-    logo_url = _company_brand_store().logo_for(company_name)
+    logo_url = _company_brand_store().logo_for(company_name) if _remote_logos_allowed() else None
     try:
         logo_url = validate_public_https_logo_url(logo_url)
     except ValueError:
@@ -2038,8 +2148,19 @@ def _my_applications(career_track_id: str) -> None:
         logo_markup=_company_mark_markup,
         on_browse=lambda: _navigate(focus="Role market"),
         on_prepare=lambda record: _enter_preparation_workspace(career_track_id, record.opening),
-        on_open=lambda record: _hub_go("application", application=record.id),
+        on_open=lambda record: _open_application(career_track_id, record.id),
     )
+
+
+def _open_application(career_track_id: str, application_id: str) -> None:
+    """Deep-link to an application inside its own career track.
+
+    The application route resolves records within the selected track, so the
+    owning track must be selected before navigation; otherwise a fresh session
+    would open the first track and report the record as unavailable.
+    """
+    st.session_state["pending_workspace"] = career_track_id
+    _hub_go("application", application=application_id)
 
 
 def _enter_preparation_workspace(career_track_id: str, opening: DiscoveredOpening) -> None:

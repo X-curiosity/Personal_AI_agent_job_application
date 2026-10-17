@@ -143,3 +143,33 @@ def test_public_board_openings_keep_ashby_secondary_locations(monkeypatch) -> No
 def test_public_board_openings_rejects_unsupported_provider() -> None:
     with pytest.raises(ValueError, match="registered Greenhouse, Lever, and Ashby"):
         sources.fetch_public_board_openings("LinkedIn", "example", company="Example")
+
+
+def test_checked_redirect_validates_every_hop() -> None:
+    handler = sources._CheckedRedirect()
+    with pytest.raises(ValueError):
+        handler.redirect_request(None, None, 302, "", {}, "http://127.0.0.1/admin")
+    with pytest.raises(ValueError):
+        handler.redirect_request(None, None, 302, "", {}, "https://not-allowlisted.example.com/x")
+
+
+def test_get_json_rejects_oversized_responses(monkeypatch) -> None:
+    monkeypatch.setattr(sources, "_assert_public_https_url", lambda url: None)
+
+    class OversizedResponse:
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *args):
+            return False
+
+        def geturl(self):
+            return "https://boards-api.greenhouse.io/x"
+
+        def read(self, limit=-1):
+            assert limit == sources.MAX_SOURCE_BYTES + 1
+            return b"x" * (sources.MAX_SOURCE_BYTES + 1)
+
+    monkeypatch.setattr(sources._opener, "open", lambda *args, **kwargs: OversizedResponse())
+    with pytest.raises(RuntimeError, match="MB safety limit"):
+        sources._get_json("https://boards-api.greenhouse.io/x")

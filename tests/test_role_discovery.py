@@ -388,12 +388,24 @@ def test_scheduled_role_market_refresh_replays_saved_queries(tmp_path):
                      "description": "Build Python services.", "location": "NYC", "published_at": "2026-10-16"}]
         raise RuntimeError("board down")
 
+    # A partial outage keeps the last complete run: one failing feed must not
+    # erase the other employers' previously verified openings.
     summary = refresh_saved_role_markets(store, boards=DEFAULT_VETTED_COMPANY_BOARDS, fetch_openings=fake_fetch)
-    assert summary["refreshed"] == 1 and summary["kept"] == 0
-    assert summary["errors"]  # the two failed boards are reported
+    assert summary["refreshed"] == 0 and summary["kept"] == 1
+    assert summary["errors"]  # the failed boards are reported
     run = store.latest_run(career_track_id="track", workspace_id="thread")
-    assert [match.opening.title for match in run.matches] == ["Backend Engineer"]
-    assert run.matches[0].opening.source_url == "https://boards.greenhouse.io/figma/jobs/1"
+    assert run.matches == ()
+
+    def healthy_fetch(source, identifier, *, company):
+        return [{"title": "Backend Engineer", "source": source, "source_id": f"b-{company}",
+                 "board_identifier": identifier, "url": f"https://boards.example.com/{company}/jobs/1",
+                 "description": "Build Python services.", "location": "NYC", "published_at": "2026-10-16"}]
+
+    summary = refresh_saved_role_markets(store, boards=DEFAULT_VETTED_COMPANY_BOARDS, fetch_openings=healthy_fetch)
+    assert summary["refreshed"] == 1 and summary["kept"] == 0
+    run = store.latest_run(career_track_id="track", workspace_id="thread")
+    assert run.matches  # a fully successful refresh replaces the board
+    assert all(match.opening.title == "Backend Engineer" for match in run.matches)
 
 
 def test_scheduled_refresh_keeps_last_successful_run_when_every_feed_fails(tmp_path):

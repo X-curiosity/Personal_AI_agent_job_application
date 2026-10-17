@@ -89,3 +89,71 @@ def test_store_roundtrip_one_row_per_provider(tmp_path):
 def test_oauth_state_is_random_and_urlsafe():
     first, second = new_oauth_state(), new_oauth_state()
     assert first != second and len(first) > 20 and " " not in first
+
+
+def test_credential_endpoints_refuse_redirects():
+    from tau_job_application.accounts import _NoRedirect as AccountsNoRedirect
+    from tau_job_application.official_sources import _NoRedirect as OfficialNoRedirect
+
+    # Returning None makes urllib raise instead of re-sending the bearer token
+    # to the redirect target.
+    assert AccountsNoRedirect().redirect_request(None, None, 302, "", {}, "https://evil.example.com") is None
+    assert OfficialNoRedirect().redirect_request(None, None, 302, "", {}, "https://evil.example.com") is None
+
+
+def test_linkedin_authorization_url_supports_pkce_and_nonce():
+    url = linkedin_authorization_url(
+        client_id="abc123", redirect_uri="http://127.0.0.1:8506/?view=account",
+        state="state-1", nonce="nonce-1", code_challenge="challenge-1",
+    )
+    assert "nonce=nonce-1" in url
+    assert "code_challenge=challenge-1" in url
+    assert "code_challenge_method=S256" in url
+
+
+def test_pkce_challenge_matches_rfc7636_appendix_b():
+    from tau_job_application.accounts import new_pkce_verifier, pkce_challenge
+
+    assert pkce_challenge("dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk") == "E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM"
+    assert 43 <= len(new_pkce_verifier()) <= 128
+
+
+def _id_token(claims: dict) -> str:
+    import base64
+    import json
+
+    def part(value: dict) -> str:
+        return base64.urlsafe_b64encode(json.dumps(value).encode()).rstrip(b"=").decode()
+
+    return f"{part({'alg': 'RS256', 'typ': 'JWT'})}.{part(claims)}.signature"
+
+
+def test_linkedin_signin_sends_verifier_and_binds_nonce():
+    captured = {}
+
+    def fake_poster(url, *, expected_host, method, data, headers):
+        captured["body"] = data.decode()
+        return {"access_token": "token-123", "id_token": _id_token({"nonce": "nonce-1", "sub": "lnk-42"})}
+
+    def fake_fetcher(url, *, expected_host, headers=None, **kwargs):
+        return {"sub": "lnk-42", "name": "Alex Example"}
+
+    account = complete_linkedin_signin(
+        code="code-1", client_id="abc", client_secret="secret",
+        redirect_uri="http://127.0.0.1:8506/?view=account",
+        code_verifier="verifier-1", nonce="nonce-1",
+        poster=fake_poster, fetcher=fake_fetcher,
+    )
+    assert "code_verifier=verifier-1" in captured["body"]
+    assert account.subject == "lnk-42"
+
+    def wrong_nonce_poster(url, *, expected_host, method, data, headers):
+        return {"access_token": "token-123", "id_token": _id_token({"nonce": "attacker", "sub": "lnk-42"})}
+
+    with pytest.raises(RuntimeError, match="did not match"):
+        complete_linkedin_signin(
+            code="code-1", client_id="abc", client_secret="secret",
+            redirect_uri="http://127.0.0.1:8506/?view=account",
+            code_verifier="verifier-1", nonce="nonce-1",
+            poster=wrong_nonce_poster, fetcher=fake_fetcher,
+        )

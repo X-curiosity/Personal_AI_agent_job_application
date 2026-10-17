@@ -15,6 +15,7 @@ from uuid import uuid4
 from tau_job_application.matching import normalize_skill
 from tau_job_application.models import AnalysisResult, SkillNode
 from tau_job_application.planning import build_project_plans
+from tau_job_application.storage import ensure_private_permissions
 
 PROFILE_FIELDS = ("cv_text", "github", "portfolio", "linkedin", "x")
 DRAFT_FIELDS = (*PROFILE_FIELDS, "job_title", "company", "job_url", "job_text")
@@ -71,6 +72,7 @@ class WorkspaceStore:
                     id INTEGER PRIMARY KEY CHECK(id=1), profile_json TEXT NOT NULL, updated_at TEXT NOT NULL
                 );
             """)
+        ensure_private_permissions(self.path)
 
     def _connect(self):
         db = sqlite3.connect(self.path)
@@ -198,6 +200,12 @@ class WorkspaceStore:
         with self._connect() as db:
             self._thread(db, workspace_id, thread_id)
             db.execute("DELETE FROM career_threads WHERE id=?", (thread_id,))
+            # Role-market runs belong to this thread but are declared by the
+            # role-discovery store. Prune them so scheduled refreshes never
+            # spend network requests on a workspace the user deleted.
+            tables = {row[0] for row in db.execute("SELECT name FROM sqlite_master WHERE type='table'")}
+            if "role_discovery_runs" in tables:
+                db.execute("DELETE FROM role_discovery_runs WHERE workspace_id=?", (thread_id,))
 
     def delete_workspace(self, workspace_id):
         with self._connect() as db:

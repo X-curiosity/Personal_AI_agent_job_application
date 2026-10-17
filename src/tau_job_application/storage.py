@@ -4,10 +4,28 @@ from __future__ import annotations
 
 from datetime import UTC, datetime
 import json
+import os
 from pathlib import Path
 import sqlite3
 
 from tau_job_application.models import AnalysisResult
+
+
+def ensure_private_permissions(path: Path) -> None:
+    """Restrict the local store directory and database to the current OS user.
+
+    The database holds CV text, identity data, notes, and reply snippets, so
+    it must never be readable by other accounts on this machine. Existing
+    installs are corrected in place on the next launch.
+    """
+    try:
+        os.chmod(path.parent, 0o700)
+        if path.exists():
+            os.chmod(path, 0o600)
+    except OSError:
+        # Permissions are a hardening layer, not a reason to break the app on
+        # filesystems that do not support POSIX modes.
+        pass
 
 
 class LocalStore:
@@ -32,6 +50,7 @@ class LocalStore:
                     details_json TEXT NOT NULL
                 );
             """)
+        ensure_private_permissions(self.path)
 
     def save_analysis(self, result: AnalysisResult) -> int:
         with self._connect() as connection:

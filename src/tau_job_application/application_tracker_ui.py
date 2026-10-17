@@ -204,7 +204,7 @@ def _application_card(store, career_track_id, record, today, thread_names, *, lo
                         f'<b>{"Overdue action" if overdue else "Next step"}</b> · {escape(progress.next_step)}'
                         + (f' <span>· {escape(due_label(progress.next_step_on, today))}</span>'
                            if progress.next_step_on else '') + '</div>', unsafe_allow_html=True)
-        if on_open and st.button("Documents, contacts & replies", key=f"{key}:open", use_container_width=True):
+        if on_open and st.button("Documents, interview & replies", key=f"{key}:open", use_container_width=True):
             on_open(record)
         actions = st.columns(3)
         if opening.canonical_url:

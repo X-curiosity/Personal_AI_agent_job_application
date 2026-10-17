@@ -60,7 +60,13 @@ def test_landing_snapshot_uses_the_newest_local_market_and_its_shortlist(tmp_pat
     assert data.latest_role_title == "Backend Engineer"
     assert len(data.opportunities) == 1
     assert data.opportunities[0].company == "Figma"
-    assert data.opportunities[0].logo_url == "https://assets.example.test/figma.svg"
+    # Remote logos stay off until the user opts in (IP privacy), even when a
+    # local mapping exists.
+    assert data.opportunities[0].logo_url is None
+
+    monkeypatch.setattr(ui, "_remote_logos_allowed", lambda: True)
+    opted_in = ui._landing_page_data()
+    assert opted_in.opportunities[0].logo_url == "https://assets.example.test/figma.svg"
 
 
 def test_role_mark_uses_catalog_then_prefers_a_local_override(tmp_path, monkeypatch) -> None:
@@ -69,6 +75,12 @@ def test_role_mark_uses_catalog_then_prefers_a_local_override(tmp_path, monkeypa
     database = tmp_path / "brands.sqlite"
     monkeypatch.setattr(ui, "WORKSPACES", WorkspaceStore(database))
 
+    # Default: a local monogram only; no remote request is made without opt-in.
+    private_markup = ui._company_mark_markup("Figma")
+    assert "<img" not in private_markup
+    assert ">FI</span>" in private_markup
+
+    monkeypatch.setattr(ui, "_remote_logos_allowed", lambda: True)
     catalog_markup = ui._company_mark_markup("Figma")
     assert 'src="https://cdn.simpleicons.org/figma/000000"' in catalog_markup
     assert 'aria-label="Figma"' in catalog_markup

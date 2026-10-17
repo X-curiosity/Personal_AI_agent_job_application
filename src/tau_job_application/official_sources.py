@@ -12,7 +12,7 @@ from io import StringIO
 import json
 import re
 from urllib.parse import urlencode, urlparse
-from urllib.request import Request, urlopen
+from urllib.request import HTTPRedirectHandler, Request, build_opener
 
 from pydantic import BaseModel, Field
 
@@ -27,6 +27,24 @@ class AuthorizedIdentity(BaseModel):
     email: str | None = None
     profile_url: str | None = None
     raw_fields: dict[str, str] = Field(default_factory=dict)
+
+
+MAX_RESPONSE_BYTES = 2_000_000
+
+
+class _NoRedirect(HTTPRedirectHandler):
+    """Refuse redirects so bearer credentials can never leak to another host.
+
+    urllib's default handler re-sends request headers — including tokens — to
+    redirect targets. These connectors call fixed official endpoints only, so
+    a redirect is never legitimate.
+    """
+
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        return None
+
+
+_opener = build_opener(_NoRedirect())
 
 
 class OpportunitySignal(BaseModel):
@@ -170,9 +188,15 @@ def _request_json(url: str, token: str, *, token_header: str = "Authorization") 
     credential = f"Bearer {token.strip()}" if token_header == "Authorization" else token.strip()
     request = Request(url, headers={token_header: credential, "Accept": "application/json", "User-Agent": "job-readiness-assistant/0.2"})
     try:
-        with urlopen(request, timeout=15) as response:  # noqa: S310 - fixed official endpoints only
-            return json.loads(response.read().decode("utf-8"))
+        with _opener.open(request, timeout=15) as response:  # noqa: S310 - fixed official endpoints only
+            body = response.read(MAX_RESPONSE_BYTES + 1)
     except Exception as exc:
+        raise RuntimeError(f"Official API request failed: {exc}") from exc
+    if len(body) > MAX_RESPONSE_BYTES:
+        raise RuntimeError("Official API response exceeded the 2 MB safety limit")
+    try:
+        return json.loads(body.decode("utf-8"))
+    except (UnicodeDecodeError, json.JSONDecodeError) as exc:
         raise RuntimeError(f"Official API request failed: {exc}") from exc
 
 

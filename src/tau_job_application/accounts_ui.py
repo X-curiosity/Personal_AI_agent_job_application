@@ -8,6 +8,7 @@ per-conversation consent.
 from __future__ import annotations
 
 import os
+import time
 
 import streamlit as st
 
@@ -16,7 +17,31 @@ from tau_job_application.accounts import (
     connect_github,
     linkedin_authorization_url,
     new_oauth_state,
+    new_pkce_verifier,
+    pkce_challenge,
 )
+
+_OAUTH_ATTEMPT_TTL_SECONDS = 600
+
+
+def _linkedin_attempt() -> dict:
+    """One expiring sign-in attempt: state, OIDC nonce, and PKCE verifier.
+
+    The attempt is created once and reused across reruns, so the link the user
+    clicks always matches the values the callback validates. It expires after
+    ten minutes and is consumed on the first callback, success or failure.
+    """
+    attempt = st.session_state.get("linkedin-oauth-attempt")
+    if not isinstance(attempt, dict) or time.time() - attempt.get("created", 0) > _OAUTH_ATTEMPT_TTL_SECONDS:
+        attempt = {
+            "state": new_oauth_state(),
+            "nonce": new_oauth_state(),
+            "verifier": new_pkce_verifier(),
+            "created": time.time(),
+        }
+        st.session_state["linkedin-oauth-attempt"] = attempt
+    st.session_state.pop("linkedin-oauth-state", None)
+    return attempt
 
 
 _BRAND_LOGOS = {
@@ -98,21 +123,22 @@ def render_accounts(api, track: str) -> None:
     params = st.query_params
     code, state = params.get("code", ""), params.get("state", "")
     if code and state:
-        expected = st.session_state.get("linkedin-oauth-state")
+        # Consume the attempt regardless of outcome so a callback cannot be replayed.
+        attempt = st.session_state.pop("linkedin-oauth-attempt", None)
         client_id = os.environ.get("LINKEDIN_CLIENT_ID", "")
         client_secret = os.environ.get("LINKEDIN_CLIENT_SECRET", "")
         redirect_uri = os.environ.get("LINKEDIN_REDIRECT_URI", "")
         st.query_params.clear()
         st.query_params["view"] = "account"
-        if not expected or state != expected:
+        if not attempt or state != attempt.get("state"):
             st.error("The LinkedIn sign-in state did not match; start the connection again.")
         else:
             try:
                 with st.spinner("Verifying your LinkedIn identity…"):
                     store.save(complete_linkedin_signin(
                         code=code, client_id=client_id, client_secret=client_secret, redirect_uri=redirect_uri,
+                        code_verifier=attempt["verifier"], nonce=attempt["nonce"],
                     ))
-                st.session_state.pop("linkedin-oauth-state", None)
                 st.success("LinkedIn identity verified and linked.")
                 st.rerun()
             except (RuntimeError, ValueError) as exc:
@@ -122,14 +148,17 @@ def render_accounts(api, track: str) -> None:
         client_id = os.environ.get("LINKEDIN_CLIENT_ID", "")
         redirect_uri = os.environ.get("LINKEDIN_REDIRECT_URI", "")
         if client_id and os.environ.get("LINKEDIN_CLIENT_SECRET") and redirect_uri:
-            state = new_oauth_state()
-            st.session_state["linkedin-oauth-state"] = state
+            attempt = _linkedin_attempt()
             st.link_button(
                 "Sign in with LinkedIn",
-                linkedin_authorization_url(client_id=client_id, redirect_uri=redirect_uri, state=state),
+                linkedin_authorization_url(
+                    client_id=client_id, redirect_uri=redirect_uri,
+                    state=attempt["state"], nonce=attempt["nonce"],
+                    code_challenge=pkce_challenge(attempt["verifier"]),
+                ),
                 type="primary",
             )
-            st.caption("Official OpenID Connect sign-in on linkedin.com; you return here automatically.")
+            st.caption("Official OpenID Connect sign-in on linkedin.com with PKCE; you return here automatically.")
         else:
             with st.expander("One-time setup: connect your own LinkedIn app", expanded=True):
                 st.markdown(
