@@ -216,7 +216,8 @@ def gather_match_candidates(hiring_store, catalog_store) -> list[MatchCompanyFac
             basis = "live board check"
         facts = MatchCompanyFacts(
             name=entry.name, stage_group=group, industry=entry.industry,
-            locations=entry.locations, hiring_signal=entry.signal,
+            locations=entry.locations or (entry.sample_locations[0] if entry.sample_locations else None),
+            hiring_signal=entry.signal,
             source_label=entry.source_label, stage_basis=basis,
         )
         by_name.setdefault(entry.name.casefold(), facts)

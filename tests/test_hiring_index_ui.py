@@ -65,13 +65,14 @@ def test_build_lists_active_hiring_companies_with_honest_signals(tmp_path, monke
     assert run["entry_count"] == 3  # one live row plus two directory flags
     captions = " ".join(item.value for item in app.caption)
     assert "never scraped or automated" in captions
-    table = app.dataframe[0].value
+    table = next(frame.value for frame in app.dataframe if "Openings" in frame.value.columns and "Beta Health" in set(frame.value["Company"]))
     assert set(table["Company"]) == {"Alpha AI", "Beta Health", "Figma"}
     assert "Directory flag (unverified)" in set(table["Signal"])
-    # Signal filter isolates the live-openings bucket.
-    signal = next(item for item in app.selectbox if item.label == "Signal")
+    # Signal filter isolates the live-openings bucket (the map's own Signal
+    # selectbox uses different option labels; pick by key, not position).
+    signal = next(item for item in app.selectbox if item.key == "hiring-index-signal")
     signal.select("live_openings").run()
-    table = app.dataframe[0].value
+    table = next(frame.value for frame in app.dataframe if "Openings" in frame.value.columns)
     assert set(table["Company"]) == {"Figma"}
 
 

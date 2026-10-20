@@ -54,9 +54,18 @@ incomplete → complete; `/matches` renders the ranked roles.
 
 ## What we took vs. what we deliberately changed
 
+**The map (observed in the main bundle).** StartupMap's map is Mapbox GL with
+per-startup `latitude/longitude` from `/api/startups` (~620 KB), supercluster
+for clustering, toggles for Clustering / Show logos / Show names, filter chips
+(city, industry, stage, hiring status, team size, founding year, accelerator),
+a search box with match-count badge, pin click → preview card → `/startup/:id`
+detail, and a `?zoomCity=` deep link that `flyTo`s the city. Pin colours encode
+hiring status (`actively_hiring` / `open_to_talent` / `not_hiring`).
+
 Taken: five-step guided flow, conditional steps, live count sidebar,
 "later filters don't apply yet" semantics (our `for_step`), explicit consent
-copy, honest limit notes.
+copy, honest limit notes — and for the map: signal-colored pins, stage
+filters, a matched-count line, and click-for-detail via tooltip + table.
 
 Changed on purpose:
 
@@ -71,3 +80,21 @@ Changed on purpose:
   role inventories, so the live number counts *hiring companies* (with a
   verified-live sub-count) instead of roles.
 - **No telemetry, no auth wall, no animations.**
+
+## The map adaptation (added after the join flow)
+
+- **No Mapbox token and no supercluster.** The map renders with pydeck on the
+  same Carto basemap as the app's other maps; the bounded ~500 hiring
+  companies do not need clustering.
+- **Offline geocoding, never guessed.** Their `/api/startups` ships exact
+  coordinates; our directories ship free-text locations, so
+  `city_coordinates.py` resolves them against a curated gazetteer (~140
+  cities + country centroids). Results carry a precision label: city pins are
+  exact, country-level pins render as large soft discs, and remote/unplaceable
+  companies are counted openly under "Not pinned" instead of being invented.
+  On the current local data this pins 97.6% of hiring candidates.
+- **Colour encodes the generalization.** Pins are colored by company stage
+  (early/growth/scale-up/big) rather than only hiring status, keeping the
+  big-company generalization visible; live-board companies get a stronger pin.
+- **Match me integration.** A checkbox applies the saved Match me answers as
+  the map's filter, tying the two adaptations together.

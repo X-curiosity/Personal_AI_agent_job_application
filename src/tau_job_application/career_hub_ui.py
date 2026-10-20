@@ -80,7 +80,7 @@ def render_portal(api, track, view):
         from tau_job_application.match_onboarding_ui import render_match_onboarding
         render_match_onboarding(api, track)
     elif view == "companies":
-        _companies(api)
+        _companies(api, track)
 
 
 _SIGNAL_LABELS = {
@@ -184,11 +184,14 @@ def _portal_boards(api):
     return tuple(unique.values())
 
 
-def _companies(api):
+def _companies(api, track=None):
     catalog = api._company_catalog_store()
     st.markdown('<div class="section-kicker">Source-aware discovery</div><h1>Your company database</h1>', unsafe_allow_html=True)
     st.write("Bring in a small, reviewable company set, then connect each employer’s official public hiring board. Directory records and job adverts remain separate.")
     st.caption("Imports are manual, capped at 100 records, and saved with their source. No company website is crawled and no personal contact data is collected.")
+
+    from tau_job_application.company_map_ui import render_company_map
+    render_company_map(api, track)
 
     with st.expander("Import companies", expanded=not bool(catalog.list_companies(limit=1))):
         limit = st.number_input("Companies per import", min_value=5, max_value=100, value=25, step=5)
