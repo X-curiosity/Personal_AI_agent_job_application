@@ -293,6 +293,17 @@ def geocode_location(locations: str | None) -> GeocodeResult | None:
         latitude, longitude = CITY_COORDINATES[alias]
         return GeocodeResult(latitude=latitude, longitude=longitude, precision="city", label=segments[0].title())
 
+    # Street addresses put the city after the street ("Affolternstrasse 44,
+    # Zurich, 8050, Switzerland"). A middle segment counts as a city only when
+    # the exact "city, country" pair exists, so a stray word can never steer
+    # the pin to the wrong country.
+    if len(segments) >= 3 and segments[-1] in COUNTRY_CENTROIDS:
+        for segment in segments[1:-1]:
+            key = f"{segment}, {segments[-1]}"
+            if key in CITY_COORDINATES:
+                latitude, longitude = CITY_COORDINATES[key]
+                return GeocodeResult(latitude=latitude, longitude=longitude, precision="city", label=segment.title())
+
     country_keys = [segments[-1]] if segments else []
     if len(segments) >= 2:
         country_keys.append(text)

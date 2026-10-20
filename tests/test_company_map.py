@@ -62,3 +62,11 @@ def test_build_map_points_applies_match_preferences():
         facts("Big Co", "big", "USA"),
     ], prefs)
     assert [point["name"] for point in points] == ["Early Co"]
+
+
+def test_street_address_resolves_the_middle_city_segment():
+    point = geocode_location("Affolternstrasse 44, Zurich, 8050, Switzerland")
+    assert point is not None and point.precision == "city" and point.label == "Zurich"
+    # A middle word that is not a known city keeps the honest country fallback.
+    fallback = geocode_location("Affolternstrasse 44, 8050, Switzerland")
+    assert fallback is not None and fallback.precision == "country"

@@ -20,4 +20,9 @@ uploads/
 # Keep real candidate and application data out of Git.
 private/
 data/
+# Only reviewed public map assets may be published; all other data stays ignored.
+!vercel-site/data/
+vercel-site/data/*
+!vercel-site/data/companies.json
+!vercel-site/data/world.geojson
 venv/
