@@ -228,94 +228,94 @@ def _standout_plans(result, assessment):
 STYLES = """
 <style>
 :root {
-    --ink: #19352e;
-    --forest: #20483c;
-    --sage: #6f8875;
-    --paper: #fbfaf5;
-    --mist: #eef2ea;
-    --line: #dce4d9;
-    --clay: #d9865c;
+    --ink: #1F1B16;
+    --forest: #1F1B16;
+    --sage: #736A5E;
+    --paper: #F5F1E9;
+    --mist: #F1ECE3;
+    --line: #E6DFD1;
+    --clay: #1F1B16;
 }
-.stApp, [data-testid="stAppViewContainer"] {background: #f7faf8; color: var(--ink); color-scheme: light;}
+.stApp, [data-testid="stAppViewContainer"] {background: #F5F1E9; color: var(--ink); color-scheme: light;}
 /* Hide the default Streamlit chrome: the white header bar and its colored top line.
    The sidebar collapse control stays usable; the bar itself is transparent. */
 [data-testid="stDecoration"] {display: none;}
 [data-testid="stHeader"] {background: transparent; box-shadow: none; backdrop-filter: none;}
 [data-testid="stHeader"] [data-testid="stToolbar"] {background: transparent;}
 .block-container {padding-top: 1.35rem; padding-bottom: 3rem; max-width: 1440px;}
-div[data-testid="stSidebar"] {background: #173a31;}
-div[data-testid="stSidebar"] * {color: #f5f5ed;}
-div[data-testid="stSidebar"] [data-testid="stCaptionContainer"] p {color: #c9d7c9;}
-div[data-testid="stSidebar"] [data-testid="stProgress"] > div > div > div > div {background-color: #d6bd70;}
-div[data-testid="stTextInput"] label, div[data-testid="stTextArea"] label, div[data-testid="stFileUploader"] label, div[data-testid="stCheckbox"] label, div[data-testid="stSelectbox"] label {color: #28463b !important; font-weight: 620;}
-div[data-baseweb="input"] > div, div[data-baseweb="textarea"] {background-color: #fffef9 !important; border-color: #c9d7c9 !important; color: #19352e !important;}
-div[data-baseweb="input"] input, div[data-baseweb="textarea"] textarea {background-color: transparent !important; color: #19352e !important; caret-color: #19352e !important;}
-div[data-testid="stTextInput"] input, div[data-testid="stTextArea"] textarea {background-color: #fffef9 !important; color: #19352e !important; caret-color: #19352e !important; border: 1px solid #c9d7c9 !important;}
-div[data-testid="stTextInput"] input::placeholder, div[data-testid="stTextArea"] textarea::placeholder {color: #5f7168 !important; opacity: 1 !important;}
-div[data-testid="stFileUploader"] section {background: #fffef9 !important; border-color: #c9d7c9 !important; color: #19352e !important;}
-div[data-testid="stFileUploader"] small, div[data-testid="stFileUploader"] span {color: #4e655a !important;}
-button[data-testid="stBaseButton-primary"] {background: #1f5041 !important; border-color: #1f5041 !important; color: #fffef8 !important;}
-button[data-testid="stBaseButton-primary"]:hover {background: #173a31 !important; border-color: #173a31 !important;}
-button[data-testid="stBaseButton-secondary"] {background: #fffef9 !important; border-color: #b9cdbd !important; color: #173a31 !important;}
-button[data-testid="stBaseButton-secondary"] *, button[data-testid="stBaseButton-secondary"] {color: #173a31 !important;}
-button[data-testid="stBaseButton-secondary"]:hover {background: #edf4ed !important; border-color: #71927a !important;}
-a[data-testid="stBaseLinkButton-primary"] {background: #1f5041 !important; border-color: #1f5041 !important; color: #fffef8 !important;}
-a[data-testid="stBaseLinkButton-primary"] * {color: #fffef8 !important;}
-a[data-testid="stBaseLinkButton-primary"]:hover {background: #173a31 !important; border-color: #173a31 !important;}
-a[data-testid="stBaseLinkButton-secondary"] {background: #fffef9 !important; border-color: #b9cdbd !important; color: #173a31 !important;}
-a[data-testid="stBaseLinkButton-secondary"] * {color: #173a31 !important;}
-[data-testid="stMetricLabel"], [data-testid="stMetricLabel"] *, [data-testid="stMetricValue"], [data-testid="stMetricValue"] * {color: #19352e !important;}
-.workspace-hero {background: radial-gradient(circle at 86% 18%, rgba(218, 194, 119, .36), transparent 24%), linear-gradient(120deg, #173a31 0%, #285445 66%, #47735e 100%); border-radius: 18px; color: #fbfbf3; padding: 2rem 2.15rem 1.7rem; box-shadow: 0 16px 35px rgba(25, 53, 46, .14); margin-bottom: 1.3rem;}
-.workspace-hero .eyebrow {font-size: .74rem; text-transform: uppercase; letter-spacing: .13em; font-weight: 700; color: #d8e5d5; margin-bottom: .55rem;}
-.workspace-hero h1 {color: #fffef8; font-size: clamp(1.65rem, 3.1vw, 2.8rem); line-height: 1.1; margin: 0 0 .45rem;}
-.workspace-hero p {color: #deeadf; max-width: 760px; margin: 0; font-size: 1rem;}
-.workspace-hero .job-chip {display: inline-block; margin-top: 1rem; border: 1px solid rgba(255,255,255,.4); border-radius: 999px; padding: .35rem .72rem; color: #fbfbf4; font-size: .82rem;}
-.metric-card {background: rgba(255, 255, 252, .86); border-radius: 14px; padding: 17px 14px; min-height: 110px; border: 1px solid var(--line); box-shadow: 0 5px 15px rgba(25, 53, 46, .045);}
-.metric-label {font-size: .75rem; letter-spacing: .055em; text-transform: uppercase; color: #61726a; margin-bottom: 6px; font-weight: 700;}
+div[data-testid="stSidebar"] {background: #1F1B16;}
+div[data-testid="stSidebar"] * {color: #FFFAF3;}
+div[data-testid="stSidebar"] [data-testid="stCaptionContainer"] p {color: #E6DFD1;}
+div[data-testid="stSidebar"] [data-testid="stProgress"] > div > div > div > div {background-color: #C9BC9C;}
+div[data-testid="stTextInput"] label, div[data-testid="stTextArea"] label, div[data-testid="stFileUploader"] label, div[data-testid="stCheckbox"] label, div[data-testid="stSelectbox"] label {color: #1F1B16 !important; font-weight: 620;}
+div[data-baseweb="input"] > div, div[data-baseweb="textarea"] {background-color: #FFFEFB !important; border-color: #E6DFD1 !important; color: #1F1B16 !important;}
+div[data-baseweb="input"] input, div[data-baseweb="textarea"] textarea {background-color: transparent !important; color: #1F1B16 !important; caret-color: #1F1B16 !important;}
+div[data-testid="stTextInput"] input, div[data-testid="stTextArea"] textarea {background-color: #FFFEFB !important; color: #1F1B16 !important; caret-color: #1F1B16 !important; border: 1px solid #E6DFD1 !important;}
+div[data-testid="stTextInput"] input::placeholder, div[data-testid="stTextArea"] textarea::placeholder {color: #736A5E !important; opacity: 1 !important;}
+div[data-testid="stFileUploader"] section {background: #FFFEFB !important; border-color: #E6DFD1 !important; color: #1F1B16 !important;}
+div[data-testid="stFileUploader"] small, div[data-testid="stFileUploader"] span {color: #655D52 !important;}
+button[data-testid="stBaseButton-primary"] {background: #1F1B16 !important; border-color: #1F1B16 !important; color: #FFFAF3 !important;}
+button[data-testid="stBaseButton-primary"]:hover {background: #1F1B16 !important; border-color: #1F1B16 !important;}
+button[data-testid="stBaseButton-secondary"] {background: #FFFEFB !important; border-color: #E6DFD1 !important; color: #1F1B16 !important;}
+button[data-testid="stBaseButton-secondary"] *, button[data-testid="stBaseButton-secondary"] {color: #1F1B16 !important;}
+button[data-testid="stBaseButton-secondary"]:hover {background: #F3EEE6 !important; border-color: #736A5E !important;}
+a[data-testid="stBaseLinkButton-primary"] {background: #1F1B16 !important; border-color: #1F1B16 !important; color: #FFFAF3 !important;}
+a[data-testid="stBaseLinkButton-primary"] * {color: #FFFAF3 !important;}
+a[data-testid="stBaseLinkButton-primary"]:hover {background: #1F1B16 !important; border-color: #1F1B16 !important;}
+a[data-testid="stBaseLinkButton-secondary"] {background: #FFFEFB !important; border-color: #E6DFD1 !important; color: #1F1B16 !important;}
+a[data-testid="stBaseLinkButton-secondary"] * {color: #1F1B16 !important;}
+[data-testid="stMetricLabel"], [data-testid="stMetricLabel"] *, [data-testid="stMetricValue"], [data-testid="stMetricValue"] * {color: #1F1B16 !important;}
+.workspace-hero {background: radial-gradient(circle at 86% 18%, rgba(31, 27, 22, .36), transparent 24%), linear-gradient(120deg, #1F1B16 0%, #2E2820 66%, #4A4238 100%); border-radius: 18px; color: #FFFAF3; padding: 2rem 2.15rem 1.7rem; box-shadow: 0 16px 35px rgba(31, 27, 22, .14); margin-bottom: 1.3rem;}
+.workspace-hero .eyebrow {font-size: .74rem; text-transform: uppercase; letter-spacing: .13em; font-weight: 700; color: #E6DFD1; margin-bottom: .55rem;}
+.workspace-hero h1 {color: #FFFAF3; font-size: clamp(1.65rem, 3.1vw, 2.8rem); line-height: 1.1; margin: 0 0 .45rem;}
+.workspace-hero p {color: #E6DFD1; max-width: 760px; margin: 0; font-size: 1rem;}
+.workspace-hero .job-chip {display: inline-block; margin-top: 1rem; border: 1px solid rgba(255,255,255,.4); border-radius: 999px; padding: .35rem .72rem; color: #FFFAF3; font-size: .82rem;}
+.metric-card {background: rgba(255, 255, 252, .86); border-radius: 14px; padding: 17px 14px; min-height: 110px; border: 1px solid var(--line); box-shadow: 0 5px 15px rgba(31, 27, 22, .045);}
+.metric-label {font-size: .75rem; letter-spacing: .055em; text-transform: uppercase; color: #736A5E; margin-bottom: 6px; font-weight: 700;}
 .metric-value {font-size: 1.8rem; font-weight: 760; color: var(--ink); line-height: 1.05;}
-.metric-note {font-size: .78rem; color: #66776e; margin-top: .35rem;}
-.section-kicker {font-size: .76rem; letter-spacing: .11em; text-transform: uppercase; color: #5b7767; font-weight: 750; margin-bottom: .25rem;}
+.metric-note {font-size: .78rem; color: #736A5E; margin-top: .35rem;}
+.section-kicker {font-size: .76rem; letter-spacing: .11em; text-transform: uppercase; color: #655D52; font-weight: 750; margin-bottom: .25rem;}
 .quiet-panel {background: rgba(255,255,252,.72); border: 1px solid var(--line); border-radius: 14px; padding: 1.1rem 1.2rem; margin: .45rem 0 1rem;}
-.next-action {background: #fff9eb; border-left: 4px solid #d98a58; border-radius: 5px 12px 12px 5px; padding: 1rem 1.1rem;}
+.next-action {background: #F6F2EA; border-left: 4px solid #1F1B16; border-radius: 5px 12px 12px 5px; padding: 1rem 1.1rem;}
 .path-card {background: rgba(255,255,252,.8); border: 1px solid var(--line); border-radius: 12px; padding: .9rem 1rem; min-height: 105px;}
-.path-step {font-size: .72rem; text-transform: uppercase; letter-spacing: .09em; color: #67806e; font-weight: 800;}
+.path-step {font-size: .72rem; text-transform: uppercase; letter-spacing: .09em; color: #736A5E; font-weight: 800;}
 .path-card h4 {margin: .3rem 0; color: var(--ink);}
-.path-card p {font-size: .86rem; color: #5c6e65; margin: 0;}
-div[data-testid="stTabs"] [role="tab"], div[data-testid="stTabs"] [role="tab"] * {font-weight: 650 !important; color: #52665b !important; opacity: 1 !important;}
-div[data-testid="stTabs"] [role="tab"][aria-selected="true"], div[data-testid="stTabs"] [role="tab"][aria-selected="true"] * {color: #173a31 !important;}
+.path-card p {font-size: .86rem; color: #736A5E; margin: 0;}
+div[data-testid="stTabs"] [role="tab"], div[data-testid="stTabs"] [role="tab"] * {font-weight: 650 !important; color: #655D52 !important; opacity: 1 !important;}
+div[data-testid="stTabs"] [role="tab"][aria-selected="true"], div[data-testid="stTabs"] [role="tab"][aria-selected="true"] * {color: #1F1B16 !important;}
 div[data-testid="stExpander"] {background: rgba(255,255,252,.66); border: 1px solid var(--line); border-radius: 10px;}
-.role-feed-avatar {position:relative; overflow:hidden; width: 46px; height: 46px; display: grid; place-items: center; border-radius: 12px; background: linear-gradient(145deg, #e6efe8, #cfded1); border: 1px solid #b8cdbb; color: #1d493c; font-size: .84rem; font-weight: 800; letter-spacing: .045em; margin-top: .25rem;}
+.role-feed-avatar {position:relative; overflow:hidden; width: 46px; height: 46px; display: grid; place-items: center; border-radius: 12px; background: linear-gradient(145deg, #F3EEE6, #E6DFD1); border: 1px solid #E6DFD1; color: #1F1B16; font-size: .84rem; font-weight: 800; letter-spacing: .045em; margin-top: .25rem;}
 .role-feed-avatar .role-feed-monogram {display:grid; place-items:center; width:100%; height:100%;}
 .role-feed-avatar img {position:absolute; inset:0; width:100%; height:100%; object-fit:contain; padding:5px;}
-.role-feed-title {font-size: 1.02rem; line-height: 1.25; font-weight: 760; color: #173a31; margin: .05rem 0 .22rem;}
-.role-feed-company {font-size: .88rem; color: #415d51; margin: 0 0 .3rem;}
+.role-feed-title {font-size: 1.02rem; line-height: 1.25; font-weight: 760; color: #1F1B16; margin: .05rem 0 .22rem;}
+.role-feed-company {font-size: .88rem; color: #655D52; margin: 0 0 .3rem;}
 .role-feed-meta {display: flex; gap: .35rem; flex-wrap: wrap; margin: .1rem 0 .35rem;}
-.role-feed-pill {display: inline-block; border-radius: 999px; padding: .19rem .5rem; background: #edf3ec; border: 1px solid #d5e3d3; color: #476557; font-size: .72rem; line-height: 1.2;}
-.role-feed-pill.source {background: #f7f2e4; border-color: #e6d8af; color: #74613a;}
-.role-feed-pill.state {background: #e2efe5; border-color: #bdd4c2; color: #27543c; font-weight: 700;}
-.role-feed-relevance {background: #173a31; color: #f9faf4; border-radius: 12px; padding: .68rem .52rem; text-align: center; margin-top: .12rem;}
-.role-feed-relevance b {display: block; color: #fffef8; font-size: 1.16rem; line-height: 1.05;}
-.role-feed-relevance span {display: block; color: #d4e3d5; font-size: .66rem; letter-spacing: .04em; text-transform: uppercase; margin-top: .23rem;}
-.role-feed-reason {font-size: .8rem; color: #5b7164; margin: .15rem 0 0;}
-.role-market-note {background: #f6f1e3; border-left: 3px solid #d2b66c; border-radius: 5px 10px 10px 5px; color: #5e5333; padding: .68rem .85rem; font-size: .84rem; margin: .6rem 0 .9rem;}
+.role-feed-pill {display: inline-block; border-radius: 999px; padding: .19rem .5rem; background: #F1ECE3; border: 1px solid #E6DFD1; color: #655D52; font-size: .72rem; line-height: 1.2;}
+.role-feed-pill.source {background: #F6F2EA; border-color: #E6DFD1; color: #655D52;}
+.role-feed-pill.state {background: #F1ECE3; border-color: #E6DFD1; color: #1F1B16; font-weight: 700;}
+.role-feed-relevance {background: #1F1B16; color: #FFFAF3; border-radius: 12px; padding: .68rem .52rem; text-align: center; margin-top: .12rem;}
+.role-feed-relevance b {display: block; color: #FFFAF3; font-size: 1.16rem; line-height: 1.05;}
+.role-feed-relevance span {display: block; color: #E6DFD1; font-size: .66rem; letter-spacing: .04em; text-transform: uppercase; margin-top: .23rem;}
+.role-feed-reason {font-size: .8rem; color: #655D52; margin: .15rem 0 0;}
+.role-market-note {background: #F6F2EA; border-left: 3px solid #B49B57; border-radius: 5px 10px 10px 5px; color: #655D52; padding: .68rem .85rem; font-size: .84rem; margin: .6rem 0 .9rem;}
 /* Sticky top app bar, the usual browser-app navigation format. */
 div[data-testid="stHorizontalBlock"]:has(.topnav-brand-mark) {
     position: sticky; top: 0; z-index: 999;
-    background: linear-gradient(120deg, #173a31 0%, #234f42 90%);
+    background: linear-gradient(120deg, #1F1B16 0%, #2E2820 90%);
     margin: -1.3rem -1rem 1.15rem; padding: .45rem 1.2rem;
-    border-radius: 0 0 16px 16px; box-shadow: 0 8px 22px rgba(25,53,46,.16);
+    border-radius: 0 0 16px 16px; box-shadow: 0 8px 22px rgba(31,27,22,.16);
     align-items: center; row-gap: 0;
 }
 .topnav-brand-mark {display: none;}
 /* Brand button: looks like a wordmark, acts like a link home. */
 div[data-testid="stColumn"]:has(.topnav-brand-mark) button {
     background: transparent !important; border: none !important; box-shadow: none !important;
-    color: #fbfbf3 !important; font-size: 1.16rem; font-weight: 800; letter-spacing: .02em;
+    color: #FFFAF3 !important; font-size: 1.16rem; font-weight: 800; letter-spacing: .02em;
     padding: .1rem 0 !important; white-space: nowrap; text-align: left; min-height: 0;
 }
-div[data-testid="stColumn"]:has(.topnav-brand-mark) button * {color: #fbfbf3 !important; white-space: nowrap;}
+div[data-testid="stColumn"]:has(.topnav-brand-mark) button * {color: #FFFAF3 !important; white-space: nowrap;}
 div[data-testid="stColumn"]:has(.topnav-brand-mark) button:hover,
-div[data-testid="stColumn"]:has(.topnav-brand-mark) button:hover * {color: #d6bd70 !important;}
+div[data-testid="stColumn"]:has(.topnav-brand-mark) button:hover * {color: #C9BC9C !important;}
 /* Nav pills: never wrap or clip; scroll sideways instead. */
 div[data-testid="stHorizontalBlock"]:has(.topnav-brand-mark) [data-testid="stSegmentedControl"] {justify-content: flex-end; overflow-x: auto;}
 div[data-testid="stHorizontalBlock"]:has(.topnav-brand-mark) [data-testid="stSegmentedControl"] > div,
@@ -326,10 +326,10 @@ div[data-testid="stHorizontalBlock"]:has(.topnav-brand-mark) [data-testid="stSeg
     background: transparent !important; border: none !important; box-shadow: none !important;
     border-radius: 999px !important; font-weight: 650 !important; white-space: nowrap;
 }
-div[data-testid="stHorizontalBlock"]:has(.topnav-brand-mark) [data-testid="stSegmentedControl"] label * {color: #cfddd0 !important;}
-div[data-testid="stHorizontalBlock"]:has(.topnav-brand-mark) [data-testid="stSegmentedControl"] label:hover * {color: #fffef8 !important;}
-div[data-testid="stHorizontalBlock"]:has(.topnav-brand-mark) [data-testid="stSegmentedControl"] label:has(input:checked) {background: #d6bd70 !important;}
-div[data-testid="stHorizontalBlock"]:has(.topnav-brand-mark) [data-testid="stSegmentedControl"] label:has(input:checked) * {color: #173a31 !important;}
+div[data-testid="stHorizontalBlock"]:has(.topnav-brand-mark) [data-testid="stSegmentedControl"] label * {color: #E6DFD1 !important;}
+div[data-testid="stHorizontalBlock"]:has(.topnav-brand-mark) [data-testid="stSegmentedControl"] label:hover * {color: #FFFAF3 !important;}
+div[data-testid="stHorizontalBlock"]:has(.topnav-brand-mark) [data-testid="stSegmentedControl"] label:has(input:checked) {background: #C9BC9C !important;}
+div[data-testid="stHorizontalBlock"]:has(.topnav-brand-mark) [data-testid="stSegmentedControl"] label:has(input:checked) * {color: #1F1B16 !important;}
 /* Streamlit Cloud chrome has no place in this local app. */
 [data-testid="stToolbar"] {display: none;}
 </style>
@@ -2328,7 +2328,7 @@ def _role_location_map(matches, thread_id: str) -> None:
             map_style="https://basemaps.cartocdn.com/gl/positron-gl-style/style.json",
             tooltip={
                 "html": "<b>{location}</b><br/>{roles}",
-                "style": {"backgroundColor": "#173a31", "color": "#fffef8"},
+                "style": {"backgroundColor": "#1F1B16", "color": "#FFFAF3"},
             },
         )
         st.pydeck_chart(deck, use_container_width=True, height=330, key=f"role-location-map:{thread_id}")
@@ -2482,7 +2482,7 @@ def _company_explorer(workspace_id: str, thread_id: str) -> None:
         map_style="https://basemaps.cartocdn.com/gl/positron-gl-style/style.json",
         tooltip={
             "html": "<b>{company}</b><br/>{city}, {country}<br/>{focus}<br/><br/>Profile overlap: {matching_skills}",
-            "style": {"backgroundColor": "#173a31", "color": "#fffef8"},
+            "style": {"backgroundColor": "#1F1B16", "color": "#FFFAF3"},
         },
     )
     st.pydeck_chart(deck, use_container_width=True, height=480, key=f"company-explorer-map:{thread_id}")
@@ -2563,7 +2563,7 @@ def _company_footprint(selected, thread_id: str) -> None:
         map_style="https://basemaps.cartocdn.com/gl/positron-gl-style/style.json",
         tooltip={
             "html": "<b>{site_type}</b><br/>{city}, {country}<br/><br/>{focus}",
-            "style": {"backgroundColor": "#173a31", "color": "#fffef8"},
+            "style": {"backgroundColor": "#1F1B16", "color": "#FFFAF3"},
         },
     )
     st.pydeck_chart(deck, use_container_width=True, height=360, key=f"company-footprint-map:{thread_id}")
