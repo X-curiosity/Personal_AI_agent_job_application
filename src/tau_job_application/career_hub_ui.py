@@ -76,6 +76,9 @@ def render_portal(api, track, view):
         _role(api, store, track)
     elif view == "application":
         _application(api, store, track)
+    elif view == "match":
+        from tau_job_application.match_onboarding_ui import render_match_onboarding
+        render_match_onboarding(api, track)
     elif view == "companies":
         _companies(api)
 
@@ -282,6 +285,9 @@ def _home(api, store, track):
     header[0].write("Explore your roles. Build the evidence. Keep every application in one place.")
     if header[1].button("Edit my interests", use_container_width=True):
         go("onboarding")
+    if header[1].button("Match me · 5 answers", type="primary", use_container_width=True,
+                        help="Guided setup: role areas, experience, work style, company stage, industries — with a live count of hiring companies that fit."):
+        go("match")
     columns = st.columns(2)
     for i, role in enumerate(interests.roles):
         with columns[i % 2]:

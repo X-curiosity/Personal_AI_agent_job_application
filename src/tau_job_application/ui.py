@@ -385,11 +385,11 @@ def main() -> None:
         _product_landing()
         return
 
-    workspace_id, thread_id = choose_scope(WORKSPACES, compact=_route_value("view") in {"career", "onboarding", "role", "application", "companies", "eligibility", "agents", "account"})
+    workspace_id, thread_id = choose_scope(WORKSPACES, compact=_route_value("view") in {"career", "onboarding", "role", "application", "companies", "match", "eligibility", "agents", "account"})
     _top_nav()
     with st.sidebar:
         st.caption("Your career track and job workspace live here. Everything else is in the top bar.")
-    if _route_value("view") in {"career", "onboarding", "role", "application", "companies"}:
+    if _route_value("view") in {"career", "onboarding", "role", "application", "companies", "match"}:
         render_portal(sys.modules[__name__], workspace_id, _route_value("view"))
         return
     if _route_value("view") == "eligibility":
