@@ -19,5 +19,11 @@ fonts, logos or geocoding APIs. Outbound company/source links are user-initiated
   output before publication. Personal records are never queried. This static
   snapshot does not automatically refresh when the local scheduler runs.
 
-No StartupMap code, logos, photographs, company database, or map styles are
-bundled. Observed interactions informed an independently written interface.
+- `../data/wikidata_hq.json`: headquarters coordinates from Wikidata
+  (CC0, https://www.wikidata.org/wiki/Wikidata:Licensing), matched only by
+  exact official-website statements, regenerated with
+  `python scripts/fetch_wikidata_hq.py`. No StartupMap API data is used.
+
+No StartupMap code, logos, photographs, company database, coordinates, or map
+styles are bundled. Observed interactions informed an independently written
+interface.

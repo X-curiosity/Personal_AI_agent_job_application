@@ -29,19 +29,22 @@
 
   <section id="explore" class="explorer" aria-label="Company explorer">
     <form id="filters" class="filters" role="search" aria-label="Filter companies">
-      <div class="search-field"><label for="search">Search companies</label><input id="search" name="q" type="search" placeholder="Company, sector, or place…" maxlength="200" autocomplete="off"></div>
-      <div><label for="stage">Company stage</label><select id="stage" name="stage"><option value="">All stages</option><option value="early">Early stage</option><option value="growth">Growth</option><option value="scaleup">Scale-up</option><option value="big">Big company</option><option value="unknown">Stage unknown</option></select></div>
-      <div><label for="industry">Industry</label><select id="industry" name="industry"><option value="">All industries</option></select></div>
-      <div><label for="location">Location</label><select id="location" name="location"><option value="">All locations</option></select></div>
-      <div><label for="signal">Hiring evidence</label><select id="signal" name="signal"><option value="">All signals</option><option value="directory_flag">Directory hiring flag</option><option value="board_snapshot">Board snapshot</option><option value="unknown">Hiring unknown</option></select></div>
-      <button class="button reset" type="reset">Clear filters</button>
+      <div class="chip-bar" role="group" aria-label="Quick filters">
+        <select id="role" name="role" class="chip-select" aria-label="Role area"><option value="">Role</option></select>
+        <select id="industry" name="industry" class="chip-select" aria-label="Sector"><option value="">Sector</option></select>
+        <select id="type" name="type" class="chip-select" aria-label="Company type"><option value="">Type</option><option value="startup">Startup</option><option value="public">Public company</option><option value="private">Private company</option></select>
+        <select id="location" name="location" class="chip-select" aria-label="Hiring in"><option value="">Hiring in</option></select>
+        <button class="chip-clear" type="reset" hidden id="clear-filters">Clear</button>
+      </div>
     </form>
     <div class="explorer-meta"><p id="result-count" role="status" aria-live="polite">Loading companies…</p><p>Saved facts, not a live vacancy feed. <a href="#data-notes">About this data</a></p></div>
     <div class="mobile-switch" role="group" aria-label="Explorer view"><button type="button" id="list-view" aria-pressed="false">List</button><button type="button" id="map-view" aria-pressed="true">Map</button></div>
     <div class="explorer-body" data-view="map">
       <aside class="results-panel" aria-labelledby="results-heading">
         <div id="list-panel">
+          <div class="search-field"><label for="search">Search companies</label><input id="search" name="q" type="search" placeholder="Company, sector, or place…" maxlength="200" autocomplete="off" form="filters"></div>
           <div class="list-heading"><div><p class="eyebrow">Discover your options</p><h2 id="results-heading" tabindex="-1">Companies</h2></div><button id="clear-group" class="text-button" type="button" hidden>Show all results</button></div>
+          <p class="list-note">Company stage appears in each startup profile. Unknown facts stay unknown.</p>
           <p id="group-note" class="group-note" hidden></p>
           <div id="load-error" class="error" role="alert" hidden><p>We couldn’t load the catalogue. Check your connection and try again.</p><button type="button" class="button" id="retry">Try again</button></div>
           <p id="empty-state" class="empty" hidden>No companies match these filters. Try another place or clear a filter.</p>
@@ -52,11 +55,12 @@
       </aside>
       <div class="map-panel">
         <div id="map" role="region" aria-label="Company locations map; the company list provides the same records" tabindex="0"></div>
-        <div class="map-tools"><button class="button" id="fit-map" type="button">Fit results</button><label><input type="checkbox" id="group-pins" checked> Group nearby pins</label><label><input type="checkbox" id="show-names"> Show names</label></div>
+        <div class="map-tools"><button class="button" id="fit-map" type="button">Fit results</button><label><input type="checkbox" id="group-pins" checked> Group nearby pins</label><label><input type="checkbox" id="show-names" checked> Show names</label></div>
         <p id="map-status" role="status" class="map-status" hidden></p>
         <div class="map-legend" aria-label="Map legend"><span><i class="pin-sample" aria-hidden="true"></i> Company pin</span><span><i class="hiring-sample" aria-hidden="true"></i> Hiring flag (unverified)</span><span><i class="count-sample" aria-hidden="true">12</i> Grouped companies</span></div>
       </div>
     </div>
+    <p id="map-spread-note" class="map-footnote" hidden>Companies sharing a city centre are spread around it for display — spread positions are not addresses. The list is the complete record.</p>
     <p class="map-footnote">Pins represent approximate city or country centres, not office addresses. For multiple offices, the first resolvable place is shown. Companies without a resolved location remain in the list. Zoom out for country and region cards; zoom in for city cards and individual company pins.</p>
     <noscript><p class="error">Enable JavaScript for the interactive map and filters. You can also <a href="data/companies.json">download the public catalogue</a>.</p></noscript>
   </section>

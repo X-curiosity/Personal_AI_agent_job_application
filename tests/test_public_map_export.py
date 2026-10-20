@@ -16,26 +16,44 @@ def _database(path: Path) -> None:
             "locations": "London, Canada", "hiring": False,
             "private_notes": "never publish", "credentials": "secret", "custom_board": "private",
         }
+        payload["company_type"] = "Startup"  # stage must stay unknown, never promoted
         db.execute("INSERT INTO company_catalog VALUES (1,?,?,?,?,?)", (
-            "YC community API", "acme", "Acme", json.dumps(payload), "2026-10-20T12:00:00+00:00"))
+            "CompaniesMarketCap", "acme", "Acme", json.dumps(payload), "2026-10-20T12:00:00+00:00"))
         db.execute("INSERT INTO company_catalog VALUES (2,?,?,?,?,?)", (
-            "YC community API", "remote", "Remote Co", json.dumps({
+            "CompaniesMarketCap", "remote", "Remote Co", json.dumps({
                 "source_url": "javascript:alert(1)", "locations": "Remote", "hiring": True,
+                "company_type": "Public",
             }), "2026-10-20T12:00:00+00:00"))
+        db.execute("CREATE TABLE yc_directory (slug TEXT, name TEXT, payload_json TEXT, snapshot_id INTEGER)")
+        db.execute("INSERT INTO yc_directory VALUES (?,?,?,1)", ("ycstartup", "YC Startup", json.dumps({
+            "name": "YC Startup", "slug": "ycstartup", "status": "Active", "is_hiring": True,
+            "stage": "Early", "locations": "Berlin, Germany", "website": "https://ycstartup.example.com",
+            "industries": ["Fintech"], "tags": ["Payments"], "one_liner": "Test startup",
+            "directory_url": "https://www.ycombinator.com/companies/ycstartup",
+        })))
 
 
 def test_export_has_only_public_schema_and_safe_values(tmp_path: Path) -> None:
     database, output = tmp_path / "catalog.sqlite", tmp_path / "companies.json"
     _database(database)
-    data = export_catalog(database, output, exported_at="2026-10-20T13:00:00+00:00")
+    data = export_catalog(database, output, exported_at="2026-10-20T13:00:00+00:00", logos=False)
     assert data["schemaVersion"] == 1
-    assert len(data["companies"]) == 2
+    assert len(data["companies"]) == 3  # two catalogue rows + one directory row
     company = data["companies"][0]
     assert set(company) == COMPANY_FIELDS
     assert company["stage"] == "unknown"  # unknown is never promoted to early
+    assert company["type"] == "startup"
+    public = next(item for item in data["companies"] if item["name"] == "Remote Co")
+    assert public["stage"] == "big" and public["type"] == "public"
+    startup = next(item for item in data["companies"] if item["name"] == "YC Startup")
+    assert startup["type"] == "startup"
+    assert startup["fundingStage"] == "Early"
+    assert startup["hiringSignal"] == "directory_flag"
+    assert startup["precision"] == "city"
+    assert startup["tags"] == ["Payments"]
     assert company["website"] is None
     assert company["precision"] == "country"  # London must not become a UK city pin
-    assert company["id"] == public_id("YC community API", "acme")
+    assert company["id"] == public_id("CompaniesMarketCap", "acme")
     assert "private_notes" not in output.read_text()
     assert "credentials" not in output.read_text()
     assert "custom_board" not in output.read_text()
@@ -44,7 +62,7 @@ def test_export_has_only_public_schema_and_safe_values(tmp_path: Path) -> None:
 def test_export_schema_coordinates_and_unmapped_records(tmp_path: Path) -> None:
     database, output = tmp_path / "catalog.sqlite", tmp_path / "companies.json"
     _database(database)
-    companies = export_catalog(database, output)["companies"]
+    companies = export_catalog(database, output, logos=False)["companies"]
     assert {company["precision"] for company in companies} <= {"city", "country", "unmapped"}
     assert all(company["stage"] in {"early", "growth", "scaleup", "big", "unknown"} for company in companies)
     for company in companies:
@@ -112,3 +130,14 @@ def test_logo_source_prefers_direct_url_and_validates_domains():
     assert _logo_source({"website": "http://acme.com"}) == []
     assert _logo_source({}) == []
     assert _logo_source({"logo_url": "javascript:x"}) == []
+
+
+def test_hq_coordinates_override_city_estimates(tmp_path: Path) -> None:
+    from scripts.export_public_map import apply_hq
+    record = {"website": "https://www.nvidia.com", "latitude": 37.0, "longitude": -122.0, "precision": "city"}
+    hq = {"nvidia.com": {"lat": 37.3709, "lng": -121.9637, "label": "Nvidia", "qid": "Q182477"}}
+    updated = apply_hq(dict(record), hq)
+    assert updated["precision"] == "hq"
+    assert updated["latitude"] == 37.3709
+    untouched = apply_hq(dict(record), {})
+    assert untouched["precision"] == "city"  # no map, no change

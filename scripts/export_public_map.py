@@ -27,13 +27,33 @@ from tau_job_application.city_coordinates import (  # noqa: E402
     geocode_location,
 )
 
+HQ_PRECISION = "hq"
+
+
+def load_hq_coordinates(path: Path) -> dict[str, dict]:
+    """Wikidata (CC0) headquarters coordinates keyed by website domain."""
+    try:
+        data = json.loads(path.read_text())
+    except (OSError, json.JSONDecodeError):
+        return {}
+    return data if isinstance(data, dict) else {}
+
+
+def website_domain(website: str | None) -> str | None:
+    if not website:
+        return None
+    host = (urlparse(website).hostname or "").lower()
+    return host[4:] if host.startswith("www.") else host or None
+
 STAGES = {"early", "growth", "scaleup", "big", "unknown"}
 COMPANY_FIELDS = {
     "id", "name", "summary", "industry", "stage", "stageBasis", "location",
     "latitude", "longitude", "precision", "locationLabel", "source",
     "sourceUrl", "website", "hiringSignal", "observedAt",
     "country", "countryCode", "region", "logo",
+    "type", "fundingStage", "tags",
 }
+COMPANY_TYPES = {"startup", "public", "private"}
 
 # Country names arrive in many spellings across the three directories; the map
 # groups on this normalized form. ISO codes drive flag emoji on country cards.
@@ -226,6 +246,10 @@ def download_logo(company_id: str, urls: list[str], logos_dir: Path) -> str | No
     """One bounded fetch chain per company at export time; visitors then load
     the logo from this site, never from the third-party hosts."""
 
+    if logos_dir.exists():
+        for existing in logos_dir.glob(f"{company_id}.*"):
+            if existing.suffix in {".png", ".jpg", ".webp", ".gif", ".ico"}:
+                return f"data/logos/{existing.name}"  # cache: no repeat fetch
     for url in urls:
         request = Request(url, headers={"User-Agent": "CoApplyGPT-PublicMap/1.0 (logo snapshot)", "Accept": "image/*"})
         try:
@@ -265,6 +289,18 @@ def attach_logos(companies: list[dict[str, Any]], logos_dir: Path, *, workers: i
     return count
 
 
+def apply_hq(record: dict[str, Any], hq: dict[str, dict]) -> dict[str, Any]:
+    """Exact headquarters coordinate wins over the city/country estimate, but
+    only from the Wikidata domain-verified map — never guessed."""
+    domain = website_domain(record.get("website"))
+    entry = hq.get(domain or "")
+    if entry and isinstance(entry.get("lat"), (int, float)) and isinstance(entry.get("lng"), (int, float)):
+        record["latitude"] = entry["lat"]
+        record["longitude"] = entry["lng"]
+        record["precision"] = HQ_PRECISION
+    return record
+
+
 def company_record(row: sqlite3.Row) -> dict[str, Any]:
     try:
         payload = json.loads(row["payload_json"])
@@ -298,6 +334,98 @@ def company_record(row: sqlite3.Row) -> dict[str, Any]:
         "countryCode": COUNTRY_ISO.get(country or ""),
         "region": region,
         "logo": None,  # filled by attach_logos() after all records are built
+        "type": "public" if str(payload.get("company_type") or "").casefold() == "public" else "startup",
+        "fundingStage": str(payload.get("funding_stage") or "").strip() or None,
+        "tags": [],
+        "_logo_payload": payload,
+    }
+
+
+def yc_record(row: sqlite3.Row) -> dict[str, Any] | None:
+    """One public YC directory record (yc-oss community mirror)."""
+
+    try:
+        payload = json.loads(row["payload_json"])
+    except (TypeError, json.JSONDecodeError):
+        return None
+    if not isinstance(payload, dict) or not payload.get("name") or not payload.get("slug"):
+        return None
+    if str(payload.get("status") or "").casefold() == "inactive":
+        return None  # dissolved companies are not discovery targets
+    location = str(payload.get("locations") or "").strip() or None
+    geocode = _safe_geocode(location)
+    country, region = split_location(location)
+    industries = [str(item).strip() for item in payload.get("industries") or [] if str(item).strip()]
+    tags = [str(item).strip() for item in payload.get("tags") or [] if str(item).strip()]
+    raw_stage = str(payload.get("stage") or "").strip()
+    stage, stage_basis = classify_stage({"funding_stage": raw_stage, "company_type": "Public" if str(payload.get("status") or "").casefold() == "public" else "Startup"})
+    source_url = safe_https(payload.get("directory_url")) or f"https://www.ycombinator.com/companies/{row['slug']}"
+    return {
+        "id": public_id("YC directory", row["slug"]),
+        "name": str(payload["name"]).strip(),
+        "summary": str(payload.get("one_liner") or "").strip() or None,
+        "industry": "; ".join(industries[:3]) or None,
+        "stage": stage,
+        "stageBasis": stage_basis,
+        "location": location,
+        "latitude": geocode.latitude if geocode else None,
+        "longitude": geocode.longitude if geocode else None,
+        "precision": geocode.precision if geocode else "unmapped",
+        "locationLabel": geocode.label if geocode else (location or "Unmapped"),
+        "source": "YC community API",
+        "sourceUrl": source_url,
+        "website": safe_https(payload.get("website")),
+        "hiringSignal": "directory_flag" if payload.get("is_hiring") is True else "unknown",
+        "observedAt": str(payload.get("snapshot_date") or ""),
+        "country": country,
+        "countryCode": COUNTRY_ISO.get(country or ""),
+        "region": region,
+        "logo": None,
+        "type": "public" if str(payload.get("status") or "").casefold() == "public" else "startup",
+        "fundingStage": raw_stage or None,
+        "tags": tags[:10],
+        "_logo_payload": payload,
+    }
+
+
+def atlas_record(row: sqlite3.Row) -> dict[str, Any] | None:
+    """One public Global Capital Atlas record."""
+
+    try:
+        payload = json.loads(row["payload_json"])
+    except (TypeError, json.JSONDecodeError):
+        return None
+    if not isinstance(payload, dict) or not payload.get("name"):
+        return None
+    location = str(payload.get("address") or payload.get("country") or "").strip() or None
+    geocode = _safe_geocode(location)
+    country, region = split_location(location)
+    ownership = str(payload.get("ownership") or "").strip().casefold()
+    company_type = "public" if ownership == "public" else "private"
+    return {
+        "id": public_id("Global Capital Atlas", row["slug"]),
+        "name": str(payload["name"]).strip(),
+        "summary": str(payload.get("description") or "").strip()[:500] or None,
+        "industry": str(payload.get("industry") or "").strip() or None,
+        "stage": "big" if company_type == "public" else "unknown",
+        "stageBasis": "public listing in the atlas" if company_type == "public" else "private company; stage not published",
+        "location": location,
+        "latitude": geocode.latitude if geocode else None,
+        "longitude": geocode.longitude if geocode else None,
+        "precision": geocode.precision if geocode else "unmapped",
+        "locationLabel": geocode.label if geocode else (location or "Unmapped"),
+        "source": "Global Capital Atlas",
+        "sourceUrl": safe_https(payload.get("source_url")),
+        "website": safe_https(payload.get("website")),
+        "hiringSignal": "unknown",
+        "observedAt": "",
+        "country": country,
+        "countryCode": COUNTRY_ISO.get(country or ""),
+        "region": region,
+        "logo": None,
+        "type": company_type,
+        "fundingStage": None,
+        "tags": [],
         "_logo_payload": payload,
     }
 
@@ -309,12 +437,31 @@ def export_catalog(db_path: Path, output_path: Path, *, exported_at: str | None 
         db.execute("BEGIN")
         rows = db.execute(
             "SELECT source, source_key, name, payload_json, imported_at "
-            "FROM company_catalog ORDER BY source, source_key"
+            "FROM company_catalog WHERE source='CompaniesMarketCap' ORDER BY source, source_key"
         ).fetchall()
+        companies = [company_record(row) for row in rows]
+        # The richer directory snapshots replace the smaller reviewed imports
+        # of the same sources (they were the same public data, capped at 100).
+        seen_names = {company["name"].casefold() for company in companies}
+        for table, builder in (("yc_directory", yc_record), ("atlas_companies", atlas_record)):
+            try:
+                snapshot_rows = db.execute(f"SELECT slug, name, payload_json FROM {table}").fetchall()
+            except sqlite3.OperationalError:
+                continue  # snapshot not present on this machine
+            for row in snapshot_rows:
+                record = builder(row)
+                if not record or record["name"].casefold() in seen_names:
+                    continue
+                seen_names.add(record["name"].casefold())
+                companies.append(record)
+        hq = load_hq_coordinates(output_path.parent / "wikidata_hq.json")
+        if hq:
+            companies = [apply_hq(record, hq) for record in companies]
+            print(f"Applied exact Wikidata HQ coordinates to {sum(1 for c in companies if c['precision'] == HQ_PRECISION)} companies")
         data = {
             "schemaVersion": 1,
             "exportedAt": exported_at or datetime.now(UTC).isoformat(),
-            "companies": [company_record(row) for row in rows],
+            "companies": companies,
         }
         db.rollback()
     if logos:

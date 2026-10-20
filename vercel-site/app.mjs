@@ -15,7 +15,7 @@ const dateLabel = value => {
 let companies = [], filtered = [], state = readState(location.search), groupIds = null, page = 0;
 let map, mapReady = false, loading = false, lastSelected = null;
 const mapMarkers = [];
-const controls = {q: $('search'), stage: $('stage'), industry: $('industry'), location: $('location'), signal: $('signal')};
+const controls = {q: $('search'), role: $('role'), industry: $('industry'), type: $('type'), location: $('location')};
 const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 function setView(view) {
@@ -51,10 +51,15 @@ function applyFilters({fit = false, replace = false} = {}) {
   updateURL(replace); render();
   if (fit) fitResults();
 }
+function refreshChipState() {
+  const active = ['role', 'industry', 'type', 'location'].some(k => controls[k].value) || controls.q.value;
+  $('clear-filters').hidden = !active;
+  for (const [key, control] of Object.entries(controls)) control.classList.toggle('is-active', Boolean(control.value));
+}
 $('filters').addEventListener('submit', event => { event.preventDefault(); clearTimeout(searchTimer); applyFilters({fit: true}); });
 let searchTimer;
 controls.q.addEventListener('input', () => { clearTimeout(searchTimer); searchTimer = setTimeout(() => applyFilters({fit: true, replace: true}), 180); });
-for (const key of ['stage', 'industry', 'location', 'signal']) controls[key].addEventListener('change', () => { clearTimeout(searchTimer); applyFilters({fit: true}); });
+for (const key of ['role', 'industry', 'type', 'location']) controls[key].addEventListener('change', () => { clearTimeout(searchTimer); applyFilters({fit: true}); });
 $('filters').addEventListener('reset', event => {
   event.preventDefault(); clearTimeout(searchTimer);
   state = readState(''); restoreControls(); groupIds = null; page = 0;
@@ -72,6 +77,7 @@ $('show-names').addEventListener('change', renderPins);
 $('fit-map').addEventListener('click', () => { groupIds = null; page = 0; renderList(); fitResults(); });
 
 function render() {
+  refreshChipState();
   filtered = filterCompanies(companies, state);
   const mapped = filtered.filter(hasPoint).length;
   const noun = filtered.length === 1 ? 'company' : 'companies';
@@ -98,7 +104,10 @@ function renderList() {
     const content = el('span', 'company-summary');
     content.append(el('span', 'company-name', company.name), el('span', 'company-location', company.location || 'Location unknown'));
     const tags = el('span', 'company-tags');
-    tags.append(el('span', 'tag', STAGES[company.stage]), el('span', 'tag', company.industry));
+    const typeLabel = company.type === 'startup' ? 'Startup' : company.type === 'public' ? 'Public company' : 'Private company';
+    tags.append(el('span', 'tag', typeLabel));
+    if (company.type === 'startup' && company.fundingStage) tags.append(el('span', 'tag', company.fundingStage));
+    tags.append(el('span', 'tag', company.industry));
     content.append(tags);
     const arrow = el('span', 'row-arrow', '↗'); arrow.setAttribute('aria-hidden', 'true');
     button.append(monogram, content, arrow); button.addEventListener('click', () => selectCompany(company));
@@ -127,10 +136,11 @@ function renderDetail(company) {
   const heading = el('h2', '', company.name); heading.id = 'detail-title'; heading.tabIndex = -1;
   body.append(el('div', 'monogram', initials(company.name)), heading, el('p', '', company.summary || 'No company description in this snapshot. Check the source for more information.'));
   const facts = el('dl', 'detail-facts');
-  const locationAccuracy = company.precision === 'city' ? 'Approximate city centre, not an office address.' : company.precision === 'country' ? 'Country-centre estimate. City not resolved.' : 'Not pinned. No reliable location resolved.';
+  const locationAccuracy = company.precision === 'hq' ? 'Verified headquarters coordinate from Wikidata (CC0 public data).' : company.precision === 'city' ? 'Approximate city centre, not an office address.' : company.precision === 'country' ? 'Country-centre estimate. City not resolved.' : 'Not pinned. No reliable location resolved.';
   for (const [label, value, note] of [
     ['Location', company.location || 'Unknown', locationAccuracy],
-    ['Company stage', STAGES[company.stage], company.stageBasis || 'No supporting stage facts available.'],
+    ['Type', company.type === 'startup' ? 'Startup' : company.type === 'public' ? 'Public company' : 'Private company',
+     company.type === 'startup' ? (company.fundingStage ? `Funding stage: ${company.fundingStage}` : 'Funding stage not published.') : (company.stageBasis || '')],
     ['Industry', company.industry, ''],
     ['Hiring evidence', SIGNALS[company.hiringSignal], company.hiringSignal === 'directory_flag' ? 'Unverified directory flag; check current roles with the employer.' : company.hiringSignal === 'board_snapshot' ? 'Historical board observation, not a real-time vacancy guarantee.' : 'This source does not establish current vacancies.'],
     ['Source', company.source || 'Unspecified', `Facts imported ${dateLabel(company.observedAt)}. Not a job posting date.`],
@@ -260,21 +270,64 @@ function renderPins() {
     }
     return;
   }
-  // Street level: one pin per company (same-address companies share a pin).
-  const groups = groupPoints(filtered, (lat, lng) => map.project([lng, lat]), $('group-pins').checked);
-  for (const group of groups) {
-    const multi = group.members.length > 1 ? group.members.length : 0;
-    const company = group.members[0];
-    const label = multi ? `${multi} companies near ${company.locationLabel || 'this spot'}` : company.name;
-    const pin = companyPinIcon(company, multi);
-    if (!$('show-names').checked) pin.querySelector('.pin-name').hidden = true;
-    addMapMarker(group, pin, label, () => {
-      if (!multi) { selectCompany(company); return; }
-      groupIds = new Set(group.members.map(c => c.id)); state.company = ''; page = 0; updateURL();
-      $('company-detail').hidden = true; $('list-panel').hidden = false; renderList();
-      setView('list'); $('results-heading').focus({preventScroll: true});
-    });
+  // Street level. Companies share city-centre coordinates, so co-located
+  // pins fan out on a deterministic spiral around their centre (like the
+  // reference map) with an honest disclosure; beyond FANOUT_CAP per spot the
+  // centroid keeps a count pin whose click filters the complete list.
+  const bounds = map.getBounds();
+  const inView = [], outView = [];
+  for (const company of filtered.filter(hasPoint)) {
+    (bounds.contains([company.longitude, company.latitude]) ? inView : outView).push(company);
   }
+  const bySpot = new Map();
+  for (const company of inView) {
+    const key = `${company.latitude}:${company.longitude}`;
+    if (!bySpot.has(key)) bySpot.set(key, []);
+    bySpot.get(key).push(company);
+  }
+  let fanned = 0;
+  for (const members of bySpot.values()) {
+    const base = members[0];
+    if (members.length === 1) { addCompanyPin(base, base, 0); continue; }
+    const sorted = [...members].sort((a, b) => a.name.localeCompare(b.name, 'en'));
+    const shown = sorted.slice(0, FANOUT_CAP);
+    // Screen-space spiral (markercluster-style): a constant visual spread at
+    // every zoom, converted back to coordinates for placement.
+    const zoom = map.getZoom();
+    const centre = map.project([base.longitude, base.latitude], zoom);
+    shown.forEach((company, i) => {
+      const angle = i * 2.399963, radius = 20 * Math.sqrt(i + 1); // pixels
+      const point = map.unproject([centre.x + radius * Math.cos(angle), centre.y + radius * Math.sin(angle)], zoom);
+      fanned++;
+      addCompanyPin(company, {latitude: point.lat, longitude: point.lng}, 0);
+    });
+    if (members.length > FANOUT_CAP) {
+      const extra = members.length - FANOUT_CAP;
+      addCompanyPin(base, base, extra, members);
+    }
+  }
+  $('map-spread-note').hidden = fanned === 0;
+  // Out-of-viewport companies stay decluttered grid clusters.
+  for (const group of groupPoints(outView, (lat, lng) => map.project([lng, lat]), true)) {
+    if (group.members.length < 3) continue; // single/double distant pins are noise at street zoom
+    const company = group.members[0];
+    addCompanyPin(company, group, group.members.length, group.members);
+  }
+}
+
+const FANOUT_CAP = 300;
+
+function addCompanyPin(company, position, extraCount, groupMembers = null) {
+  const multi = groupMembers ? groupMembers.length : 0;
+  const label = multi ? `${multi} companies near ${company.locationLabel || 'this spot'}` : company.name;
+  const pin = companyPinIcon(company, multi > 1 ? multi : 0);
+  if (!$('show-names').checked) pin.querySelector('.pin-name').hidden = true;
+  addMapMarker(position, pin, label, () => {
+    if (!multi) { selectCompany(company); return; }
+    groupIds = new Set(groupMembers.map(c => c.id)); state.company = ''; page = 0; updateURL();
+    $('company-detail').hidden = true; $('list-panel').hidden = false; renderList();
+    setView('list'); $('results-heading').focus({preventScroll: true});
+  });
 }
 async function initializeMap() {
   try {
@@ -302,6 +355,7 @@ async function initializeMap() {
     map.addControl(new maplibregl.NavigationControl({showCompass: false}), 'top-right');
     globalThis.__companyMap = map; // debug/test handle
     map.on('zoomend', renderPins);
+    map.on('moveend', renderPins);
     map.on('resize', renderPins);
     map.on('load', () => { mapReady = true; renderPins(); });
     map.on('idle', () => { renderPins(); if (pendingFit) requestAnimationFrame(fitResults); });
@@ -325,7 +379,10 @@ async function loadCatalogue() {
     const response = await fetch('data/companies.json', {credentials: 'omit', signal: AbortSignal.timeout(15000)});
     if (!response.ok) throw new Error('Catalogue unavailable');
     const payload = await response.json(); companies = readCatalogue(payload);
-    addOptions('industry', companies.map(c => c.industry)); addOptions('location', companies.map(c => c.locationLabel));
+    const {ROLE_AREAS} = await import('./map-core.mjs');
+    addOptions('role', Object.keys(ROLE_AREAS).filter(a => ROLE_AREAS[a].length));
+    addOptions('industry', companies.map(c => c.industry));
+    addOptions('location', companies.flatMap(c => [c.country, c.region]));
     restoreControls();
     $('catalogue-total').textContent = `${companies.length.toLocaleString()} public companies`;
     $('snapshot-date').textContent = `Snapshot exported ${dateLabel(payload.exportedAt)}`;

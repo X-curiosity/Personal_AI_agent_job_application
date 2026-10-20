@@ -43,6 +43,10 @@ test('URL state roundtrip is bounded and excludes unrelated parameters', () => {
  assert.deepEqual(readState(stateQuery(state)),state);
  assert.equal(readState('?q='+'a'.repeat(300)).q.length,200);
 });
+test('hq precision pins like a city coordinate', () => {
+ const [c] = read([{...fixture, precision:'hq', latitude:37.67, longitude:-121.88}]);
+ assert.equal(c.precision,'hq'); assert.equal(hasPoint(c),true);
+});
 test('published snapshot conforms to browser contract', () => {
  const payload=JSON.parse(readFileSync(new URL('../vercel-site/data/companies.json',import.meta.url)));
  const rows=readCatalogue(payload);
@@ -85,4 +89,23 @@ test('declutterCards keeps the largest group per screen cell', async () => {
  const kept=declutterCards(groups,project,150);
  assert.equal(kept.length,2);
  assert.deepEqual(kept.map(x=>x.members.length).sort((a,b)=>a-b),[8,10]);
+});
+test('type, role and funding stage fields', async () => {
+ const {companyRoles, TYPES} = await import('../vercel-site/map-core.mjs');
+ const rows=read([
+  {...fixture,type:'startup',fundingStage:'Series A',tags:['Fintech','Payments'],industry:'Financial Services'},
+  {...fixture,id:'two',type:'public',fundingStage:null,tags:[],industry:'Semiconductors'},
+  {...fixture,id:'three',type:'bogus',fundingStage:null,tags:[],industry:'Design'},
+ ]);
+ const byId=Object.fromEntries(rows.map(r=>[r.id,r]));
+ assert.equal(byId.one.type,'startup'); assert.equal(byId.one.fundingStage,'Series A');
+ assert.equal(byId.three.type,'private'); // unknown type falls back safely
+ assert.deepEqual(companyRoles(byId.one),['Finance']);
+ assert.ok(companyRoles(byId.three).includes('Design'));
+ assert.equal(companyRoles({...byId.two,industry:''}).length,0);
+ assert.equal(filterCompanies(rows,{type:'startup'}).length,1);
+ assert.equal(filterCompanies(rows,{role:'Finance'}).length,1);
+ assert.equal(filterCompanies(rows,{role:'Engineering'}).length,1); // semiconductors are engineering
+ assert.equal(filterCompanies(rows,{role:'Legal'}).length,0);
+ assert.equal(filterCompanies(rows,{location:'London'}).length,3);
 });
