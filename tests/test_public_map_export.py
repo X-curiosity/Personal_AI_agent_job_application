@@ -83,3 +83,32 @@ def test_street_address_keeps_city_pin_but_london_canada_stays_country():
     assert point.precision == "city" and point.label == "Zurich"
     guarded = _safe_geocode("London, Canada")
     assert guarded.precision == "country"  # alias must not steer to the UK
+
+
+def test_country_normalization_and_region_detection():
+    from scripts.export_public_map import normalize_country, split_location
+    assert normalize_country("USA") == "United States"
+    assert normalize_country("United States") == "United States"
+    assert normalize_country("UK") == "United Kingdom"
+    assert normalize_country("france") == "France"
+    assert normalize_country(None) is None
+    assert split_location("San Francisco, CA, USA") == ("United States", "California")
+    assert split_location("Austin, TX, United States") == ("United States", "Texas")
+    assert split_location("New York City, NY, USA") == ("United States", "New York")
+    assert split_location("Seattle, Washington, USA") == ("United States", "Washington")
+    assert split_location("Paris, France") == ("France", None)
+    assert split_location("Lyon, Auvergne-Rhône-Alpes, France") == ("France", "Auvergne-Rhône-Alpes")
+    assert split_location("Mexico City, Mexico; Lima, Peru")[0] == "Mexico"
+    assert split_location(None) == (None, None)
+
+
+def test_logo_source_prefers_direct_url_and_validates_domains():
+    from scripts.export_public_map import _logo_source
+    assert _logo_source({"logo_url": "https://cdn.example.com/logo.png"}) == ["https://cdn.example.com/logo.png"]
+    candidates = _logo_source({"website": "https://www.acme.com/about"})
+    assert candidates[0] == "https://www.acme.com/apple-touch-icon.png"
+    assert candidates[1] == "https://www.acme.com/favicon.ico"
+    assert candidates[2] == "https://icons.duckduckgo.com/ip3/acme.com.ico"
+    assert _logo_source({"website": "http://acme.com"}) == []
+    assert _logo_source({}) == []
+    assert _logo_source({"logo_url": "javascript:x"}) == []

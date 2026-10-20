@@ -35,6 +35,9 @@ export function readCatalogue(payload) {
       latitude: raw.latitude, longitude: raw.longitude, precision: raw.precision,
       source: text('source', 200), sourceUrl: safeURL(raw.sourceUrl), website: safeURL(raw.website),
       hiringSignal: Object.hasOwn(SIGNALS, raw.hiringSignal) ? raw.hiringSignal : 'unknown', observedAt: text('observedAt', 80),
+      country: text('country', 100) || null, countryCode: /^[A-Z]{2}$/.test(raw.countryCode || '') ? raw.countryCode : null,
+      region: text('region', 100) || null,
+      logo: /^data\/logos\/company_[0-9a-f]{20}\.(png|jpg|webp|gif)$/.test(raw.logo || '') ? raw.logo : null,
     };
     if (!hasPoint(company)) Object.assign(company, {latitude: null, longitude: null, precision: 'unmapped'});
     return company;
@@ -60,6 +63,64 @@ export function stateQuery(state) {
   const p = new URLSearchParams();
   for (const key of ['q', 'stage', 'industry', 'location', 'signal', 'company']) if (state[key]) p.set(key, state[key]);
   return p.toString();
+}
+
+// Zoom hierarchy, following the observed startupmap pattern: country cards
+// far out, region cards (US states and named regions) next, city cards closer,
+// and one pin per company once the map is street-level.
+export const ZOOM = Object.freeze({countryMax: 3, regionMax: 5, cityMax: 7});
+export function zoomLayer(zoom) {
+  if (zoom <= ZOOM.countryMax) return 'country';
+  if (zoom <= ZOOM.regionMax) return 'region';
+  if (zoom <= ZOOM.cityMax) return 'city';
+  return 'pins';
+}
+
+export function cardGroups(companies, keyFn) {
+  const groups = new Map();
+  for (const company of companies.filter(hasPoint)) {
+    const key = keyFn(company);
+    if (!key) continue;
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key).push(company);
+  }
+  return [...groups.entries()].map(([key, members]) => ({
+    key,
+    members,
+    latitude: members.reduce((v, c) => v + c.latitude, 0) / members.length,
+    longitude: members.reduce((v, c) => v + c.longitude, 0) / members.length,
+  })).sort((a, b) => b.members.length - a.members.length);
+}
+
+export function countryCards(companies) {
+  return cardGroups(companies, c => c.country);
+}
+export function regionCards(companies) {
+  // Region cards where a region is known; companies without one join their
+  // city groups so the zoom level never hides them.
+  const regions = cardGroups(companies.filter(c => c.region), c => `${c.country}::${c.region}`);
+  const cities = cardGroups(companies.filter(c => !c.region), c => `city::${c.locationLabel}`);
+  return [...regions, ...cities];
+}
+export function cityCards(companies) {
+  return cardGroups(companies, c => c.locationLabel);
+}
+
+// Card layers declutter like the reference map: one card per screen cell,
+// keeping the largest group, so dense regions (Europe) stay readable.
+export function declutterCards(groups, project, cellPx = 150) {
+  const cells = new Map();
+  for (const group of groups) {
+    const p = project(group.latitude, group.longitude);
+    const key = `${Math.floor(p.x / cellPx)}:${Math.floor(p.y / cellPx)}`;
+    if (!cells.has(key) || cells.get(key).members.length < group.members.length) cells.set(key, group);
+  }
+  return [...cells.values()];
+}
+
+export function flagEmoji(iso) {
+  if (!/^[A-Z]{2}$/.test(iso || '')) return '';
+  return String.fromCodePoint(...[...iso].map(ch => 0x1F1E6 + ch.charCodeAt(0) - 65));
 }
 
 // Grid grouping is a visual decluttering operation, not geographic precision.

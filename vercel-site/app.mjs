@@ -1,4 +1,4 @@
-import {STAGES, SIGNALS, PAGE_SIZE, filterCompanies, groupPoints, hasPoint, readCatalogue, readState, stateQuery} from './map-core.mjs';
+import {STAGES, SIGNALS, PAGE_SIZE, filterCompanies, groupPoints, hasPoint, readCatalogue, readState, stateQuery, zoomLayer, countryCards, regionCards, cityCards, flagEmoji, declutterCards} from './map-core.mjs';
 
 const $ = id => document.getElementById(id);
 const el = (tag, className, text) => {
@@ -13,7 +13,8 @@ const dateLabel = value => {
   return Number.isNaN(date.valueOf()) ? 'Date unavailable' : date.toLocaleDateString('en', {year: 'numeric', month: 'short', day: 'numeric', timeZone: 'UTC'});
 };
 let companies = [], filtered = [], state = readState(location.search), groupIds = null, page = 0;
-let map, markers, loading = false, lastSelected = null;
+let map, mapReady = false, loading = false, lastSelected = null;
+const mapMarkers = [];
 const controls = {q: $('search'), stage: $('stage'), industry: $('industry'), location: $('location'), signal: $('signal')};
 const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -21,7 +22,7 @@ function setView(view) {
   document.querySelector('.explorer-body').dataset.view = view;
   $('list-view').setAttribute('aria-pressed', String(view === 'list'));
   $('map-view').setAttribute('aria-pressed', String(view === 'map'));
-  if (view === 'map') requestAnimationFrame(() => map?.invalidateSize());
+  if (view === 'map') requestAnimationFrame(() => map?.resize());
 }
 $('list-view').addEventListener('click', () => setView('list'));
 $('map-view').addEventListener('click', () => setView('map'));
@@ -110,7 +111,7 @@ function renderList() {
 }
 function selectCompany(company) {
   state.company = company.id; lastSelected = company.id; updateURL(); renderDetail(company);
-  if (map && hasPoint(company)) map.setView([company.latitude, company.longitude], company.precision === 'city' ? 5 : 3, {animate: !reducedMotion});
+  if (map && hasPoint(company)) map.jumpTo({center: [company.longitude, company.latitude], zoom: company.precision === 'city' ? 8 : 5});
 }
 function closeDetail() {
   state.company = ''; updateURL(); $('company-detail').hidden = true; $('list-panel').hidden = false;
@@ -149,57 +150,165 @@ function renderDetail(company) {
 }
 document.addEventListener('keydown', event => { if (event.key === 'Escape' && !$('company-detail').hidden) closeDetail(); });
 
+let pendingFit = false;
 function fitResults() {
-  if (!map) return;
-  map.invalidateSize();
+  if (!map || !mapReady) { pendingFit = true; return; }
+  map.resize();
+  if (!map.getContainer().clientWidth || !map.getContainer().clientHeight) { pendingFit = true; return; }
+  pendingFit = false;
   const points = filtered.filter(hasPoint);
-  if (!points.length) { map.setView([25, 0], 2, {animate: false}); return; }
-  map.fitBounds(points.map(c => [c.latitude, c.longitude]), {padding: [55, 85], maxZoom: 5, animate: !reducedMotion});
+  if (!points.length) { map.jumpTo({center: [0, 25], zoom: 2}); return; }
+  zoomToBounds(points, worldSpreadMaxZoom(points));
 }
+
+
+function worldSpreadMaxZoom(points) {
+  const lngs = points.map(c => c.longitude);
+  return Math.max(...lngs) - Math.min(...lngs) > 60 ? 2.8 : 5;
+}
+const ENTRY_MIN_ZOOM = 1.6;
+
+// cameraForBounds + jumpTo: deterministic and honors maxZoom. fitBounds and
+// easeTo both misbehaved under animation-less environments in verification.
+function zoomToBounds(points, maxZoom) {
+  if (!map) return;
+  const lngs = points.map(c => c.longitude), lats = points.map(c => c.latitude);
+  const camera = map.cameraForBounds(
+    [[Math.min(...lngs), Math.min(...lats)], [Math.max(...lngs), Math.max(...lats)]],
+    {padding: {top: 60, bottom: 60, left: 85, right: 85}, maxZoom},
+  );
+  if (camera) map.jumpTo({center: camera.center, zoom: Math.max(camera.zoom, Math.min(maxZoom, ENTRY_MIN_ZOOM))});
+}
+
+function clearMarkers() {
+  for (const marker of mapMarkers.splice(0)) marker.remove();
+}
+
+function addMapMarker(group, content, label, onClick) {
+  const element = el('div', 'map-marker');
+  element.append(content);
+  element.tabIndex = 0; element.setAttribute('role', 'button');
+  element.setAttribute('aria-label', label);
+  element.addEventListener('click', onClick);
+  element.addEventListener('keydown', event => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); onClick(); } });
+  const marker = new maplibregl.Marker({element, anchor: 'center'}).setLngLat([group.longitude, group.latitude]).addTo(map);
+  mapMarkers.push(marker);
+}
+function cardIcon(text1, text2, extraClass = '') {
+  const card = el('div', `map-card${extraClass ? ' ' + extraClass : ''}`);
+  card.append(el('span', 'map-card-title', text1), el('span', 'map-card-count', text2));
+  return card;
+}
+
+function addCard(group, title, countLabel, extraClass = '', nextLayerZoom = 0) {
+  addMapMarker(group, cardIcon(title, countLabel, extraClass), `${title}, ${countLabel}`, () => {
+    // Fit the group, but always advance at least into the next hierarchy
+    // layer so a card click can never loop on the same view.
+    const lngs = group.members.map(c => c.longitude), lats = group.members.map(c => c.latitude);
+    const camera = map.cameraForBounds(
+      [[Math.min(...lngs), Math.min(...lats)], [Math.max(...lngs), Math.max(...lats)]],
+      {padding: {top: 60, bottom: 60, left: 85, right: 85}, maxZoom: 12},
+    );
+    const sameSpot = new Set(group.members.map(c => `${c.latitude}:${c.longitude}`)).size === 1;
+    if (camera) map.jumpTo({center: camera.center, zoom: Math.min(sameSpot ? 10 : 12, Math.max(camera.zoom, nextLayerZoom))});
+  });
+}
+
+function companyPinIcon(company, multi) {
+  const wrap = el('div', 'pin-wrap');
+  const body = el('div', 'pin-body');
+  if (company.logo) {
+    const img = el('img', 'pin-logo');
+    img.src = company.logo; img.alt = ''; img.loading = 'lazy';
+    img.addEventListener('error', () => { img.replaceWith(el('span', 'pin-monogram', initials(company.name))); }, {once: true});
+    body.append(img);
+  } else {
+    body.append(el('span', 'pin-monogram', initials(company.name)));
+  }
+  if (company.hiringSignal === 'directory_flag') {
+    const dot = el('span', 'hiring-dot'); dot.title = 'Directory hiring flag (unverified)'; body.append(dot);
+  }
+  if (multi) body.append(el('span', 'pin-count', String(multi)));
+  wrap.append(body, el('span', 'pin-name', multi ? `${multi} companies` : company.name));
+  return wrap;
+}
+
 function renderPins() {
-  if (!map || !markers) return;
-  markers.clearLayers();
-  const groups = groupPoints(filtered, (lat, lng) => map.project([lat, lng], map.getZoom()), $('group-pins').checked);
+  if (!map || !mapReady) return;
+  clearMarkers();
+  const layer = zoomLayer(map.getZoom());
+  const project = (lat, lng) => map.project([lng, lat]);
+  if (layer === 'country') {
+    for (const group of declutterCards(countryCards(filtered), project)) {
+      const code = group.members.find(c => c.countryCode)?.countryCode;
+      addCard(group, `${flagEmoji(code)} ${group.key}`.trim(), `${group.members.length.toLocaleString()} ${group.members.length === 1 ? 'company' : 'companies'}`, 'country-card', 4);
+
+    }
+    return;
+  }
+  if (layer === 'region') {
+    for (const group of declutterCards(regionCards(filtered), project)) {
+      const [, region, city] = group.key.includes('::') ? group.key.split('::') : [null, group.key, null];
+      const label = group.key.startsWith('city::') ? city : region;
+      addCard(group, label, `${group.members.length.toLocaleString()} ${group.members.length === 1 ? 'company' : 'companies'}`, '', 6);
+    }
+    return;
+  }
+  if (layer === 'city') {
+    for (const group of declutterCards(cityCards(filtered), project)) {
+      addCard(group, group.key, `${group.members.length.toLocaleString()} ${group.members.length === 1 ? 'company' : 'companies'}`, '', 8);
+    }
+    return;
+  }
+  // Street level: one pin per company (same-address companies share a pin).
+  const groups = groupPoints(filtered, (lat, lng) => map.project([lng, lat]), $('group-pins').checked);
   for (const group of groups) {
-    const multi = group.members.length > 1;
-    const country = group.members.every(c => c.precision === 'country');
-    const markerBody = el('div', `pin-dot${multi ? ' cluster' : ''}${country ? ' country' : ''}`, multi ? String(group.members.length) : initials(group.members[0].name));
-    const size = multi ? 38 : 30;
-    const label = multi ? `${group.members.length} companies near ${group.members[0].locationLabel || 'this region'}` : group.members[0].name;
-    const marker = L.marker([group.latitude, group.longitude], {
-      icon: L.divIcon({html: markerBody, className: 'company-pin', iconSize: [size, size], iconAnchor: [size / 2, size / 2]}),
-      keyboard: true, title: label, alt: label,
-    }).addTo(markers);
-    const tooltip = el('span', '', label);
-    marker.bindTooltip(tooltip, {permanent: $('show-names').checked, direction: 'top', className: 'company-tooltip', offset: [0, -12]});
-    const markerEl = marker.getElement();
-    if (markerEl) markerEl.setAttribute('aria-label', label);
-    marker.on('click', () => {
-      if (!multi) { selectCompany(group.members[0]); return; }
+    const multi = group.members.length > 1 ? group.members.length : 0;
+    const company = group.members[0];
+    const label = multi ? `${multi} companies near ${company.locationLabel || 'this spot'}` : company.name;
+    const pin = companyPinIcon(company, multi);
+    if (!$('show-names').checked) pin.querySelector('.pin-name').hidden = true;
+    addMapMarker(group, pin, label, () => {
+      if (!multi) { selectCompany(company); return; }
       groupIds = new Set(group.members.map(c => c.id)); state.company = ''; page = 0; updateURL();
       $('company-detail').hidden = true; $('list-panel').hidden = false; renderList();
-      const positions = new Set(group.members.map(c => `${c.latitude}:${c.longitude}`));
-      if (positions.size > 1) map.fitBounds(group.members.map(c => [c.latitude, c.longitude]), {padding: [60, 85], maxZoom: 5, animate: !reducedMotion});
-      else map.setView([group.latitude, group.longitude], country ? 3 : 5, {animate: !reducedMotion});
       setView('list'); $('results-heading').focus({preventScroll: true});
     });
   }
 }
 async function initializeMap() {
   try {
-    if (!globalThis.L) throw new Error('Map library unavailable');
-    map = L.map('map', {zoomControl: false, minZoom: 1, maxZoom: 7, maxBounds: [[-85, -210], [85, 210]], maxBoundsViscosity: 1, scrollWheelZoom: false, zoomAnimation: !reducedMotion, fadeAnimation: !reducedMotion}).setView([25, 0], 2);
-    L.control.zoom({position: 'topright'}).addTo(map);
-    map.attributionControl.setPrefix('<a href="https://leafletjs.com" rel="noreferrer">Leaflet</a>');
-    map.attributionControl.addAttribution('<a href="https://www.naturalearthdata.com/about/terms-of-use/" rel="noreferrer">Natural Earth</a> · approximate locations');
-    markers = L.layerGroup().addTo(map);
+    if (!globalThis.maplibregl) throw new Error('Map library unavailable');
+    // Street basemap: OpenFreeMap Positron (keyless, OpenStreetMap data). If
+    // the style cannot be fetched, fall back to the self-hosted Natural Earth
+    // outline so the map never renders a third-party error watermark.
+    let style = 'https://tiles.openfreemap.org/styles/positron';
+    try {
+      const probe = await fetch(style, {credentials: 'omit', signal: AbortSignal.timeout(8000)});
+      if (!probe.ok) throw new Error('style unavailable');
+    } catch {
+      const worldResponse = await fetch('data/world.geojson', {credentials: 'omit'});
+      const world = worldResponse.ok ? await worldResponse.json() : {type: 'FeatureCollection', features: []};
+      style = {version: 8, sources: {world: {type: 'geojson', data: world}}, layers: [
+        {id: 'bg', type: 'background', paint: {'background-color': '#e7e6df'}},
+        {id: 'land', type: 'fill', source: 'world', paint: {'fill-color': '#f5f1e9', 'fill-outline-color': '#d6cebd'}},
+      ]};
+    }
+    map = new maplibregl.Map({
+      container: 'map', style, center: [0, 25], zoom: 2, minZoom: 1, maxZoom: 12,
+      maxBounds: [[-179.9, -85], [179.9, 85]], scrollZoom: false, attributionControl: {compact: true},
+      fadeDuration: reducedMotion ? 0 : 300,
+    });
+    map.addControl(new maplibregl.NavigationControl({showCompass: false}), 'top-right');
+    globalThis.__companyMap = map; // debug/test handle
     map.on('zoomend', renderPins);
     map.on('resize', renderPins);
-    const response = await fetch('data/world.geojson', {credentials: 'omit'});
-    if (!response.ok) throw new Error('Base map unavailable');
-    const world = await response.json();
-    L.geoJSON(world, {style: {color: '#d6cebd', weight: 0.7, fillColor: '#f5f1e9', fillOpacity: 1}, interactive: false}).addTo(map).bringToBack();
-    renderPins();
+    map.on('load', () => { mapReady = true; renderPins(); });
+    map.on('idle', () => { renderPins(); if (pendingFit) requestAnimationFrame(fitResults); });
+    map.on('error', () => {
+      $('map-status').hidden = false;
+      $('map-status').textContent = 'Some map tiles failed to load. Company pins and the list still work.';
+    });
   } catch {
     $('map-status').hidden = false;
     $('map-status').textContent = 'Map background unavailable. You can still explore all companies in the list.';
@@ -228,6 +337,7 @@ async function loadCatalogue() {
   } finally { $('retry').disabled = false; }
 }
 $('retry').addEventListener('click', loadCatalogue);
-// The world outline and catalogue load independently; neither contacts a third party.
+// The basemap style and catalogue load independently; only map tiles contact
+// a third party (OpenFreeMap), company data and logos stay self-hosted.
 initializeMap();
 loadCatalogue();

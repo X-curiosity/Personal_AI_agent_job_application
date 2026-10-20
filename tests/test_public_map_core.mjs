@@ -49,3 +49,40 @@ test('published snapshot conforms to browser contract', () => {
  assert.ok(rows.length>0); assert.equal(rows.length,payload.companies.length);
  for(const row of rows) assert.ok(row.precision==='unmapped'||hasPoint(row));
 });
+test('zoom hierarchy and grouping cards', async () => {
+ const {zoomLayer, countryCards, regionCards, cityCards, flagEmoji} = await import('../vercel-site/map-core.mjs');
+ assert.equal(zoomLayer(2),'country'); assert.equal(zoomLayer(3),'country');
+ assert.equal(zoomLayer(4),'region'); assert.equal(zoomLayer(5),'region');
+ assert.equal(zoomLayer(6),'city'); assert.equal(zoomLayer(7),'city');
+ assert.equal(zoomLayer(8),'pins'); assert.equal(zoomLayer(12),'pins');
+ const rows=read([
+  {...fixture,country:'United States',countryCode:'US',region:'California',locationLabel:'San Francisco'},
+  {...fixture,id:'two',country:'United States',countryCode:'US',region:'California',locationLabel:'San Francisco'},
+  {...fixture,id:'three',country:'United States',countryCode:'US',region:'Texas',locationLabel:'Austin',latitude:30.26,longitude:-97.74},
+  {...fixture,id:'four',country:'France',countryCode:'FR',region:null,locationLabel:'Paris',latitude:48.85,longitude:2.35},
+ ]);
+ const countries=countryCards(rows);
+ assert.equal(countries[0].key,'United States'); assert.equal(countries[0].members.length,3);
+ const regions=regionCards(rows);
+ assert.equal(regions.filter(g=>!g.key.startsWith('city::')).length,2); // California + Texas
+ assert.equal(regions.filter(g=>g.key.startsWith('city::')).length,1); // Paris joins as city
+ const cities=cityCards(rows);
+ assert.deepEqual(cities.map(g=>g.key).sort(),['Austin','Paris','San Francisco']);
+ assert.equal(flagEmoji('US'),'🇺🇸'); assert.equal(flagEmoji('XX'),'🇽🇽'); assert.equal(flagEmoji('usa'),'');
+});
+test('logo paths are allowlisted', () => {
+ const good={...fixture,logo:'data/logos/company_0123456789abcdef0123.png'};
+ assert.equal(read([good])[0].logo,good.logo);
+ for(const bad of ['https://evil.com/x.png','data/logos/../../secret','data/logos/company_x.png','data/logos/company_0123456789abcdef0123.svg'])
+  assert.equal(read([{...fixture,logo:bad}])[0].logo,null,bad);
+});
+test('declutterCards keeps the largest group per screen cell', async () => {
+ const {declutterCards} = await import('../vercel-site/map-core.mjs');
+ const g=(lat,lng,n)=>({latitude:lat,longitude:lng,members:Array(n).fill(1)});
+ const groups=[g(48.85,2.35,10),g(48.9,2.4,5),g(52.5,13.4,8),g(52.52,13.42,3)];
+ // ~2km apart at this fake projection: same cell for each pair, cities far apart
+ const project=(lat,lng)=>({x:lng*100,y:lat*100});
+ const kept=declutterCards(groups,project,150);
+ assert.equal(kept.length,2);
+ assert.deepEqual(kept.map(x=>x.members.length).sort((a,b)=>a-b),[8,10]);
+});
