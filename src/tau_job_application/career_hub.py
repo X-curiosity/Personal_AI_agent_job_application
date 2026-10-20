@@ -182,18 +182,19 @@ class HubStore:
                        (thread, letter, resume, datetime.now(UTC).isoformat()))
 
 
-def draft_documents(cv: str, title: str, company: str, skills: list[str]) -> tuple[str, str]:
+def draft_documents(cv: str, title: str, company: str, skills: list[str], *, sender_name: str = "") -> tuple[str, str]:
     """No provider call: preserve source CV verbatim and add labelled targeting text."""
     if not cv.strip():
         raise ValueError("Add your background or a CV first; we cannot invent your experience")
     relevant = ", ".join(skills) or "[add a role-relevant fact you can substantiate]"
     resume = f"TARGET: {title} — {company}\nRelevant evidence to review: {relevant}\n\n{cv.strip()}"
+    signature = sender_name.strip() or "[Your name]"
     letter = (f"Dear {company} hiring team,\n\nI would like to apply for the {title} role.\n\n"
               f"The supplied CV contains the following role-relevant evidence: {relevant}. "
               "[Replace this sentence with one specific example of your contribution and its outcome.]\n\n"
               "[Explain why this company's work and this role interest you.]\n\n"
               "Thank you for considering my application. I would welcome the chance to discuss my work.\n\n"
-              "[Your name]")
+              f"{signature}")
     return resume, letter
 
 

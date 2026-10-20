@@ -700,7 +700,12 @@ def _documents(api, store, track, record):
         metrics[2].metric("Combined evidence match", f"{assessment.score}/100" if assessment.score is not None else "Not available")
         st.caption("Not a hiring probability or validated ATS score. Letter prose does not raise your evidence score. No employee profiles are used.")
         if st.button("Create reviewable CV & letter drafts", key=key + ":draft"):
-            resume, new_letter = draft_documents(cv, record.opening.title, record.opening.company.name, result.tailored_resume.relevant_skills)
+            from tau_job_application.profile_identity import ProfileIdentityStore
+            identity = ProfileIdentityStore(api.WORKSPACES.path).load()
+            resume, new_letter = draft_documents(
+                cv, record.opening.title, record.opening.company.name, result.tailored_resume.relevant_skills,
+                sender_name=identity.name if identity else "",
+            )
             store.save_documents(track, record.thread_id, letter=new_letter, resume=resume)
             st.session_state[key + ":pending-letter"] = new_letter
             st.rerun()

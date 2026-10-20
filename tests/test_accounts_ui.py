@@ -68,3 +68,49 @@ def test_accounts_view_states_and_github_flow(tmp_path, monkeypatch):
     # Unlink returns to the not-connected state.
     next(item for item in app.button if item.label == "Unlink").click().run()
     assert ui.ACCOUNTS.get("github") is None
+
+
+def test_profile_identity_saves_edits_and_removes_locally(tmp_path, monkeypatch):
+    from tau_job_application.profile_identity import ProfileIdentityStore
+
+    ui = setup_ui(tmp_path, monkeypatch)
+    app = AppTest.from_string("from tau_job_application.ui import main\nmain()", default_timeout=40)
+    app.query_params["view"] = "account"
+    app.run()
+    assert not app.exception
+    assert any(item.value == "Your profile" for item in app.subheader)
+
+    next(item for item in app.text_input if item.label == "Your name").set_value("Alex Example")
+    next(item for item in app.text_input if item.label == "Your email").set_value("alex@example.com")
+    next(item for item in app.button if item.label == "Save my profile").click()
+    app.run()
+    assert not app.exception
+    identity = ProfileIdentityStore(ui.WORKSPACES.path).load()
+    assert (identity.name, identity.email) == ("Alex Example", "alex@example.com")
+    assert any("Alex Example" in item.value for item in app.markdown)
+
+    next(item for item in app.button if item.label == "Edit").click()
+    app.run()
+    next(item for item in app.text_input if item.label == "Your name").set_value("Alexandra Example")
+    next(item for item in app.button if item.label == "Save my profile").click()
+    app.run()
+    assert ProfileIdentityStore(ui.WORKSPACES.path).load().name == "Alexandra Example"
+
+    next(item for item in app.button if item.label == "Remove").click()
+    app.run()
+    assert ProfileIdentityStore(ui.WORKSPACES.path).load() is None
+
+
+def test_profile_identity_rejects_an_invalid_email(tmp_path, monkeypatch):
+    ui = setup_ui(tmp_path, monkeypatch)
+    app = AppTest.from_string("from tau_job_application.ui import main\nmain()", default_timeout=40)
+    app.query_params["view"] = "account"
+    app.run()
+    next(item for item in app.text_input if item.label == "Your name").set_value("Alex")
+    next(item for item in app.text_input if item.label == "Your email").set_value("not-an-email")
+    next(item for item in app.button if item.label == "Save my profile").click()
+    app.run()
+    assert not app.exception
+    assert any("valid email" in item.body for item in app.error)
+    from tau_job_application.profile_identity import ProfileIdentityStore
+    assert ProfileIdentityStore(ui.WORKSPACES.path).load() is None

@@ -20,6 +20,7 @@ from tau_job_application.accounts import (
     new_pkce_verifier,
     pkce_challenge,
 )
+from tau_job_application.profile_identity import ProfileIdentityStore
 
 _OAUTH_ATTEMPT_TTL_SECONDS = 600
 
@@ -80,6 +81,41 @@ def _account_card(provider: str, title: str, account, disconnect_key: str, on_di
     return account is not None
 
 
+def _profile_identity(api) -> None:
+    """Local name + email: not an account, just who you are on this device."""
+
+    store = ProfileIdentityStore(api.WORKSPACES.path)
+    identity = store.load()
+    st.subheader("Your profile")
+    st.caption(
+        "Saved only in your local database, permission-locked to your OS user. "
+        "Not an account: no password, no server, and it is never sent anywhere."
+    )
+    with st.container(border=True):
+        if identity and not st.session_state.get("identity-editing"):
+            st.markdown(f"**{identity.name}** · {identity.email}")
+            st.caption(f"Saved {identity.updated_at[:10]} · used to prefill your local document drafts")
+            left, right = st.columns(2)
+            if left.button("Edit", key="identity-edit", use_container_width=True):
+                st.session_state["identity-editing"] = True
+                st.rerun()
+            if right.button("Remove", key="identity-remove", use_container_width=True):
+                store.clear()
+                st.rerun()
+        else:
+            with st.form("identity-form"):
+                name = st.text_input("Your name", value=identity.name if identity else "", max_chars=200, placeholder="Alex Example")
+                email = st.text_input("Your email", value=identity.email if identity else "", max_chars=320, placeholder="alex@example.com")
+                if st.form_submit_button("Save my profile", type="primary"):
+                    try:
+                        store.save(name, email)
+                        st.session_state.pop("identity-editing", None)
+                        st.success("Profile saved locally.")
+                        st.rerun()
+                    except ValueError as exc:
+                        st.error(str(exc))
+
+
 def render_accounts(api, track: str) -> None:
     store = api._account_store()
     st.markdown('<div class="section-kicker">Your identity, your rules</div><h1>Connected accounts</h1>', unsafe_allow_html=True)
@@ -93,6 +129,8 @@ def render_accounts(api, track: str) -> None:
         "Load remote avatars and brand logos", key="account-logos",
         help="Off by default: loading a remote image shares your IP address with its host (account avatar or the Simple Icons CDN for brand logos).",
     )
+
+    _profile_identity(api)
 
     github = store.get("github")
     linkedin = store.get("linkedin")
