@@ -27,6 +27,7 @@ from tau_job_application.role_discovery import (
     opening_matches_period,
     suggest_role_aliases,
 )
+from tau_job_application.role_market_state import RoleMarketStatus, opening_key
 
 
 PORTAL_BOARDS = (*DEFAULT_VETTED_COMPANY_BOARDS, VettedCompanyBoard(
@@ -347,6 +348,140 @@ def _structured_profile(api, store, track):
     )
 
 
+def _relative_posted_label(opening) -> str:
+    """'Posted 5d ago' style label, only from a source-supplied publication date."""
+
+    if opening.source_timestamp_kind != "published" or not opening.source_timestamp:
+        return "Publication date not provided"
+    try:
+        published = datetime.fromisoformat(opening.source_timestamp.replace("Z", "+00:00"))
+    except ValueError:
+        return "Publication date not provided"
+    days = max(0, (datetime.now(UTC) - published).days)
+    if days == 0:
+        return "Posted today"
+    if days == 1:
+        return "Posted 1d ago"
+    if days < 7:
+        return f"Posted {days}d ago"
+    weeks = days // 7
+    return f"Posted {weeks}w ago"
+
+
+def _track_and_open(api, track, opening, relevance):
+    """Create the dedicated application thread and record, then open its workspace."""
+
+    target = api._prepared_discovered_workspace(track, opening) or api._create_discovered_job_workspace(track, opening)
+    record = api._application_store().save(track, target, opening, relevance=relevance)
+    st.session_state["pending_workspace"] = track
+    go("application", application=record.id)
+
+
+def _append_note(api, track, opening, record, relevance, note: str) -> None:
+    """Start tracking if needed, then append one dated note to the application."""
+
+    if record is None:
+        target = api._prepared_discovered_workspace(track, opening) or api._create_discovered_job_workspace(track, opening)
+        record = api._application_store().save(track, target, opening, relevance=relevance)
+    stamp = datetime.now(UTC).date().isoformat()
+    existing = record.progress.notes
+    entry = f"{stamp} · {note.strip()}"
+    progress = record.progress.model_copy(update={"notes": f"{existing}\n{entry}" if existing else entry})
+    api._application_store().update(track, record.id, progress)
+
+
+def _cluster_dashboard(api, track: str, thread: str, page_matches: list, *, hidden_count: int) -> None:
+    """Saved-jobs style rows for one role cluster: track, note, apply, hide.
+
+    LinkedIn's avatar stack is deliberately replaced by the candidate's own
+    tracking status: this app has no connections data and never invents one.
+    """
+
+    tracker = api._application_store()
+    tracker.import_shortlist(track)
+    tracked_by_key = {record.opening_key: record for record in tracker.list_records(track)}
+
+    selection_keys = [f"cluster-sel:{thread}:{opening_key(match.opening)}" for match in page_matches]
+    selected = [match for match, key in zip(page_matches, selection_keys, strict=True) if st.session_state.get(key)]
+    bar = st.columns((3, 1, 1))
+    bar[0].caption(
+        f"{len(selected)} selected · {len(page_matches)} listings on this page"
+        + (f" · {hidden_count} hidden by you" if hidden_count else "")
+    )
+    if bar[1].button("Track selected", key=f"cluster-track:{thread}", disabled=not selected, use_container_width=True):
+        for match in selected[:20]:
+            target = api._prepared_discovered_workspace(track, match.opening) or api._create_discovered_job_workspace(track, match.opening)
+            api._application_store().save(track, target, match.opening, relevance=match.score)
+            st.session_state.pop(f"cluster-sel:{thread}:{opening_key(match.opening)}", None)
+        st.rerun()
+    if bar[2].button("Hide selected", key=f"cluster-hide:{thread}", disabled=not selected, use_container_width=True):
+        state_store = api._role_market_state_store()
+        for match in selected[:20]:
+            state_store.set_status(track, thread, match.opening, "hidden")
+            st.session_state.pop(f"cluster-sel:{thread}:{opening_key(match.opening)}", None)
+        st.rerun()
+
+    for match in page_matches:
+        opening = match.opening
+        key = opening_key(opening)
+        record = tracked_by_key.get(key)
+        row = st.columns((0.35, 0.65, 4.4, 1.35, 1.05, 0.95, 0.35))
+        row[0].checkbox("Select", key=f"cluster-sel:{thread}:{key}", label_visibility="collapsed")
+        with row[1]:
+            st.markdown(api._company_mark_markup(opening.company.name), unsafe_allow_html=True)
+        with row[2]:
+            if st.button(opening.title, key=f"cluster-open:{thread}:{key}", type="tertiary",
+                         help="Open this role's application workspace"):
+                _track_and_open(api, track, opening, match.score)
+            workplace = f" ({opening.workplace_type})" if opening.workplace_type else ""
+            st.markdown(
+                f'<p class="cluster-meta">{escape(opening.company.name)} · {escape(opening.location or "Location not listed")}{escape(workplace)}</p>'
+                f'<p class="cluster-posted">{escape(_relative_posted_label(opening))} · Official {escape(opening.source)} listing</p>',
+                unsafe_allow_html=True,
+            )
+        with row[3]:
+            stage = record.progress.stage if record else None
+            status_class = stage.value if stage else "untracked"
+            status_label = stage.label if stage else "Not tracked"
+            st.markdown(
+                f'<span class="cluster-status {status_class}">{escape(status_label)}</span>'
+                f'<div class="cluster-relevance"><b>{match.score}</b> role relevance</div>',
+                unsafe_allow_html=True,
+            )
+        with row[4]:
+            note_count = len([line for line in (record.progress.notes.splitlines() if record else []) if line.strip()])
+            with st.popover(f"＋ Note{'' if not note_count else f' ({note_count})'}", use_container_width=True):
+                if record and record.progress.notes:
+                    st.caption("Latest notes")
+                    st.text("\n".join(record.progress.notes.splitlines()[-3:]))
+                if record is None:
+                    st.caption("Saving a note also starts tracking this role (stage: Saved).")
+                with st.form(f"cluster-note:{thread}:{key}"):
+                    note = st.text_area("New note", max_chars=2000, placeholder="Spoke to recruiter, asked for transcript…")
+                    if st.form_submit_button("Save note"):
+                        if note.strip():
+                            _append_note(api, track, opening, record, match.score, note)
+                            st.rerun()
+                        else:
+                            st.error("Write the note first.")
+        with row[5]:
+            if opening.canonical_url:
+                st.link_button("Apply ↗", opening.canonical_url, use_container_width=True,
+                               help="Opens the employer's official listing in a new tab. You apply there, never here.")
+            else:
+                st.caption("No apply link")
+        with row[6]:
+            with st.popover("⋯"):
+                if st.button("Open application workspace", key=f"cluster-ws:{thread}:{key}"):
+                    _track_and_open(api, track, opening, match.score)
+                if st.button("Hide from this cluster", key=f"cluster-hide-one:{thread}:{key}"):
+                    api._role_market_state_store().set_status(track, thread, opening, "hidden")
+                    st.rerun()
+                st.caption("Hidden listings stay in the Role market shortlist, where you can restore them.")
+        st.divider()
+    st.caption("Not seeing some jobs? Only official boards registered for this product are checked; hidden listings can be restored from the Role market shortlist.")
+
+
 def _role(api, store, track):
     role = api._route_value("role").strip()
     if not role or len(role) > 100:
@@ -406,24 +541,15 @@ def _role(api, store, track):
     if order == "Recently published":
         # Never present an update time or the collection time as a publication date.
         matches.sort(key=lambda match: match.opening.source_timestamp if match.opening.source_timestamp_kind == "published" and match.opening.source_timestamp else "", reverse=True)
-    page_count = max(1, (len(matches) + 11) // 12)
-    page = st.selectbox("Position page", range(1, page_count + 1)) if page_count > 1 else 1
-    columns = st.columns(2)
-    for index, match in enumerate(matches[(page - 1) * 12:page * 12]):
-        opening = match.opening
-        with columns[index % 2]:
-            st.markdown(f'<article class="hub-tile"><div class="hub-company">{api._company_mark_markup(opening.company.name)}<h2>{escape(opening.company.name)}</h2></div><h3>{escape(opening.title)}</h3><p>{escape(opening.location or "Location not listed")}</p><small>{escape(api._source_timestamp_label(opening) or "Publication date not provided")} · {escape(opening.source)}</small></article>', unsafe_allow_html=True)
-            if st.button("Open application workspace", key=f"hub-job:{api._role_card_key(opening)}", use_container_width=True):
-                # Create a dedicated application thread: CV and project evidence
-                # must not accidentally belong to the entire discovery cluster.
-                target = api._prepared_discovered_workspace(track, opening) or api._create_discovered_job_workspace(track, opening)
-                record = api._application_store().save(track, target, opening, relevance=match.score)
-                # The application route resolves records inside the selected
-                # track; select this role's track before navigating.
-                st.session_state["pending_workspace"] = track
-                go("application", application=record.id)
-    if not matches:
-        st.info("No related positions in these employer feeds match your filters. Try an alias or use the existing Role market to bring a permitted source.")
+    state_store = api._role_market_state_store()
+    states = {state.opening_key: state for state in state_store.list_states(track, thread)}
+    visible = [match for match in matches if (state := states.get(opening_key(match.opening))) is None or state.status is not RoleMarketStatus.HIDDEN]
+    hidden_count = len(matches) - len(visible)
+    page_count = max(1, (len(visible) + 11) // 12)
+    page = st.selectbox("Position page", range(1, page_count + 1), key=f"hub-page:{thread}") if page_count > 1 else 1
+    _cluster_dashboard(api, track, thread, visible[(page - 1) * 12:page * 12], hidden_count=hidden_count)
+    if not visible:
+        st.info("No related positions in these employer feeds match your filters. Try an alias, restore a hidden listing, or use the existing Role market to bring a permitted source.")
     _role_company_browser(api, role, thread)
 
 
@@ -662,6 +788,20 @@ _STYLE = """<style>
 .hub-tile p{color:#48524b;line-height:1.6;margin:.65rem 0;}
 .hub-tile small{font-family:monospace;font-size:.77rem;letter-spacing:.025em;color:#69716a;}
 .hub-company{display:flex;align-items:center;gap:16px;}.hub-company .role-feed-avatar{flex-shrink:0;}
+.cluster-title{color:#151c18;font-weight:650;font-size:.98rem;line-height:1.35;margin:0;}
+.cluster-meta{color:#5f6a63;font-size:.84rem;margin:.15rem 0 0;}
+.cluster-posted{color:#8a9088;font-size:.78rem;margin:.1rem 0 0;}
+.cluster-status{display:inline-block;border-radius:999px;padding:.16rem .6rem;font-size:.72rem;font-weight:700;letter-spacing:.02em;}
+.cluster-status.untracked{background:#f0eee6;color:#7a7565;border:1px solid #ddd8c8;}
+.cluster-status.saved{background:#eef2ea;color:#4a5d52;border:1px solid #d5dfd2;}
+.cluster-status.preparing{background:#e8eff5;color:#3d5a74;border:1px solid #cfdeeb;}
+.cluster-status.applied{background:#e2efe5;color:#27543c;border:1px solid #bdd4c2;}
+.cluster-status.contacted{background:#e2efe5;color:#27543c;border:1px solid #bdd4c2;}
+.cluster-status.interview{background:#f7f2e4;color:#74613a;border:1px solid #e6d8af;}
+.cluster-status.offer{background:#e5f3ec;color:#1c6a44;border:1px solid #bfe0cf;}
+.cluster-status.closed{background:#f3e8e6;color:#8a4a40;border:1px solid #e2c9c4;}
+.cluster-relevance{font-size:.72rem;color:#69716a;margin-top:.3rem;}
+.cluster-relevance b{color:#173a31;font-size:.95rem;}
 button:focus-visible,a:focus-visible{outline:3px solid #16734c!important;outline-offset:3px;}
 @media(max-width:700px){.hub-tile{min-height:0;padding:20px 0;}.hub-tile h2{font-size:1.35rem;}}
 </style>"""
