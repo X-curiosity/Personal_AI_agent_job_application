@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Co-Apply GPT — Your career co-pilot, on your machine</title>
+<meta name="description" content="Co-Apply GPT matches your real evidence to real roles, tracks every application, and rehearses your interviews. Local-first: your CV never leaves your machine.">
+<meta property="og:title" content="Co-Apply GPT">
+<meta property="og:description" content="Evidence-based role matching, application tracking, and interview practice. Local-first and private by design.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%23173a31'/%3E%3Ctext x='50' y='68' font-size='52' text-anchor='middle' fill='%23f5f5ed' font-family='Georgia'%3EC%3C/text%3E%3C/svg%3E">
+<style>
+  :root {
+    --ink: #173a31; --ink-2: #28463b; --ink-3: #4e655a;
+    --paper: #faf8f1; --card: #fffef9; --line: #dce4d9;
+    --gold: #d6bd70; --green: #16734c;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { background: var(--paper); color: var(--ink); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; line-height: 1.55; }
+  .serif { font-family: Georgia, "Times New Roman", serif; }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 0 24px; }
+
+  nav { position: sticky; top: 0; z-index: 10; background: var(--ink); color: #f5f5ed; }
+  nav .wrap { display: flex; align-items: center; justify-content: space-between; height: 60px; }
+  nav .brand { font-weight: 800; letter-spacing: -0.02em; font-size: 1.05rem; color: #f5f5ed; text-decoration: none; }
+  nav .brand span { color: var(--gold); }
+  nav a.cta-nav { color: #f5f5ed; text-decoration: none; font-size: 0.9rem; border: 1px solid rgba(255,255,255,0.35); border-radius: 999px; padding: 0.4rem 0.95rem; }
+  nav a.cta-nav:hover { background: rgba(255,255,255,0.1); }
+
+  header.hero { background: linear-gradient(160deg, #122e27 0%, #173a31 55%, #1d493c 100%); color: #fffef8; padding: 96px 0 88px; position: relative; overflow: hidden; }
+  header.hero::after { content: ""; position: absolute; width: 420px; height: 420px; border: 1px solid rgba(214,189,112,0.35); border-radius: 50%; right: -140px; top: -140px; box-shadow: 0 0 0 42px rgba(214,189,112,0.06), 0 0 0 92px rgba(214,189,112,0.04); }
+  .kicker { font-size: 0.78rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--gold); font-weight: 800; margin-bottom: 1rem; }
+  h1 { font-size: clamp(2.4rem, 5.4vw, 4.2rem); line-height: 1.02; letter-spacing: -0.04em; max-width: 760px; }
+  .hero p.sub { margin-top: 1.3rem; font-size: clamp(1rem, 1.8vw, 1.22rem); color: #dce7de; max-width: 640px; }
+  .hero .actions { margin-top: 2.2rem; display: flex; gap: 0.9rem; flex-wrap: wrap; }
+  .btn { display: inline-block; border-radius: 999px; padding: 0.8rem 1.6rem; font-weight: 700; text-decoration: none; font-size: 0.98rem; }
+  .btn-primary { background: var(--gold); color: #1d2b22; }
+  .btn-primary:hover { filter: brightness(1.06); }
+  .btn-ghost { border: 1px solid rgba(255,255,255,0.4); color: #fffef8; }
+  .btn-ghost:hover { background: rgba(255,255,255,0.08); }
+  .promise { display: inline-block; margin-top: 1.8rem; font-size: 0.82rem; color: #eef4ec; border: 1px solid rgba(255,255,255,0.3); border-radius: 999px; padding: 0.42rem 0.85rem; background: rgba(14,39,32,0.25); }
+
+  section { padding: 72px 0; }
+  .section-kicker { font-size: 0.74rem; letter-spacing: 0.13em; text-transform: uppercase; color: #557464; font-weight: 800; margin-bottom: 0.6rem; }
+  h2 { font-size: clamp(1.7rem, 3.4vw, 2.5rem); letter-spacing: -0.03em; line-height: 1.1; }
+  .lead { color: var(--ink-3); max-width: 640px; margin-top: 0.8rem; }
+
+  .demo-card { background: var(--card); border: 1px solid var(--line); border-radius: 18px; padding: 2rem; margin-top: 2.4rem; box-shadow: 0 8px 24px rgba(25,53,46,0.06); }
+  .demo-label { font-size: 0.78rem; letter-spacing: 0.1em; text-transform: uppercase; color: #557464; font-weight: 800; }
+  .bar-track { background: #e9efe7; border-radius: 999px; height: 22px; margin-top: 0.9rem; position: relative; overflow: hidden; }
+  .bar-fill { background: linear-gradient(90deg, #1d493c, #16734c); height: 100%; border-radius: 999px; }
+  .bar-note { display: flex; justify-content: space-between; font-size: 0.82rem; color: var(--ink-3); margin-top: 0.5rem; }
+  .chips { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.7rem; margin-top: 1.2rem; }
+  .chip { background: #f4f7f1; border: 1px solid var(--line); border-radius: 12px; padding: 0.7rem 0.8rem; font-size: 0.85rem; font-weight: 650; color: var(--ink-2); text-align: center; }
+  .chip small { display: block; font-weight: 500; color: var(--ink-3); margin-top: 0.15rem; }
+
+  .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.1rem; margin-top: 2.2rem; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 15px; padding: 1.3rem 1.25rem; }
+  .card h3 { font-size: 1.02rem; margin-bottom: 0.45rem; }
+  .card p { font-size: 0.88rem; color: var(--ink-3); }
+  .card .num { font-size: 0.72rem; font-weight: 800; letter-spacing: 0.12em; color: #77917b; }
+
+  .steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-top: 2.2rem; }
+  .step { border-top: 3px solid #77917b; padding-top: 0.9rem; }
+  .step h3 { font-size: 0.98rem; margin: 0.3rem 0 0.4rem; }
+  .step p { font-size: 0.85rem; color: var(--ink-3); }
+
+  .privacy { background: var(--ink); color: #e9f0ea; border-radius: 20px; padding: 2.6rem; margin-top: 1rem; }
+  .privacy h2 { color: #fffef8; }
+  .privacy .lead { color: #b9ccc0; }
+  .privacy ul { list-style: none; margin-top: 1.6rem; display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.8rem 2rem; }
+  .privacy li { padding-left: 1.6rem; position: relative; font-size: 0.92rem; }
+  .privacy li::before { content: "✓"; position: absolute; left: 0; color: var(--gold); font-weight: 800; }
+
+  .run { background: #122e27; color: #d8e6dc; border-radius: 14px; padding: 1.4rem 1.6rem; font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 0.9rem; margin-top: 1.8rem; overflow-x: auto; }
+  .run .prompt { color: var(--gold); }
+
+  footer { border-top: 1px solid var(--line); padding: 2.4rem 0 3rem; color: var(--ink-3); font-size: 0.85rem; }
+  footer a { color: var(--ink-2); }
+
+  @media (max-width: 820px) {
+    .grid, .steps, .privacy ul { grid-template-columns: 1fr 1fr; }
+    .chips { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 560px) {
+    .grid, .steps, .privacy ul { grid-template-columns: 1fr; }
+    header.hero { padding: 64px 0; }
+    .privacy { padding: 1.8rem; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <a class="brand" href="#">Co-Apply <span>GPT</span></a>
+    <a class="cta-nav" href="https://github.com/X-curiosity/Personal_AI_agent_job_application">GitHub ↗</a>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="wrap">
+    <p class="kicker">Local-first career platform</p>
+    <h1 class="serif">Apply with evidence, not hope.</h1>
+    <p class="sub">Co-Apply GPT matches your real CV evidence to real roles on official employer boards, tracks every application in one dashboard, and rehearses your interviews level by level. Your data never leaves your machine.</p>
+    <div class="actions">
+      <a class="btn btn-primary" href="https://github.com/X-curiosity/Personal_AI_agent_job_application">Get it on GitHub</a>
+      <a class="btn btn-ghost" href="#how">See how it works</a>
+    </div>
+    <span class="promise">No account · no cloud database · no scraping · runs at 127.0.0.1</span>
+  </div>
+</header>
+
+<section id="match">
+  <div class="wrap">
+    <p class="section-kicker">The 0–100 match bar</p>
+    <h2 class="serif">A score you can actually interrogate</h2>
+    <p class="lead">The match bar is deterministic evidence coverage on a 100 scale — never a hiring prediction. Tap any number to open the page that explains it.</p>
+    <div class="demo-card">
+      <p class="demo-label">Your match for this role · tap a number to open its page</p>
+      <div class="bar-track"><div class="bar-fill" style="width: 78%"></div></div>
+      <div class="bar-note"><span>78% match · evidence coverage</span><span>rises as you verify skills &amp; projects</span></div>
+      <div class="chips">
+        <div class="chip">Skills coverage 82%<small>opens the Job brief</small></div>
+        <div class="chip">CV readiness 74%<small>opens the CV studio</small></div>
+        <div class="chip">Project proof 67%<small>opens Proof projects</small></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="features" style="padding-top:0">
+  <div class="wrap">
+    <p class="section-kicker">Everything in one workspace</p>
+    <h2 class="serif">From discovery to signed offer</h2>
+    <div class="grid">
+      <div class="card"><p class="num">01</p><h3>Role clusters &amp; tracking dashboard</h3><p>Each role page lists live openings like a saved-jobs board: track stages, add dated notes, hide noise, apply at the employer.</p></div>
+      <div class="card"><p class="num">02</p><h3>Official-board discovery</h3><p>Greenhouse, Lever and Ashby feeds only — the same postings LinkedIn mirrors, read lawfully. Feed outages never erase your board.</p></div>
+      <div class="card"><p class="num">03</p><h3>Actively-hiring index</h3><p>6,300+ YC companies, 2,400+ Atlas companies and live board checks, refreshed automatically every six hours.</p></div>
+      <div class="card"><p class="num">04</p><h3>Application workspaces</h3><p>Tailored CV and letter drafts, project evidence, contacts, and reply tracking per vacancy — with Gmail bound to exact conversations.</p></div>
+      <div class="card"><p class="num">05</p><h3>Interview practice, Lv 1–5</h3><p>Progressive difficulty grounded in the role's actual requirements, scored with strengths and gaps per rehearsal.</p></div>
+      <div class="card"><p class="num">06</p><h3>Eligibility checklists</h3><p>Deterministic document checklists for international applications — rules, not guesses about visas.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="how" style="background:#f3f0e6">
+  <div class="wrap">
+    <p class="section-kicker">A focused route to each role</p>
+    <h2 class="serif">Four moves, repeated per vacancy</h2>
+    <div class="steps">
+      <div class="step"><p class="num">01 · MAP</p><h3>Job evidence</h3><p>Requirements reviewed from the real advert, phrase by phrase.</p></div>
+      <div class="step"><p class="num">02 · STRENGTHEN</p><h3>CV guidance</h3><p>Truthful edits tied to experience you already show. Never invented.</p></div>
+      <div class="step"><p class="num">03 · PROVE</p><h3>Standout projects</h3><p>Planned work stays planned; only completed, proven projects count.</p></div>
+      <div class="step"><p class="num">04 · REHEARSE</p><h3>Interview stories</h3><p>Saved rehearsals per role, tracked beside the application status.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="privacy">
+  <div class="wrap">
+    <div class="privacy">
+      <p class="section-kicker" style="color:#d6bd70">Privacy is the architecture</p>
+      <h2 class="serif">Your career data lives on your disk</h2>
+      <p class="lead">Co-Apply GPT is a local application. There is no account system, no analytics, and no server of ours to breach.</p>
+      <ul>
+        <li>SQLite on your machine, permission-locked to your OS user</li>
+        <li>No tokens stored — LinkedIn OIDC tokens are discarded after identity</li>
+        <li>Remote logos and avatars are off until you opt in</li>
+        <li>Gmail reads only exact conversations you bind and consent to</li>
+        <li>No LinkedIn scraping or automation, ever</li>
+        <li>Applications are prepared for your approval — never auto-submitted</li>
+      </ul>
+    </div>
+    <div class="run">
+      <span class="prompt">$</span> git clone git@github.com:X-curiosity/Personal_AI_agent_job_application.git<br>
+      <span class="prompt">$</span> cd Personal_AI_agent_job_application &amp;&amp; ./run.sh<br>
+      <span class="prompt">→</span> Co-Apply GPT at http://127.0.0.1:8506
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <p><strong>Co-Apply GPT</strong> · an open, local-first career platform · <a href="https://github.com/X-curiosity/Personal_AI_agent_job_application">Source on GitHub</a></p>
+    <p style="margin-top:0.4rem">This page is marketing only. The product collects nothing here because nothing runs here.</p>
+  </div>
+</footer>
+
+</body>
+</html>

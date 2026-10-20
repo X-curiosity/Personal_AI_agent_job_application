@@ -10,6 +10,7 @@ __pycache__/
 *.sqlite3
 *.sqlite-wal
 *.sqlite-shm
+.vercel/
 coverage.xml
 htmlcov/
 output/
