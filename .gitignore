@@ -24,6 +24,7 @@ data/
 !vercel-site/data/
 vercel-site/data/*
 !vercel-site/data/companies.json
+!vercel-site/data/wikidata_hq.json
 !vercel-site/data/world.geojson
 !vercel-site/data/logos/
 !vercel-site/data/logos/*

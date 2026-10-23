@@ -1,0 +1,6644 @@
+{
+ "bidv.com.vn": {
+  "lat": 21.0245,
+  "lng": 105.84117,
+  "label": "Bank for Investment and Development of Vietnam",
+  "qid": "Q1003180"
+ },
+ "tokentransit.com": {
+  "lat": 37.775,
+  "lng": -122.41944444444445,
+  "label": "Token Transit",
+  "qid": "Q100385354"
+ },
+ "bunge.com": {
+  "lat": 32.295,
+  "lng": -64.78305555555555,
+  "label": "Bunge Limited",
+  "qid": "Q1009458"
+ },
+ "boehringer-ingelheim.com": {
+  "lat": 14.556666666666667,
+  "lng": 121.0213888888889,
+  "label": "Boehringer Ingelheim (Philippines)",
+  "qid": "Q100955913"
+ },
+ "aurora.tech": {
+  "lat": 40.44166666666667,
+  "lng": -80,
+  "label": "Aurora Innovation",
+  "qid": "Q101606525"
+ },
+ "caci.com": {
+  "lat": 38.880277777778,
+  "lng": -77.108333333333,
+  "label": "CACI",
+  "qid": "Q1022711"
+ },
+ "cdw.com": {
+  "lat": 42.231111111111,
+  "lng": -87.969166666667,
+  "label": "CDW",
+  "qid": "Q1023155"
+ },
+ "cvc.com": {
+  "lat": 49.185833333333335,
+  "lng": -2.11,
+  "label": "CVC Capital Partners",
+  "qid": "Q1024566"
+ },
+ "gazprom.com": {
+  "lat": 59.95,
+  "lng": 30.316666666667,
+  "label": "Gazprom",
+  "qid": "Q102673"
+ },
+ "cameco.com": {
+  "lat": 52.133333333333,
+  "lng": -106.68333333333,
+  "label": "Cameco",
+  "qid": "Q1028449"
+ },
+ "suzano.com.br": {
+  "lat": -12.983055555555556,
+  "lng": -38.492777777777775,
+  "label": "Suzano Papel e Celulose",
+  "qid": "Q1030695"
+ },
+ "cnrl.com": {
+  "lat": 51.0475,
+  "lng": -114.0625,
+  "label": "Canadian Natural Resources",
+  "qid": "Q1032229"
+ },
+ "newyorklife.com": {
+  "lat": 40.71277777777778,
+  "lng": -74.00611111111111,
+  "label": "New York Life Insurance Company",
+  "qid": "Q1039380"
+ },
+ "vistracorp.com": {
+  "lat": 32.811666666667,
+  "lng": -96.950833333333,
+  "label": "Vistra",
+  "qid": "Q104158381"
+ },
+ "varenergi.no": {
+  "lat": 58.845,
+  "lng": 5.829444,
+  "label": "Vår Energi",
+  "qid": "Q104177614"
+ },
+ "typewise.app": {
+  "lat": 47.37444444444444,
+  "lng": 8.54111111111111,
+  "label": "Typewise",
+  "qid": "Q104181076"
+ },
+ "abbott.com": {
+  "lat": 43.57805556,
+  "lng": -70.32166667,
+  "label": "Abbott Diagnostics",
+  "qid": "Q104290524"
+ },
+ "carnivalcorp.com": {
+  "lat": 50.906666666666666,
+  "lng": -1.4044444444444444,
+  "label": "Carnival Corporation",
+  "qid": "Q1044059"
+ },
+ "madrigalpharma.com": {
+  "lat": 40.0694,
+  "lng": -75.3158,
+  "label": "Madrigal Pharmaceuticals (United States)",
+  "qid": "Q104481026"
+ },
+ "penumbrainc.com": {
+  "lat": 37.763888888889,
+  "lng": -122.25694444444,
+  "label": "Penumbra",
+  "qid": "Q104822216"
+ },
+ "seres.cn": {
+  "lat": 29.55,
+  "lng": 106.50694444444,
+  "label": "Seres Group",
+  "qid": "Q104907477"
+ },
+ "cemex.com": {
+  "lat": 25.6643,
+  "lng": -100.4023,
+  "label": "Cemex",
+  "qid": "Q1053348"
+ },
+ "cenovus.com": {
+  "lat": 51.0475,
+  "lng": -114.0625,
+  "label": "Cenovus Energy",
+  "qid": "Q1053422"
+ },
+ "centerpointenergy.com": {
+  "lat": 29.762777777778,
+  "lng": -95.383055555556,
+  "label": "CenterPoint Energy",
+  "qid": "Q1053560"
+ },
+ "traderepublic.com": {
+  "lat": 52.516666666667,
+  "lng": 13.383333333333,
+  "label": "Trade Republic",
+  "qid": "Q105475811"
+ },
+ "embraer.com": {
+  "lat": -23.178888888889,
+  "lng": -45.886944444444,
+  "label": "Embraer",
+  "qid": "Q105557"
+ },
+ "rocketcompanies.com": {
+  "lat": 42.331666666667,
+  "lng": -83.0475,
+  "label": "Rocket Companies",
+  "qid": "Q105887484"
+ },
+ "evolution.com": {
+  "lat": 59.329444444444,
+  "lng": 18.068611111111,
+  "label": "",
+  "qid": "Q105965579"
+ },
+ "livenationentertainment.com": {
+  "lat": 34.073055555556,
+  "lng": -118.39944444444,
+  "label": "Live Nation Entertainment",
+  "qid": "Q1061903"
+ },
+ "walshgroup.com": {
+  "lat": 41.88194444444444,
+  "lng": -87.62777777777778,
+  "label": "Walsh Construction",
+  "qid": "Q106192156"
+ },
+ "cctc.cc": {
+  "lat": 23.67,
+  "lng": 116.63,
+  "label": "Chaozhou Three-circle",
+  "qid": "Q106222125"
+ },
+ "bridgebio.com": {
+  "lat": 37.44444444444444,
+  "lng": -122.16,
+  "label": "BridgeBio",
+  "qid": "Q106238343"
+ },
+ "lego.com": {
+  "lat": 55.7243,
+  "lng": 9.1188,
+  "label": "The Lego Group",
+  "qid": "Q1063455"
+ },
+ "walmex.mx": {
+  "lat": 19.353773,
+  "lng": -99.13589,
+  "label": "Walmart de México y Centroamérica",
+  "qid": "Q1064887"
+ },
+ "lundingold.com": {
+  "lat": 49.26083333333333,
+  "lng": -123.1138888888889,
+  "label": "Lundin Gold",
+  "qid": "Q106599766"
+ },
+ "wbd.com": {
+  "lat": 40.71277777777778,
+  "lng": -74.00611111111111,
+  "label": "Warner Bros. Discovery",
+  "qid": "Q107074885"
+ },
+ "wahaha.com.cn": {
+  "lat": 30.25,
+  "lng": 120.1675,
+  "label": "Hangzhou Wahaha Group",
+  "qid": "Q1071849"
+ },
+ "revmed.com": {
+  "lat": 37.482777777778,
+  "lng": -122.23611111111,
+  "label": "Revolution Medicines (United States)",
+  "qid": "Q107518109"
+ },
+ "hitachienergy.com": {
+  "lat": 47.37444444444444,
+  "lng": 8.54111111111111,
+  "label": "Hitachi Energy",
+  "qid": "Q107530770"
+ },
+ "kajima.co.jp": {
+  "lat": 35.67138611111111,
+  "lng": 139.73443333333333,
+  "label": "Kajima Corporation",
+  "qid": "Q1081154"
+ },
+ "scrimba.com": {
+  "lat": 59.913333333333334,
+  "lng": 10.738888888888889,
+  "label": "scrimba",
+  "qid": "Q108126577"
+ },
+ "szeastroc.com": {
+  "lat": 22.546666666666667,
+  "lng": 114.05444444444444,
+  "label": "Eastroc Beverage",
+  "qid": "Q108312672"
+ },
+ "crunchbase.com": {
+  "lat": 37.775,
+  "lng": -122.41944444444445,
+  "label": "Crunchbase",
+  "qid": "Q10846831"
+ },
+ "powerchina.cn": {
+  "lat": 39.95812,
+  "lng": 116.29214,
+  "label": "Power China",
+  "qid": "Q10873928"
+ },
+ "kgi.com": {
+  "lat": 25.0375,
+  "lng": 121.5625,
+  "label": "KGI Financial Holding",
+  "qid": "Q10876574"
+ },
+ "zto.com": {
+  "lat": 31.24758,
+  "lng": 121.22285,
+  "label": "ZTO Express",
+  "qid": "Q10876705"
+ },
+ "yuanta.com": {
+  "lat": 25.0375,
+  "lng": 121.5625,
+  "label": "Yuanta Financial Holding",
+  "qid": "Q10889617"
+ },
+ "chubb.com": {
+  "lat": 40.6346,
+  "lng": -74.519,
+  "label": "Chubb Corp.",
+  "qid": "Q1089060"
+ },
+ "whoop.com": {
+  "lat": 42.360277777777775,
+  "lng": -71.05777777777777,
+  "label": "WHOOP",
+  "qid": "Q108907426"
+ },
+ "buymeacoffee.com": {
+  "lat": 37.775,
+  "lng": -122.41944444444445,
+  "label": "Buy Me a Coffee",
+  "qid": "Q108939982"
+ },
+ "nanya.com": {
+  "lat": 37.35,
+  "lng": -121.96666666667,
+  "label": "Nanya Technology",
+  "qid": "Q10906621"
+ },
+ "sonatrach.com": {
+  "lat": 36.776388888889,
+  "lng": 3.0586111111111,
+  "label": "Sonatrach",
+  "qid": "Q1090717"
+ },
+ "chuden.co.jp": {
+  "lat": 35.169972,
+  "lng": 136.913778,
+  "label": "Chubu Electric Power",
+  "qid": "Q1091203"
+ },
+ "cintas.com": {
+  "lat": 39.1,
+  "lng": -84.5125,
+  "label": "Cintas",
+  "qid": "Q1092571"
+ },
+ "colossal.com": {
+  "lat": 32.779166666667,
+  "lng": -96.808888888889,
+  "label": "Colossal Biosciences",
+  "qid": "Q109511106"
+ },
+ "shoplocale.com": {
+  "lat": 37.236111111111,
+  "lng": -121.96166666667,
+  "label": "Locale",
+  "qid": "Q109587661"
+ },
+ "coca-colahellenic.com": {
+  "lat": 47.196944444444,
+  "lng": 8.4861111111111,
+  "label": "Coca-Cola HBC",
+  "qid": "Q1104910"
+ },
+ "influxdata.com": {
+  "lat": 37.775,
+  "lng": -122.41944444444445,
+  "label": "InfluxData",
+  "qid": "Q110705768"
+ },
+ "oneok.com": {
+  "lat": 36.131388888889,
+  "lng": -95.937222222222,
+  "label": "ONEOK",
+  "qid": "Q11074156"
+ },
+ "block.xyz": {
+  "lat": 37.775,
+  "lng": -122.41944444444445,
+  "label": "Block, Inc.",
+  "qid": "Q110778747"
+ },
+ "salt.security": {
+  "lat": 32.08,
+  "lng": 34.78,
+  "label": "",
+  "qid": "Q110897441"
+ },
+ "sumitomolife.co.jp": {
+  "lat": 34.69375,
+  "lng": 135.5021111111111,
+  "label": "Sumitomo Life Insurance Company",
+  "qid": "Q1110126"
+ },
+ "technoprobe.com": {
+  "lat": 45.7,
+  "lng": 9.4,
+  "label": "Technoprobe",
+  "qid": "Q111142424"
+ },
+ "sbigroup.co.jp": {
+  "lat": 35.66283611111111,
+  "lng": 139.73144166666665,
+  "label": "SBI Holdings",
+  "qid": "Q1113213"
+ },
+ "quantinuum.com": {
+  "lat": 39.933333333333,
+  "lng": -105.05,
+  "label": "Quantinuum",
+  "qid": "Q111444392"
+ },
+ "clearlake.com": {
+  "lat": 34.021944444444,
+  "lng": -118.48138888889,
+  "label": "Clearlake Capital",
+  "qid": "Q111601174"
+ },
+ "gwm.com.cn": {
+  "lat": 38.86712,
+  "lng": 115.48452,
+  "label": "Great Wall Motor",
+  "qid": "Q1117001"
+ },
+ "airwallex.com": {
+  "lat": 37.775,
+  "lng": -122.41944444444445,
+  "label": "Airwallex",
+  "qid": "Q112228127"
+ },
+ "nordea.com": {
+  "lat": 60.170833333333334,
+  "lng": 24.9375,
+  "label": "Nordea",
+  "qid": "Q1123823"
+ },
+ "scsk.jp": {
+  "lat": 35.68944444444445,
+  "lng": 139.69166666666666,
+  "label": "SCSK Corporation",
+  "qid": "Q11242714"
+ },
+ "ast-science.com": {
+  "lat": 32.005,
+  "lng": -102.09917,
+  "label": "AST SpaceMobile",
+  "qid": "Q112659289"
+ },
+ "shinkin-central-bank.jp": {
+  "lat": 35.68944444444445,
+  "lng": 139.69166666666666,
+  "label": "Shinkin Central Bank",
+  "qid": "Q112682994"
+ },
+ "tennet.eu": {
+  "lat": 51.983333333333,
+  "lng": 5.9166666666667,
+  "label": "TenneT",
+  "qid": "Q1127569"
+ },
+ "asahigroup-holdings.com": {
+  "lat": 35.68944444444445,
+  "lng": 139.69166666666666,
+  "label": "Asahi Group Holdings",
+  "qid": "Q11283168"
+ },
+ "haleon.com": {
+  "lat": 51.366666666667,
+  "lng": -0.46666666666667,
+  "label": "Haleon",
+  "qid": "Q112860932"
+ },
+ "obic.co.jp": {
+  "lat": 35.68944444444445,
+  "lng": 139.69166666666666,
+  "label": "Obic",
+  "qid": "Q11293432"
+ },
+ "sci-corp.com": {
+  "lat": 29.762777777778,
+  "lng": -95.383055555556,
+  "label": "Service Corporation International",
+  "qid": "Q11306218"
+ },
+ "eliagroup.eu": {
+  "lat": 50.846666666666664,
+  "lng": 4.351666666666667,
+  "label": "Elia Group",
+  "qid": "Q1131131"
+ },
+ "carlsberggroup.com": {
+  "lat": 55.676111111111,
+  "lng": 12.568888888889,
+  "label": "Carlsberg Group",
+  "qid": "Q113215"
+ },
+ "otis.com": {
+  "lat": 41.727777777778,
+  "lng": -72.840277777778,
+  "label": "Otis Worldwide Corporation",
+  "qid": "Q1134069"
+ },
+ "vitol.com": {
+  "lat": 51.92,
+  "lng": 4.48,
+  "label": "Vitol Gas and Power BV",
+  "qid": "Q113465528"
+ },
+ "equinor.com": {
+  "lat": 55.681388888889,
+  "lng": 11.085,
+  "label": "Equinor Refining Denmark",
+  "qid": "Q113466113"
+ },
+ "citadel.com": {
+  "lat": 19.296388888888888,
+  "lng": -81.38166666666666,
+  "label": "Citadel Energy Investments Ltd",
+  "qid": "Q113466809"
+ },
+ "stonepeak.com": {
+  "lat": 40.71277777777778,
+  "lng": -74.00611111111111,
+  "label": "Stonepeak",
+  "qid": "Q113576130"
+ },
+ "coxenterprises.com": {
+  "lat": 33.754444444444445,
+  "lng": -84.38972222222222,
+  "label": "Cox Enterprises",
+  "qid": "Q1138249"
+ },
+ "curtisswright.com": {
+  "lat": 35.226944444444,
+  "lng": -80.843333333333,
+  "label": "Curtiss-Wright",
+  "qid": "Q1138291"
+ },
+ "dfmc.com.cn": {
+  "lat": 30.595,
+  "lng": 114.2975,
+  "label": "Dongfeng Motor Corporation",
+  "qid": "Q1138452"
+ },
+ "hikari.co.jp": {
+  "lat": 35.68944444444445,
+  "lng": 139.69166666666666,
+  "label": "Hikari Tsushin",
+  "qid": "Q11388563"
+ },
+ "firstsolar.com": {
+  "lat": 33.425555555555555,
+  "lng": -111.94,
+  "label": "First Solar",
+  "qid": "Q1138888"
+ },
+ "cgglobal.com": {
+  "lat": 19.075833333333332,
+  "lng": 72.8775,
+  "label": "CG Power and Industrial Solutions",
+  "qid": "Q1140875"
+ },
+ "rosneft.ru": {
+  "lat": 55.74751,
+  "lng": 37.6209,
+  "label": "Rosneft",
+  "qid": "Q1141123"
+ },
+ "marriott.com": {
+  "lat": 38.9848265,
+  "lng": -77.0946459,
+  "label": "Marriott International",
+  "qid": "Q1141173"
+ },
+ "jp.nipponsanso.com": {
+  "lat": 35.60916666666667,
+  "lng": 139.73016666666666,
+  "label": "Taiyo Nippon Sanso",
+  "qid": "Q11441729"
+ },
+ "shizuoka-fg.co.jp": {
+  "lat": 34.975,
+  "lng": 138.38361111111,
+  "label": "Shizuoka Financial Group",
+  "qid": "Q114497974"
+ },
+ "swedbank.com": {
+  "lat": 59.3607,
+  "lng": 17.9721,
+  "label": "Swedbank",
+  "qid": "Q1145493"
+ },
+ "kalshi.com": {
+  "lat": 40.71277777777778,
+  "lng": -74.00611111111111,
+  "label": "Kalshi",
+  "qid": "Q114586938"
+ },
+ "adobe.com": {
+  "lat": 37.304166666667,
+  "lng": -121.87277777778,
+  "label": "Adobe",
+  "qid": "Q11463"
+ },
+ "shield.ai": {
+  "lat": 32.715,
+  "lng": -117.1625,
+  "label": "Shield AI",
+  "qid": "Q114658539"
+ },
+ "kone.com": {
+  "lat": 60.205555555555556,
+  "lng": 24.655555555555555,
+  "label": "Kone",
+  "qid": "Q1146592"
+ },
+ "jpx.co.jp": {
+  "lat": 35.68078611111111,
+  "lng": 139.77740833333334,
+  "label": "Japan Exchange Group",
+  "qid": "Q11507487"
+ },
+ "nipponsteel.com": {
+  "lat": 35.678981,
+  "lng": 139.763058,
+  "label": "Nippon Steel Corporation",
+  "qid": "Q1151693"
+ },
+ "dsv.com": {
+  "lat": 55.65,
+  "lng": 12.198611111111,
+  "label": "DSV",
+  "qid": "Q1155771"
+ },
+ "publicstorage.com": {
+  "lat": 34.170833333333,
+  "lng": -118.25,
+  "label": "Public Storage",
+  "qid": "Q1156045"
+ },
+ "daimlertruck.com": {
+  "lat": 48.692777777778,
+  "lng": 9.1427777777778,
+  "label": "Daimler Truck",
+  "qid": "Q1157624"
+ },
+ "deepgram.com": {
+  "lat": 37.775,
+  "lng": -122.41944444444445,
+  "label": "Deepgram",
+  "qid": "Q115770008"
+ },
+ "daiwa-grp.jp": {
+  "lat": 35.68138888888889,
+  "lng": 139.76583333333335,
+  "label": "Daiwa Securities Group",
+  "qid": "Q1157716"
+ },
+ "danaher.com": {
+  "lat": 38.895,
+  "lng": -77.036666666667,
+  "label": "Danaher Corporation",
+  "qid": "Q1159256"
+ },
+ "rededorsaoluiz.com.br": {
+  "lat": -23.550394444444,
+  "lng": -46.633947222222,
+  "label": "Rede D'Or São Luiz",
+  "qid": "Q115982462"
+ },
+ "thalesgroup.com": {
+  "lat": 48.884166666667,
+  "lng": 2.2380555555556,
+  "label": "Thales Group",
+  "qid": "Q1161666"
+ },
+ "rocketlabcorp.com": {
+  "lat": -36.84916666666667,
+  "lng": 174.76527777777778,
+  "label": "Rocket Lab",
+  "qid": "Q116319"
+ },
+ "anthropic.com": {
+  "lat": 37.775,
+  "lng": -122.41944444444445,
+  "label": "Anthropic",
+  "qid": "Q116758847"
+ },
+ "3ds.com": {
+  "lat": 48.783333333333,
+  "lng": 2.1883333333333,
+  "label": "Dassault Systèmes",
+  "qid": "Q1172038"
+ },
+ "sift.com": {
+  "lat": 37.775,
+  "lng": -122.41944444444445,
+  "label": "Sift",
+  "qid": "Q117358528"
+ },
+ "cpkcr.com": {
+  "lat": 51.0475,
+  "lng": -114.0625,
+  "label": "Canadian Pacific Kansas City",
+  "qid": "Q117706368"
+ },
+ "kokusai-electric.com": {
+  "lat": 35.68944444444445,
+  "lng": 139.69166666666666,
+  "label": "Kokusai electric",
+  "qid": "Q118304315"
+ },
+ "reckitt.com": {
+  "lat": 51.509722222222,
+  "lng": -0.59305555555556,
+  "label": "Reckitt",
+  "qid": "Q1190881"
+ },
+ "dtcc.com": {
+  "lat": 40.71277777777778,
+  "lng": -74.00611111111111,
+  "label": "Depository Trust & Clearing Corporation",
+  "qid": "Q1191721"
+ },
+ "amman.co.id": {
+  "lat": -6.25,
+  "lng": 106.8,
+  "label": "Amman Mineral Internasional",
+  "qid": "Q119398906"
+ },
+ "renesas.com": {
+  "lat": 35.69394444444445,
+  "lng": 139.7536111111111,
+  "label": "Renesas Electronics",
+  "qid": "Q1196269"
+ },
+ "rambus.com": {
+  "lat": 37.368888888889,
+  "lng": -122.03694444444,
+  "label": "Rambus",
+  "qid": "Q1196745"
+ },
+ "macquarie.com": {
+  "lat": -33.867288,
+  "lng": 151.210203,
+  "label": "Macquarie Group",
+  "qid": "Q1200904"
+ },
+ "tkogrp.com": {
+  "lat": 40.71277777777778,
+  "lng": -74.00611111111111,
+  "label": "TKO Group Holdings",
+  "qid": "Q120435068"
+ },
+ "revvity.com": {
+  "lat": 42.380596,
+  "lng": -71.235005,
+  "label": "Revvity Inc.",
+  "qid": "Q120467527"
+ },
+ "apollo.io": {
+  "lat": 37.775,
+  "lng": -122.41944444444445,
+  "label": "Apollo.io",
+  "qid": "Q121497191"
+ },
+ "coreweave.com": {
+  "lat": 40.8199,
+  "lng": -74.3102,
+  "label": "CoreWeave",
+  "qid": "Q121875386"
+ },
+ "hmg.com": {
+  "lat": 24.638333333333332,
+  "lng": 46.715,
+  "label": "Dr. Sulaiman Al Habib Medical Services Group",
+  "qid": "Q12242596"
+ },
+ "yili.com": {
+  "lat": 40.81507,
+  "lng": 111.66293,
+  "label": "Yili Group",
+  "qid": "Q1231406"
+ },
+ "ramp.com": {
+  "lat": 43,
+  "lng": -75,
+  "label": "Ramp",
+  "qid": "Q123190361"
+ },
+ "resona-gr.co.jp": {
+  "lat": 35.672805555555556,
+  "lng": 139.81727777777778,
+  "label": "Resona Holdings",
+  "qid": "Q1232514"
+ },
+ "ttm.com": {
+  "lat": 33.740833333333,
+  "lng": -117.88138888889,
+  "label": "TTM Technologies",
+  "qid": "Q123269714"
+ },
+ "botbuilt.com": {
+  "lat": 35.994166666666665,
+  "lng": -78.89861111111111,
+  "label": "BotBuilt",
+  "qid": "Q124031147"
+ },
+ "orsted.com": {
+  "lat": 55.564444444444,
+  "lng": 9.7597222222222,
+  "label": "Ørsted",
+  "qid": "Q1241260"
+ },
+ "torrentpharma.com": {
+  "lat": 23.021944444444443,
+  "lng": 72.57972222222222,
+  "label": "Torrent Pharmaceuticals",
+  "qid": "Q12430250"
+ },
+ "pddholdings.com": {
+  "lat": 53.34972222222222,
+  "lng": -6.260277777777778,
+  "label": "PDD Holdings",
+  "qid": "Q124461238"
+ },
+ "veralto.com": {
+  "lat": 42.380596,
+  "lng": -71.235005,
+  "label": "Veralto Corporation",
+  "qid": "Q124721239"
+ },
+ "albedo.com": {
+  "lat": 39.739166666667,
+  "lng": -104.98472222222,
+  "label": "Albedo Space",
+  "qid": "Q124749761"
+ },
+ "coalindia.in": {
+  "lat": 22.5675,
+  "lng": 88.37,
+  "label": "Coal India",
+  "qid": "Q124976"
+ },
+ "asteralabs.com": {
+  "lat": 37.35,
+  "lng": -121.96666666667,
+  "label": "Astera Labs",
+  "qid": "Q125028873"
+ },
+ "dogusgrubu.com.tr": {
+  "lat": 41.01,
+  "lng": 28.960277777778,
+  "label": "Doğuş Holding",
+  "qid": "Q1253703"
+ },
+ "crusoe.ai": {
+  "lat": 39.739166666667,
+  "lng": -104.98472222222,
+  "label": "Crusoe Energy",
+  "qid": "Q125522769"
+ },
+ "elcompanies.com": {
+  "lat": 40.71277777777778,
+  "lng": -74.00611111111111,
+  "label": "Estée Lauder Companies",
+  "qid": "Q1260606"
+ },
+ "dewa.gov.ae": {
+  "lat": 25.269722222222,
+  "lng": 55.309444444444,
+  "label": "Dubai Electricity and Water Authority",
+  "qid": "Q1262868"
+ },
+ "duke-energy.com": {
+  "lat": 35.226944444444,
+  "lng": -80.843333333333,
+  "label": "Duke Energy",
+  "qid": "Q1264404"
+ },
+ "albemarle.com": {
+  "lat": 30.4475,
+  "lng": -91.178611111111,
+  "label": "Albemarle Corporation",
+  "qid": "Q127074"
+ },
+ "helsing.ai": {
+  "lat": 48.1375,
+  "lng": 11.575,
+  "label": "Helsing",
+  "qid": "Q127380521"
+ },
+ "endesa.com": {
+  "lat": 40.41694444444445,
+  "lng": -3.703333333333333,
+  "label": "Endesa",
+  "qid": "Q1275336"
+ },
+ "eogresources.com": {
+  "lat": 29.762777777778,
+  "lng": -95.383055555556,
+  "label": "EOG Resources",
+  "qid": "Q1275577"
+ },
+ "eqtgroup.com": {
+  "lat": 59.329444444444,
+  "lng": 18.068611111111,
+  "label": "EQT Partners",
+  "qid": "Q1275733"
+ },
+ "ecopetrol.com.co": {
+  "lat": 4.60971,
+  "lng": -74.08175,
+  "label": "Ecopetrol",
+  "qid": "Q1282130"
+ },
+ "mondelezinternational.com": {
+  "lat": 42.168333333333,
+  "lng": -87.851388888889,
+  "label": "Mondelez International",
+  "qid": "Q12857502"
+ },
+ "hd.eneos.co.jp": {
+  "lat": 35.68425,
+  "lng": 139.770222,
+  "label": "ENEOS Holdings",
+  "qid": "Q128577"
+ },
+ "ab-inbev.com": {
+  "lat": 50.846666666666664,
+  "lng": 4.351666666666667,
+  "label": "Anheuser-Busch InBev",
+  "qid": "Q128738"
+ },
+ "backerkit.com": {
+  "lat": 37.775,
+  "lng": -122.41944444444445,
+  "label": "BackerKit",
+  "qid": "Q129251986"
+ },
+ "eicher.in": {
+  "lat": 28.466666666667,
+  "lng": 77.033333333333,
+  "label": "Eicher Motors",
+  "qid": "Q1301821"
+ },
+ "eiffage.com": {
+  "lat": 48.911111111111,
+  "lng": 2.2855555555556,
+  "label": "Eiffage",
+  "qid": "Q1302944"
+ },
+ "ssi.inc": {
+  "lat": 37.44444444444444,
+  "lng": -122.16,
+  "label": "Safe Superintelligence Inc.",
+  "qid": "Q130302670"
+ },
+ "hgtech.com.cn": {
+  "lat": 30.595,
+  "lng": 114.2975,
+  "label": "Huagong Tech",
+  "qid": "Q131069040"
+ },
+ "hd-hyundaielectric.com": {
+  "lat": 37.438611111111,
+  "lng": 127.13777777778,
+  "label": "HD Hyundai Electric",
+  "qid": "Q131187949"
+ },
+ "polycab.com": {
+  "lat": 19.075833333333332,
+  "lng": 72.8775,
+  "label": "Polycab India",
+  "qid": "Q131286598"
+ },
+ "intuit.com": {
+  "lat": 37.392777777778,
+  "lng": -122.04194444444,
+  "label": "Intuit",
+  "qid": "Q1318848"
+ },
+ "natwestgroup.com": {
+  "lat": 55.95333333333333,
+  "lng": -3.1891666666666665,
+  "label": "NatWest Group",
+  "qid": "Q13218598"
+ },
+ "tcs.com": {
+  "lat": 19.075833333333332,
+  "lng": 72.8775,
+  "label": "Tata Consultancy Services",
+  "qid": "Q13227919"
+ },
+ "ul.com": {
+  "lat": 42.1292,
+  "lng": -87.8408,
+  "label": "UL LLC",
+  "qid": "Q1324421"
+ },
+ "elbitsystems.com": {
+  "lat": 32.81916666666667,
+  "lng": 34.99916666666667,
+  "label": "Elbit Systems Ltd.",
+  "qid": "Q1325369"
+ },
+ "akesobio.com": {
+  "lat": 23.13,
+  "lng": 113.26,
+  "label": "Akeso",
+  "qid": "Q132735866"
+ },
+ "gilgameshpharmaceutical.com": {
+  "lat": 40.71277777777778,
+  "lng": -74.00611111111111,
+  "label": "Gilgamesh Pharmaceuticals",
+  "qid": "Q133094039"
+ },
+ "bam.brookfield.com": {
+  "lat": 43,
+  "lng": -75,
+  "label": "Brookfield Asset Management",
+  "qid": "Q133824445"
+ },
+ "colesgroup.com.au": {
+  "lat": -37.814166666666665,
+  "lng": 144.96305555555554,
+  "label": "Coles Group",
+  "qid": "Q1339055"
+ },
+ "fly.io": {
+  "lat": 41.88194444444444,
+  "lng": -87.62777777777778,
+  "label": "Fly.io",
+  "qid": "Q133943318"
+ },
+ "ems-group.com": {
+  "lat": 46.81981,
+  "lng": 9.45455,
+  "label": "Ems-Chemie",
+  "qid": "Q1339621"
+ },
+ "enbridge.com": {
+  "lat": 51.0475,
+  "lng": -114.0625,
+  "label": "Enbridge",
+  "qid": "Q1339966"
+ },
+ "intesasanpaolo.com": {
+  "lat": 45.079166666666666,
+  "lng": 7.676111111111111,
+  "label": "Gruppo Intesa Sanpaolo",
+  "qid": "Q1343118"
+ },
+ "bilt.com": {
+  "lat": 40.71277777777778,
+  "lng": -74.00611111111111,
+  "label": "Bilt",
+  "qid": "Q134396447"
+ },
+ "entergy.com": {
+  "lat": 29.976111111111113,
+  "lng": -90.07833333333333,
+  "label": "Entergy",
+  "qid": "Q1344587"
+ },
+ "cashfree.com": {
+  "lat": 12.9791198,
+  "lng": 77.5912997,
+  "label": "Cashfree Payments",
+  "qid": "Q134715663"
+ },
+ "tel.com": {
+  "lat": 35.67138611111111,
+  "lng": 139.73443333333333,
+  "label": "Tokyo Electron",
+  "qid": "Q1351484"
+ },
+ "saputo.com": {
+  "lat": 45.5033426,
+  "lng": -73.5868411,
+  "label": "Saputo",
+  "qid": "Q1352708"
+ },
+ "bcg.com": {
+  "lat": 42.360277777777775,
+  "lng": -71.05777777777777,
+  "label": "Boston Consulting Group",
+  "qid": "Q135635"
+ },
+ "itau.com.br": {
+  "lat": -23.550394444444,
+  "lng": -46.633947222222,
+  "label": "Banco Itaú",
+  "qid": "Q13582383"
+ },
+ "talus.bio": {
+  "lat": 47.605,
+  "lng": -122.33,
+  "label": "Talus Bio",
+  "qid": "Q135840584"
+ },
+ "howdy.com": {
+  "lat": 30.3,
+  "lng": -97.733333333333,
+  "label": "Howdy.com",
+  "qid": "Q135984806"
+ },
+ "corporate.hasbro.com": {
+  "lat": 41.875555555556,
+  "lng": -71.376111111111,
+  "label": "Hasbro, Inc.",
+  "qid": "Q136088303"
+ },
+ "termius.com": {
+  "lat": 37.775,
+  "lng": -122.41944444444445,
+  "label": "Termius Corporation",
+  "qid": "Q136218995"
+ },
+ "corporate.magnumicecream.com": {
+  "lat": 52.36666666666667,
+  "lng": 4.883333333333333,
+  "label": "The Magnum Ice Cream Company",
+  "qid": "Q136341037"
+ },
+ "mscgroup.com": {
+  "lat": 46.2,
+  "lng": 6.15,
+  "label": "MSC Group",
+  "qid": "Q136406124"
+ },
+ "wipro.com": {
+  "lat": 12.9791198,
+  "lng": 77.5912997,
+  "label": "Wipro",
+  "qid": "Q1364176"
+ },
+ "groupe-sncf.com": {
+  "lat": 48.935555555556,
+  "lng": 2.3538888888889,
+  "label": "Société nationale des chemins de fer français",
+  "qid": "Q13646"
+ },
+ "zte.com.cn": {
+  "lat": 22.546666666666667,
+  "lng": 114.05444444444444,
+  "label": "ZTE",
+  "qid": "Q136484"
+ },
+ "kepco.co.jp": {
+  "lat": 34.6927,
+  "lng": 135.493,
+  "label": "Kansai Electric Power Company",
+  "qid": "Q1365015"
+ },
+ "hochtief.com": {
+  "lat": 51.450833333333,
+  "lng": 7.0130555555556,
+  "label": "Hochtief",
+  "qid": "Q136542"
+ },
+ "inversionspace.com": {
+  "lat": 34.05223,
+  "lng": -118.24368,
+  "label": "Inversion Space",
+  "qid": "Q136649890"
+ },
+ "people.ai": {
+  "lat": 37.775,
+  "lng": -122.41944444444445,
+  "label": "People.ai, Inc.",
+  "qid": "Q136719995"
+ },
+ "mailmodo.com": {
+  "lat": 39.828175,
+  "lng": -98.5795,
+  "label": "Mailmodo",
+  "qid": "Q136752090"
+ },
+ "supabase.com": {
+  "lat": 1.3,
+  "lng": 103.8,
+  "label": "Supabase",
+  "qid": "Q136776342"
+ },
+ "aisdr.com": {
+  "lat": 39.828175,
+  "lng": -98.5795,
+  "label": "AiSDR Inc.",
+  "qid": "Q137176743"
+ },
+ "biorender.com": {
+  "lat": 43.670277777778,
+  "lng": -79.386666666667,
+  "label": "BioRender.com",
+  "qid": "Q137394547"
+ },
+ "geckorobotics.com": {
+  "lat": 40.44166666666667,
+  "lng": -80,
+  "label": "Gecko Robotics, Inc",
+  "qid": "Q137570136"
+ },
+ "newfront.com": {
+  "lat": 37.775,
+  "lng": -122.41944444444445,
+  "label": "Newfront",
+  "qid": "Q137668874"
+ },
+ "starcloud.com": {
+  "lat": 47.669444444444,
+  "lng": -122.12388888889,
+  "label": "Starcloud",
+  "qid": "Q137690980"
+ },
+ "bitstack-app.com": {
+  "lat": 43.486111111111,
+  "lng": 5.4955555555556,
+  "label": "BITSTACK DIGITAL ASSETS",
+  "qid": "Q137779154"
+ },
+ "bitminetech.io": {
+  "lat": 36.16722222222222,
+  "lng": -115.14861111111111,
+  "label": "BitMine Immersion",
+  "qid": "Q137983503"
+ },
+ "rwe.com": {
+  "lat": 51.450833333333,
+  "lng": 7.0130555555556,
+  "label": "RWE",
+  "qid": "Q138133"
+ },
+ "alphadhabi.com": {
+  "lat": 24.45111111111111,
+  "lng": 54.39694444444444,
+  "label": "Alpha Dhabi Holding",
+  "qid": "Q138164919"
+ },
+ "brightspringhealth.com": {
+  "lat": 38.25611111111111,
+  "lng": -85.75138888888888,
+  "label": "BrightSpring Health Services",
+  "qid": "Q138212837"
+ },
+ "qxo.com": {
+  "lat": 41.02649,
+  "lng": -73.62846,
+  "label": "QXO Building Products",
+  "qid": "Q138213880"
+ },
+ "exeloncorp.com": {
+  "lat": 41.88194444444444,
+  "lng": -87.62777777777778,
+  "label": "Exelon",
+  "qid": "Q1383669"
+ },
+ "exor.com": {
+  "lat": 45.079166666666666,
+  "lng": 7.676111111111111,
+  "label": "Exor",
+  "qid": "Q1384140"
+ },
+ "expeditors.com": {
+  "lat": 47.605,
+  "lng": -122.33,
+  "label": "Expeditors International",
+  "qid": "Q1384324"
+ },
+ "altro.io": {
+  "lat": 34.05223,
+  "lng": -118.24368,
+  "label": "Altro",
+  "qid": "Q138575547"
+ },
+ "iren.com": {
+  "lat": -33.867777777777775,
+  "lng": 151.21,
+  "label": "IREN",
+  "qid": "Q138585043"
+ },
+ "qnityelectronics.com": {
+  "lat": 24.804722222222,
+  "lng": 120.97138888889,
+  "label": "Qnity",
+  "qid": "Q138685636"
+ },
+ "qbe.com": {
+  "lat": -33.867777777777775,
+  "lng": 151.21,
+  "label": "QBE Insurance",
+  "qid": "Q138736"
+ },
+ "stepful.com": {
+  "lat": 40.71277777777778,
+  "lng": -74.00611111111111,
+  "label": "Stepful",
+  "qid": "Q138952932"
+ },
+ "fico.com": {
+  "lat": 37.304166666667,
+  "lng": -121.87277777778,
+  "label": "FICO",
+  "qid": "Q1392999"
+ },
+ "fairfax.ca": {
+  "lat": 43.670277777778,
+  "lng": -79.386666666667,
+  "label": "Fairfax Financial",
+  "qid": "Q1393210"
+ },
+ "thundercompute.com": {
+  "lat": 37.775,
+  "lng": -122.41944444444445,
+  "label": "Thunder Compute",
+  "qid": "Q139324016"
+ },
+ "beyond-aero.com": {
+  "lat": 43.60444444444445,
+  "lng": 1.4433333333333334,
+  "label": "",
+  "qid": "Q139588580"
+ },
+ "fastretailing.com": {
+  "lat": 34.17802777777778,
+  "lng": 131.47377777777777,
+  "label": "Fast Retailing",
+  "qid": "Q1397688"
+ },
+ "astromecha.co": {
+  "lat": 37.775,
+  "lng": -122.41944444444445,
+  "label": "Astro Mechanica",
+  "qid": "Q139783144"
+ },
+ "faire.com": {
+  "lat": 37.775,
+  "lng": -122.41944444444445,
+  "label": "Faire",
+  "qid": "Q139785345"
+ },
+ "campfire.ai": {
+  "lat": 37.775,
+  "lng": -122.41944444444445,
+  "label": "Campfire",
+  "qid": "Q139807949"
+ },
+ "camelai.com": {
+  "lat": 37.775,
+  "lng": -122.41944444444445,
+  "label": "CamelAI",
+  "qid": "Q140167229"
+ },
+ "anjahealth.com": {
+  "lat": 34.05223,
+  "lng": -118.24368,
+  "label": "Anja Health expands partnership with Vitalant Cord Blood Stem Cell Laboratory",
+  "qid": "Q140250601"
+ },
+ "reflection.ai": {
+  "lat": 40.65083333333333,
+  "lng": -73.94972222222222,
+  "label": "Reflection AI",
+  "qid": "Q140315597"
+ },
+ "agenticfabriq.com": {
+  "lat": 37.775,
+  "lng": -122.41944444444445,
+  "label": "Agentic Fabriq",
+  "qid": "Q140392995"
+ },
+ "superglue.ai": {
+  "lat": 48.1375,
+  "lng": 11.575,
+  "label": "superglue",
+  "qid": "Q140455409"
+ },
+ "nozomio.com": {
+  "lat": 37.775,
+  "lng": -122.41944444444445,
+  "label": "Nozomio Labs",
+  "qid": "Q140528449"
+ },
+ "westmining.com": {
+  "lat": 36.62386,
+  "lng": 101.77866,
+  "label": "Western Mining Company",
+  "qid": "Q1405600"
+ },
+ "ferrovial.com": {
+  "lat": 40.41694444444445,
+  "lng": -3.703333333333333,
+  "label": "Ferrovial",
+  "qid": "Q1408037"
+ },
+ "saab.com": {
+  "lat": 55.583333333333336,
+  "lng": 13,
+  "label": "Kockums",
+  "qid": "Q1408079"
+ },
+ "guardianlife.com": {
+  "lat": 40.71277777777778,
+  "lng": -74.00611111111111,
+  "label": "The Guardian Life Insurance Company of America",
+  "qid": "Q140870591"
+ },
+ "fisglobal.com": {
+  "lat": 30.316666666667,
+  "lng": -81.65,
+  "label": "Fidelity National Information Services",
+  "qid": "Q1411295"
+ },
+ "absurd.com": {
+  "lat": 34.05223,
+  "lng": -118.24368,
+  "label": "Absurd",
+  "qid": "Q141141673"
+ },
+ "53.com": {
+  "lat": 39.1,
+  "lng": -84.5125,
+  "label": "Fifth Third Bank",
+  "qid": "Q1411810"
+ },
+ "avironactive.com": {
+  "lat": 43.670277777778,
+  "lng": -79.386666666667,
+  "label": "Aviron Interactive Inc.",
+  "qid": "Q141496481"
+ },
+ "polotab.com": {
+  "lat": 19.353773,
+  "lng": -99.13589,
+  "label": "PoloTab",
+  "qid": "Q141599917"
+ },
+ "godaddy.com": {
+  "lat": 33.425555555555555,
+  "lng": -111.94,
+  "label": "GoDaddy",
+  "qid": "Q1416215"
+ },
+ "linklane.ai": {
+  "lat": 37.775,
+  "lng": -122.41944444444445,
+  "label": "LinkLane",
+  "qid": "Q141738918"
+ },
+ "nokia.com": {
+  "lat": 60.205555555555556,
+  "lng": 24.655555555555555,
+  "label": "Nokia",
+  "qid": "Q1418"
+ },
+ "first-quantum.com": {
+  "lat": 49.26083333333333,
+  "lng": -123.1138888888889,
+  "label": "First Quantum Minerals",
+  "qid": "Q1419532"
+ },
+ "hyatt.com": {
+  "lat": 41.88194444444444,
+  "lng": -87.62777777777778,
+  "label": "Hyatt Hotels Corporation",
+  "qid": "Q1425063"
+ },
+ "slb.com": {
+  "lat": 29.762777777778,
+  "lng": -95.383055555556,
+  "label": "SLB",
+  "qid": "Q1425316"
+ },
+ "bloomberg.com": {
+  "lat": 40.71277777777778,
+  "lng": -74.00611111111111,
+  "label": "Bloomberg News",
+  "qid": "Q14270642"
+ },
+ "ongcindia.com": {
+  "lat": 30.318,
+  "lng": 78.029,
+  "label": "Oil and Natural Gas Corporation",
+  "qid": "Q1430541"
+ },
+ "nab.com.au": {
+  "lat": -37.814166666666665,
+  "lng": 144.96305555555554,
+  "label": "National Australia Bank",
+  "qid": "Q1430985"
+ },
+ "orange.com": {
+  "lat": 48.823055555556,
+  "lng": 2.2691666666667,
+  "label": "Orange",
+  "qid": "Q1431486"
+ },
+ "unum.com": {
+  "lat": 35.045555555556,
+  "lng": -85.267222222222,
+  "label": "Unum",
+  "qid": "Q143435"
+ },
+ "femsa.com": {
+  "lat": 25.684444444444445,
+  "lng": -100.31805555555556,
+  "label": "FEMSA",
+  "qid": "Q1435628"
+ },
+ "umc.com": {
+  "lat": 24.78,
+  "lng": 121.01361111111,
+  "label": "United Microelectronics Corporation",
+  "qid": "Q143616"
+ },
+ "fortisinc.com": {
+  "lat": 47.56138888888889,
+  "lng": -52.71194444444444,
+  "label": "Fortis Inc.",
+  "qid": "Q1438987"
+ },
+ "fortum.com": {
+  "lat": 60.174911111111,
+  "lng": 24.830811111111,
+  "label": "Fortum",
+  "qid": "Q1439075"
+ },
+ "gruppotim.it": {
+  "lat": 45.466944444444,
+  "lng": 9.19,
+  "label": "TIM Group",
+  "qid": "Q144617"
+ },
+ "dollargeneral.com": {
+  "lat": 36.326944444444,
+  "lng": -86.704166666667,
+  "label": "Dollar General",
+  "qid": "Q145168"
+ },
+ "recordati.com": {
+  "lat": 45.466944444444,
+  "lng": 9.19,
+  "label": "Recordati",
+  "qid": "Q1452068"
+ },
+ "wanxiang.com.cn": {
+  "lat": 30.25,
+  "lng": 120.1675,
+  "label": "Wanxiang",
+  "qid": "Q1463781"
+ },
+ "sage.com": {
+  "lat": 54.977777777778,
+  "lng": -1.6133333333333,
+  "label": "Sage Group",
+  "qid": "Q1469903"
+ },
+ "parker.com": {
+  "lat": 41.49916666666667,
+  "lng": -81.69472222222223,
+  "label": "Parker Hannifin",
+  "qid": "Q1470619"
+ },
+ "vinci.com": {
+  "lat": 48.890555555556,
+  "lng": 2.2036111111111,
+  "label": "Vinci",
+  "qid": "Q1475312"
+ },
+ "keyence.com": {
+  "lat": 34.69375,
+  "lng": 135.5021111111111,
+  "label": "Keyence",
+  "qid": "Q1475699"
+ },
+ "tcifund.com": {
+  "lat": 51.511075,
+  "lng": -0.1413,
+  "label": "The Children's Investment Fund Management",
+  "qid": "Q1476216"
+ },
+ "paccar.com": {
+  "lat": 47.614444444444445,
+  "lng": -122.1925,
+  "label": "PACCAR",
+  "qid": "Q1477661"
+ },
+ "nyk.com": {
+  "lat": 35.683889,
+  "lng": 139.774444,
+  "label": "Nippon Yusen",
+  "qid": "Q1478918"
+ },
+ "my.xcelenergy.com": {
+  "lat": 44.981944444444444,
+  "lng": -93.26916666666666,
+  "label": "Xcel Energy",
+  "qid": "Q1486956"
+ },
+ "galp.com": {
+  "lat": 38.708042,
+  "lng": -9.139016,
+  "label": "Galp Energia",
+  "qid": "Q1492739"
+ },
+ "unipol.it": {
+  "lat": 44.493888888889,
+  "lng": 11.342777777778,
+  "label": "Unipol Gruppo",
+  "qid": "Q1503818"
+ },
+ "yildizholding.com.tr": {
+  "lat": 41.01,
+  "lng": 28.960277777778,
+  "label": "Yıldız Holding",
+  "qid": "Q15043910"
+ },
+ "harmony.co.za": {
+  "lat": -26.179722222222,
+  "lng": 27.704166666667,
+  "label": "Harmony Gold",
+  "qid": "Q1507228"
+ },
+ "itw.com": {
+  "lat": 42.07944444,
+  "lng": -87.81555556,
+  "label": "Illinois Tool Works",
+  "qid": "Q1510378"
+ },
+ "dexcom.com": {
+  "lat": 32.715,
+  "lng": -117.1625,
+  "label": "Dexcom",
+  "qid": "Q15109865"
+ },
+ "coherent.com": {
+  "lat": 40.7542,
+  "lng": -79.8156,
+  "label": "Coherent Corp.",
+  "qid": "Q15109887"
+ },
+ "tractorsupply.com": {
+  "lat": 35.998194,
+  "lng": -86.792619,
+  "label": "Tractor Supply Company",
+  "qid": "Q15109925"
+ },
+ "michelin.com": {
+  "lat": 45.779722222222,
+  "lng": 3.0869444444444,
+  "label": "Michelin",
+  "qid": "Q151107"
+ },
+ "mindray.com": {
+  "lat": 22.546666666666667,
+  "lng": 114.05444444444444,
+  "label": "Mindray",
+  "qid": "Q15138136"
+ },
+ "mmg.com": {
+  "lat": -37.814166666666665,
+  "lng": 144.96305555555554,
+  "label": "Minerals and Metals Group",
+  "qid": "Q15150358"
+ },
+ "suncor.com": {
+  "lat": 51.0475,
+  "lng": -114.0625,
+  "label": "Suncor Energy",
+  "qid": "Q1516410"
+ },
+ "amersports.com": {
+  "lat": 60.170833333333334,
+  "lng": 24.9375,
+  "label": "Amer Sports",
+  "qid": "Q152695"
+ },
+ "lindt-spruengli.com": {
+  "lat": 47.324722222222,
+  "lng": 8.5491666666667,
+  "label": "Lindt & Sprüngli",
+  "qid": "Q152822"
+ },
+ "asus.com": {
+  "lat": 25.0375,
+  "lng": 121.5625,
+  "label": "ASUS",
+  "qid": "Q152864"
+ },
+ "waymo.com": {
+  "lat": 37.392777777778,
+  "lng": -122.04194444444,
+  "label": "",
+  "qid": "Q15330"
+ },
+ "stc.com.sa": {
+  "lat": 24.638333333333332,
+  "lng": 46.715,
+  "label": "Saudi Telecom Company",
+  "qid": "Q1535171"
+ },
+ "mashreq.com": {
+  "lat": 25.269722222222,
+  "lng": 55.309444444444,
+  "label": "Mashreq",
+  "qid": "Q1538829"
+ },
+ "sekisuihouse.co.jp": {
+  "lat": 34.69375,
+  "lng": 135.5021111111111,
+  "label": "Sekisui House",
+  "qid": "Q1539141"
+ },
+ "vis.com.tw": {
+  "lat": 24.804722222222,
+  "lng": 120.97138888889,
+  "label": "Vanguard International Semiconductor Corporation",
+  "qid": "Q1539149"
+ },
+ "microchip.com": {
+  "lat": 33.303333333333,
+  "lng": -111.84138888889,
+  "label": "Microchip Technology",
+  "qid": "Q1545076"
+ },
+ "kkr.com": {
+  "lat": 40.71277777777778,
+  "lng": -74.00611111111111,
+  "label": "Kohlberg Kravis Roberts",
+  "qid": "Q1570773"
+ },
+ "corcept.com": {
+  "lat": 37.454166666667,
+  "lng": -122.17861111111,
+  "label": "Corcept Therapeutics",
+  "qid": "Q15734041"
+ },
+ "commerzbank.de": {
+  "lat": 50.11116,
+  "lng": 8.67437,
+  "label": "Commerzbank AG",
+  "qid": "Q157617"
+ },
+ "standardbank.com": {
+  "lat": -26.204361111111,
+  "lng": 28.041638888889,
+  "label": "Standard Bank",
+  "qid": "Q1576610"
+ },
+ "group.vattenfall.com": {
+  "lat": 59.329444444444,
+  "lng": 18.068611111111,
+  "label": "Vattenfall",
+  "qid": "Q157675"
+ },
+ "itausa.com.br": {
+  "lat": -23.550394444444,
+  "lng": -46.633947222222,
+  "label": "Itaúsa",
+  "qid": "Q1579151"
+ },
+ "essilorluxottica.com": {
+  "lat": 52.36666666666667,
+  "lng": 4.883333333333333,
+  "label": "GrandVision",
+  "qid": "Q15812731"
+ },
+ "tnb.com.my": {
+  "lat": 3.1477777777778,
+  "lng": 101.69527777778,
+  "label": "Tenaga Nasional",
+  "qid": "Q1584297"
+ },
+ "global.yamaha-motor.com": {
+  "lat": 34.717888888888886,
+  "lng": 137.8515277777778,
+  "label": "Yamaha Motor Company",
+  "qid": "Q158888"
+ },
+ "firstholding.com.tw": {
+  "lat": 25.0375,
+  "lng": 121.5625,
+  "label": "First Financial Holding",
+  "qid": "Q15919901"
+ },
+ "3m.com": {
+  "lat": 44.953055555556,
+  "lng": -92.995277777778,
+  "label": "3M",
+  "qid": "Q159433"
+ },
+ "langjiu.cn": {
+  "lat": 28.04406,
+  "lng": 105.8085,
+  "label": "Langjiu Group",
+  "qid": "Q15947177"
+ },
+ "paramount.com": {
+  "lat": 34.05223,
+  "lng": -118.24368,
+  "label": "Paramount Pictures",
+  "qid": "Q159846"
+ },
+ "huawei.com": {
+  "lat": 22.546666666666667,
+  "lng": 114.05444444444444,
+  "label": "Huawei",
+  "qid": "Q160120"
+ },
+ "telefonica.com": {
+  "lat": 40.420388888889,
+  "lng": -3.7019027777778,
+  "label": "Telefónica",
+  "qid": "Q160229"
+ },
+ "helmag.com": {
+  "lat": 53.55,
+  "lng": 10,
+  "label": "HELM",
+  "qid": "Q1603121"
+ },
+ "adaniports.com": {
+  "lat": 23.021944444444443,
+  "lng": 72.57972222222222,
+  "label": "Adani Ports & SEZ",
+  "qid": "Q16058076"
+ },
+ "celltrion.com": {
+  "lat": 37.463888888889,
+  "lng": 126.64861111111,
+  "label": "Celltrion",
+  "qid": "Q16175734"
+ },
+ "hul.co.in": {
+  "lat": 19.075833333333332,
+  "lng": 72.8775,
+  "label": "Hindustan Unilever",
+  "qid": "Q1619376"
+ },
+ "carvana.com": {
+  "lat": 33.425555555555555,
+  "lng": -111.94,
+  "label": "Carvana",
+  "qid": "Q16247191"
+ },
+ "datadoghq.com": {
+  "lat": 40.71277777777778,
+  "lng": -74.00611111111111,
+  "label": "Datadog",
+  "qid": "Q16248637"
+ },
+ "glpropinc.com": {
+  "lat": 40.3328,
+  "lng": -75.9647,
+  "label": "Gaming and Leisure Properties",
+  "qid": "Q16251015"
+ },
+ "jazzpharma.com": {
+  "lat": 53,
+  "lng": -8,
+  "label": "Jazz Pharmaceuticals",
+  "qid": "Q16255113"
+ },
+ "grainger.com": {
+  "lat": 42.2347,
+  "lng": -87.8508,
+  "label": "W. W. Grainger",
+  "qid": "Q1627894"
+ },
+ "northwesternmutual.com": {
+  "lat": 43.05,
+  "lng": -87.95,
+  "label": "Northwestern Mutual",
+  "qid": "Q1630166"
+ },
+ "hcahealthcare.com": {
+  "lat": 36.16222222222222,
+  "lng": -86.77444444444444,
+  "label": "HCA Healthcare",
+  "qid": "Q1630431"
+ },
+ "continental.com": {
+  "lat": 52.374444444444,
+  "lng": 9.7386111111111,
+  "label": "Continental AG",
+  "qid": "Q163241"
+ },
+ "veolia.com": {
+  "lat": 44.915277777778,
+  "lng": -0.24388888888889,
+  "label": "Veolia",
+  "qid": "Q1632461"
+ },
+ "kpc.com.kw": {
+  "lat": 29.375,
+  "lng": 47.98,
+  "label": "",
+  "qid": "Q1634762"
+ },
+ "danskebank.com": {
+  "lat": 55.676111111111,
+  "lng": 12.568888888889,
+  "label": "Danske Bank",
+  "qid": "Q1636974"
+ },
+ "menards.com": {
+  "lat": 44.814722222222,
+  "lng": -91.492777777778,
+  "label": "Menards",
+  "qid": "Q1639897"
+ },
+ "sampo.com": {
+  "lat": 60.170833333333334,
+  "lng": 24.9375,
+  "label": "Sampo Group",
+  "qid": "Q1640495"
+ },
+ "aib.ie": {
+  "lat": 53.34972222222222,
+  "lng": -6.260277777777778,
+  "label": "Allied Irish Banks",
+  "qid": "Q1642179"
+ },
+ "optiver.com": {
+  "lat": 52.36666666666667,
+  "lng": 4.883333333333333,
+  "label": "Optiver",
+  "qid": "Q1645300"
+ },
+ "holcim.com": {
+  "lat": 47.168055555555554,
+  "lng": 8.516944444444444,
+  "label": "Holcim Group",
+  "qid": "Q16466481"
+ },
+ "ppih.co.jp": {
+  "lat": 35.68944444444445,
+  "lng": 139.69166666666666,
+  "label": "Pan Pacific International Holdings Corporation",
+  "qid": "Q16485533"
+ },
+ "hnfhc.com.tw": {
+  "lat": 25.0375,
+  "lng": 121.5625,
+  "label": "Hua Nan Financial Holdings",
+  "qid": "Q16510360"
+ },
+ "manulife.com": {
+  "lat": 43.670277777778,
+  "lng": -79.386666666667,
+  "label": "Manulife Financial",
+  "qid": "Q1652574"
+ },
+ "icici.bank.in": {
+  "lat": 18.96,
+  "lng": 72.82,
+  "label": "ICICI Bank",
+  "qid": "Q1653258"
+ },
+ "ihi.co.jp": {
+  "lat": 35.68944444444445,
+  "lng": 139.69166666666666,
+  "label": "IHI Corporation",
+  "qid": "Q1653679"
+ },
+ "itcportal.com": {
+  "lat": 22.5675,
+  "lng": 88.37,
+  "label": "ITC Limited",
+  "qid": "Q1655008"
+ },
+ "iamgold.com": {
+  "lat": 43.670277777778,
+  "lng": -79.386666666667,
+  "label": "Iamgold",
+  "qid": "Q1655409"
+ },
+ "myvi.in": {
+  "lat": 19.075833333333332,
+  "lng": 72.8775,
+  "label": "Vodafone Idea",
+  "qid": "Q1656673"
+ },
+ "rogers.com": {
+  "lat": 43.670277777778,
+  "lng": -79.386666666667,
+  "label": "Rogers Communications",
+  "qid": "Q165684"
+ },
+ "westpharma.com": {
+  "lat": 50.816666666667,
+  "lng": 6.2833333333333,
+  "label": "West Pharmaceutical Services Deutschland",
+  "qid": "Q1660662"
+ },
+ "iag.com.au": {
+  "lat": -33.867777777777775,
+  "lng": 151.21,
+  "label": "Insurance Australia Group",
+  "qid": "Q1665336"
+ },
+ "mizuho-fg.co.jp": {
+  "lat": 35.685606,
+  "lng": 139.765275,
+  "label": "Mizuho Financial Group",
+  "qid": "Q166621"
+ },
+ "usfoods.com": {
+  "lat": 41.9908,
+  "lng": -87.8739,
+  "label": "US Foods",
+  "qid": "Q1668265"
+ },
+ "nnpcgroup.com": {
+  "lat": 9.0555555555556,
+  "lng": 7.4913888888889,
+  "label": "Nigerian National Petroleum Corporation",
+  "qid": "Q1671299"
+ },
+ "onsemi.com": {
+  "lat": 33.493055555556,
+  "lng": -111.92611111111,
+  "label": "onsemi",
+  "qid": "Q1671509"
+ },
+ "investorab.com": {
+  "lat": 59.329444444444,
+  "lng": 18.068611111111,
+  "label": "Investor",
+  "qid": "Q1671804"
+ },
+ "samsungbiologics.com": {
+  "lat": 37.463888888889,
+  "lng": 126.64861111111,
+  "label": "Samsung Biologics",
+  "qid": "Q16767532"
+ },
+ "hydroquebec.com": {
+  "lat": 45.5083,
+  "lng": -73.5625,
+  "label": "Hydro-Quebec",
+  "qid": "Q167840"
+ },
+ "statkraft.com": {
+  "lat": 59.913333333333334,
+  "lng": 10.738888888888889,
+  "label": "Statkraft AS",
+  "qid": "Q1681145"
+ },
+ "toray.co.jp": {
+  "lat": 35.68694444,
+  "lng": 139.77305556,
+  "label": "Toray Industries",
+  "qid": "Q168115"
+ },
+ "omv.com": {
+  "lat": 48.208333333333336,
+  "lng": 16.3725,
+  "label": "OMV",
+  "qid": "Q168238"
+ },
+ "annaly.com": {
+  "lat": 40.71277777777778,
+  "lng": -74.00611111111111,
+  "label": "Annaly Capital Management",
+  "qid": "Q16828730"
+ },
+ "jardines.com": {
+  "lat": 32.295,
+  "lng": -64.78305555555555,
+  "label": "Jardine Matheson",
+  "qid": "Q1683452"
+ },
+ "corpay.com": {
+  "lat": 33.754444444444445,
+  "lng": -84.38972222222222,
+  "label": "Corpay",
+  "qid": "Q16838618"
+ },
+ "vulcanmaterials.com": {
+  "lat": 33.5175,
+  "lng": -86.80944444444444,
+  "label": "Vulcan Materials Company",
+  "qid": "Q1685287"
+ },
+ "smm.co.jp": {
+  "lat": 35.658027777777775,
+  "lng": 139.75152777777777,
+  "label": "Sumitomo Metal Mining",
+  "qid": "Q1685648"
+ },
+ "jeronimomartins.com": {
+  "lat": 38.708042,
+  "lng": -9.139016,
+  "label": "Jerónimo Martins",
+  "qid": "Q1688026"
+ },
+ "ripple.com": {
+  "lat": 37.775,
+  "lng": -122.41944444444445,
+  "label": "Ripple",
+  "qid": "Q16904931"
+ },
+ "newsblur.com": {
+  "lat": 40.71277777777778,
+  "lng": -74.00611111111111,
+  "label": "NewsBlur",
+  "qid": "Q16927736"
+ },
+ "ropertech.com": {
+  "lat": 27.337222222222,
+  "lng": -82.535277777778,
+  "label": "Roper Technologies",
+  "qid": "Q16932392"
+ },
+ "glencore.com": {
+  "lat": 47.195555555556,
+  "lng": 8.5263888888889,
+  "label": "Glencore",
+  "qid": "Q169339"
+ },
+ "copart.com": {
+  "lat": 32.779166666667,
+  "lng": -96.808888888889,
+  "label": "Copart",
+  "qid": "Q16951448"
+ },
+ "nutanix.com": {
+  "lat": 37.304166666667,
+  "lng": -121.87277777778,
+  "label": "Nutanix",
+  "qid": "Q16959629"
+ },
+ "bt.com": {
+  "lat": 51.5156,
+  "lng": -0.0978,
+  "label": "BT Consumer",
+  "qid": "Q16971956"
+ },
+ "dovercorporation.com": {
+  "lat": 41.7947,
+  "lng": -88.0169,
+  "label": "Dover Corporation",
+  "qid": "Q16974527"
+ },
+ "alnylam.com": {
+  "lat": 42.375,
+  "lng": -71.106111111111,
+  "label": "Alnylam Pharmaceuticals",
+  "qid": "Q16974682"
+ },
+ "packagingcorp.com": {
+  "lat": 42.2347,
+  "lng": -87.8508,
+  "label": "Packaging Corporation of America",
+  "qid": "Q16983334"
+ },
+ "prologis.com": {
+  "lat": 37.775,
+  "lng": -122.41944444444445,
+  "label": "Prologis",
+  "qid": "Q16983765"
+ },
+ "renre.com": {
+  "lat": 32.32,
+  "lng": -64.74,
+  "label": "RenaissanceRe",
+  "qid": "Q16984071"
+ },
+ "ivanhoemines.com": {
+  "lat": 49.26083333333333,
+  "lng": -123.1138888888889,
+  "label": "Ivanhoe Mines",
+  "qid": "Q16987739"
+ },
+ "costargroup.com": {
+  "lat": 38.895,
+  "lng": -77.036666666667,
+  "label": "CoStar Group",
+  "qid": "Q16988748"
+ },
+ "harbourvest.com": {
+  "lat": 42.360277777777775,
+  "lng": -71.05777777777777,
+  "label": "HarbourVest Partners",
+  "qid": "Q16994799"
+ },
+ "circle.com": {
+  "lat": 42.360277777777775,
+  "lng": -71.05777777777777,
+  "label": "Circle",
+  "qid": "Q17007851"
+ },
+ "lumi.com": {
+  "lat": 34.05223,
+  "lng": -118.24368,
+  "label": "Lumi",
+  "qid": "Q17009088"
+ },
+ "sofi.com": {
+  "lat": 37.775,
+  "lng": -122.41944444444445,
+  "label": "SoFi",
+  "qid": "Q17020720"
+ },
+ "digitalocean.com": {
+  "lat": 40.71277777777778,
+  "lng": -74.00611111111111,
+  "label": "DigitalOcean",
+  "qid": "Q17052116"
+ },
+ "ictsi.com": {
+  "lat": 14.595833333333333,
+  "lng": 120.97722222222222,
+  "label": "International Container Terminal Services Inc.",
+  "qid": "Q17058305"
+ },
+ "ryanair.com": {
+  "lat": 53.421388888889,
+  "lng": -6.27,
+  "label": "Ryanair",
+  "qid": "Q170614"
+ },
+ "shriramfinance.in": {
+  "lat": 13.0825,
+  "lng": 80.275,
+  "label": "Shriram Finance Limited",
+  "qid": "Q17074288"
+ },
+ "repligen.com": {
+  "lat": 42.380596,
+  "lng": -71.235005,
+  "label": "Repligen",
+  "qid": "Q17078090"
+ },
+ "modernatx.com": {
+  "lat": 42.375,
+  "lng": -71.106111111111,
+  "label": "Moderna",
+  "qid": "Q17081612"
+ },
+ "paycom.com": {
+  "lat": 35.48222222222222,
+  "lng": -97.53527777777778,
+  "label": "Paycom",
+  "qid": "Q17084959"
+ },
+ "polleverywhere.com": {
+  "lat": 37.775,
+  "lng": -122.41944444444445,
+  "label": "Poll Everywhere",
+  "qid": "Q17149854"
+ },
+ "jx-nmm.com": {
+  "lat": 35.68944444444445,
+  "lng": 139.69166666666666,
+  "label": "JX Nippon Mining & Metals",
+  "qid": "Q17210819"
+ },
+ "nitorihd.co.jp": {
+  "lat": 43.090833333333,
+  "lng": 141.34083333333,
+  "label": "Nitori Holdings",
+  "qid": "Q17212489"
+ },
+ "key.com": {
+  "lat": 41.49916666666667,
+  "lng": -81.69472222222223,
+  "label": "KeyBank",
+  "qid": "Q1740314"
+ },
+ "meijiyasuda.co.jp": {
+  "lat": 35.67896389,
+  "lng": 139.76146944,
+  "label": "Meiji Yasuda Life",
+  "qid": "Q174081"
+ },
+ "gartner.com": {
+  "lat": 41.096666666667,
+  "lng": -73.552222222222,
+  "label": "Gartner",
+  "qid": "Q174198"
+ },
+ "kingdom.com.sa": {
+  "lat": 24.638333333333332,
+  "lng": 46.715,
+  "label": "Kingdom Holding Company",
+  "qid": "Q1742118"
+ },
+ "kirkland.com": {
+  "lat": 41.88194444444444,
+  "lng": -87.62777777777778,
+  "label": "Kirkland & Ellis",
+  "qid": "Q1743511"
+ },
+ "zoom.com": {
+  "lat": 37.304166666667,
+  "lng": -121.87277777778,
+  "label": "Zoom Communications",
+  "qid": "Q17460900"
+ },
+ "repsol.com": {
+  "lat": 40.3978,
+  "lng": -3.68306,
+  "label": "Repsol",
+  "qid": "Q174747"
+ },
+ "united.com": {
+  "lat": 41.878611,
+  "lng": -87.635833,
+  "label": "United Airlines",
+  "qid": "Q174769"
+ },
+ "home.sandvik": {
+  "lat": 59.329444444444,
+  "lng": 18.068611111111,
+  "label": "Sandvik",
+  "qid": "Q1753718"
+ },
+ "keysight.com": {
+  "lat": 38.448611111111,
+  "lng": -122.70472222222,
+  "label": "Keysight Technologies",
+  "qid": "Q17551096"
+ },
+ "sartorius.com": {
+  "lat": 51.533888888889,
+  "lng": 9.9355555555556,
+  "label": "Sartorius AG",
+  "qid": "Q175835"
+ },
+ "alrajhibank.com.sa": {
+  "lat": 24.638333333333332,
+  "lng": 46.715,
+  "label": "Alrajhi Bank",
+  "qid": "Q1761176"
+ },
+ "denso.com": {
+  "lat": 34.98927777777778,
+  "lng": 137.00213888888888,
+  "label": "Denso",
+  "qid": "Q176508"
+ },
+ "computershare.com": {
+  "lat": -37.814166666666665,
+  "lng": 144.96305555555554,
+  "label": "Computershare",
+  "qid": "Q176712"
+ },
+ "kongsberg.com": {
+  "lat": 59.665,
+  "lng": 9.6463888888889,
+  "label": "Kongsberg Gruppen",
+  "qid": "Q1770909"
+ },
+ "mol.co.jp": {
+  "lat": 35.683889,
+  "lng": 139.774444,
+  "label": "Mitsui O.S.K. Lines",
+  "qid": "Q1778084"
+ },
+ "wilmar-international.com": {
+  "lat": 1.3,
+  "lng": 103.8,
+  "label": "Wilmar International",
+  "qid": "Q1786712"
+ },
+ "bridgestone.co.jp": {
+  "lat": 35.68944444444445,
+  "lng": 139.69166666666666,
+  "label": "Bridgestone",
+  "qid": "Q179433"
+ },
+ "cgi.com": {
+  "lat": 45.4959,
+  "lng": -73.5722,
+  "label": "CGI Group",
+  "qid": "Q1798370"
+ },
+ "lw.com": {
+  "lat": 34.05223,
+  "lng": -118.24368,
+  "label": "Latham & Watkins",
+  "qid": "Q1806949"
+ },
+ "pzu.pl": {
+  "lat": 52.23,
+  "lng": 21.011111111111113,
+  "label": "Powszechny Zakład Ubezpieczeń",
+  "qid": "Q1807170"
+ },
+ "theheinekencompany.com": {
+  "lat": 52.36666666666667,
+  "lng": 4.883333333333333,
+  "label": "Heineken International",
+  "qid": "Q180855"
+ },
+ "woodside.com": {
+  "lat": -31.955833333333334,
+  "lng": 115.85972222222222,
+  "label": "Woodside Energy",
+  "qid": "Q1812208"
+ },
+ "mitsuifudosan.co.jp": {
+  "lat": 35.67058333333333,
+  "lng": 139.77197222222222,
+  "label": "Mitsui Fudosan",
+  "qid": "Q1812986"
+ },
+ "mtn.com": {
+  "lat": -26.204361111111,
+  "lng": 28.041638888889,
+  "label": "MTN Group",
+  "qid": "Q1813361"
+ },
+ "tokyo-gas.co.jp": {
+  "lat": 35.658027777777775,
+  "lng": 139.75152777777777,
+  "label": "Tokyo Gas",
+  "qid": "Q1813910"
+ },
+ "tatapower.com": {
+  "lat": 19.075833333333332,
+  "lng": 72.8775,
+  "label": "Tata Power",
+  "qid": "Q1814429"
+ },
+ "fanaticsinc.com": {
+  "lat": 40.71277777777778,
+  "lng": -74.00611111111111,
+  "label": "Fanatics, Inc.",
+  "qid": "Q18150640"
+ },
+ "nbg.gr": {
+  "lat": 37.98416666666667,
+  "lng": 23.728055555555557,
+  "label": "National Bank of Greece",
+  "qid": "Q1816028"
+ },
+ "suzuki.co.jp": {
+  "lat": 34.71088888888889,
+  "lng": 137.72619444444445,
+  "label": "Suzuki Motor Corporation",
+  "qid": "Q181642"
+ },
+ "qorvo.com": {
+  "lat": 36.0725,
+  "lng": -79.79027777777777,
+  "label": "Qorvo",
+  "qid": "Q18169198"
+ },
+ "supermicro.com": {
+  "lat": 37.304166666667,
+  "lng": -121.87277777778,
+  "label": "Supermicro",
+  "qid": "Q1817174"
+ },
+ "maersk.com": {
+  "lat": 55.676111111111,
+  "lng": 12.568888888889,
+  "label": "Maersk",
+  "qid": "Q18224"
+ },
+ "vivo.com": {
+  "lat": 23.04749,
+  "lng": 113.74928,
+  "label": "vivo",
+  "qid": "Q18301787"
+ },
+ "sabesp.com.br": {
+  "lat": -23.550394444444,
+  "lng": -46.633947222222,
+  "label": "Sabesp",
+  "qid": "Q183184"
+ },
+ "nn-group.com": {
+  "lat": 52.08,
+  "lng": 4.31,
+  "label": "NN Group",
+  "qid": "Q1834291"
+ },
+ "qib.com.qa": {
+  "lat": 25.28611111111111,
+  "lng": 51.529444444444444,
+  "label": "Qatar Islamic Bank",
+  "qid": "Q18346281"
+ },
+ "databricks.com": {
+  "lat": 37.775,
+  "lng": -122.41944444444445,
+  "label": "Databricks",
+  "qid": "Q18350420"
+ },
+ "twosigma.com": {
+  "lat": 40.723056,
+  "lng": -74.000833,
+  "label": "Two Sigma",
+  "qid": "Q18355352"
+ },
+ "adanipower.com": {
+  "lat": 23.021944444444443,
+  "lng": 72.57972222222222,
+  "label": "Adani Power",
+  "qid": "Q1852211"
+ },
+ "newscorp.com": {
+  "lat": 40.75861111111111,
+  "lng": -73.98222222222222,
+  "label": "News Corporation",
+  "qid": "Q185278"
+ },
+ "vodacom.com": {
+  "lat": -26,
+  "lng": 28.133333,
+  "label": "Vodacom",
+  "qid": "Q1856518"
+ },
+ "bajajfinserv.in": {
+  "lat": 18.52111111111111,
+  "lng": 73.85527777777777,
+  "label": "Bajaj Finserv",
+  "qid": "Q18636352"
+ },
+ "bookingholdings.com": {
+  "lat": 41.093888888889,
+  "lng": -73.419722222222,
+  "label": "Booking Holdings",
+  "qid": "Q18674747"
+ },
+ "loves.com": {
+  "lat": 35.48222222222222,
+  "lng": -97.53527777777778,
+  "label": "Love's Travel Stops & Country Stores",
+  "qid": "Q1872496"
+ },
+ "achmea.nl": {
+  "lat": 52.083333333333,
+  "lng": 5.2333333333333,
+  "label": "Achmea Bank",
+  "qid": "Q18746491"
+ },
+ "tatamotors.com": {
+  "lat": 18.9318,
+  "lng": 72.8317,
+  "label": "Tata Motors Limited",
+  "qid": "Q188514"
+ },
+ "delta.com": {
+  "lat": 33.754444444444445,
+  "lng": -84.38972222222222,
+  "label": "Delta Air Lines",
+  "qid": "Q188920"
+ },
+ "pradagroup.com": {
+  "lat": 45.466944444444,
+  "lng": 9.19,
+  "label": "Prada",
+  "qid": "Q193136"
+ },
+ "ubs.com": {
+  "lat": 47.37444444444444,
+  "lng": 8.54111111111111,
+  "label": "UBS",
+  "qid": "Q193199"
+ },
+ "monsterbevcorp.com": {
+  "lat": 46,
+  "lng": -94,
+  "label": "Monster Beverage",
+  "qid": "Q1945295"
+ },
+ "ckh.com.hk": {
+  "lat": 22.279444444444,
+  "lng": 114.16027777778,
+  "label": "CK Hutchison Holdings",
+  "qid": "Q19548352"
+ },
+ "truelinkfinancial.com": {
+  "lat": 37.775,
+  "lng": -122.41944444444445,
+  "label": "True Link",
+  "qid": "Q19604596"
+ },
+ "uniper.energy": {
+  "lat": 51.22555555555556,
+  "lng": 6.776666666666666,
+  "label": "Uniper",
+  "qid": "Q19839259"
+ },
+ "nisource.com": {
+  "lat": 41.48556,
+  "lng": -87.33528,
+  "label": "NiSource",
+  "qid": "Q1984481"
+ },
+ "hnlens.com": {
+  "lat": 27.6,
+  "lng": 111.8,
+  "label": "Lens Technology",
+  "qid": "Q19855135"
+ },
+ "bio-techne.com": {
+  "lat": 44.981944444444444,
+  "lng": -93.26916666666666,
+  "label": "Bio-Techne",
+  "qid": "Q19873469"
+ },
+ "ckah.com": {
+  "lat": 22.279444444444,
+  "lng": 114.16027777778,
+  "label": "CK Asset Holdings",
+  "qid": "Q19985983"
+ },
+ "axis.bank.in": {
+  "lat": 19.075833333333332,
+  "lng": 72.8775,
+  "label": "Axis Bank",
+  "qid": "Q2003549"
+ },
+ "canarabank.bank.in": {
+  "lat": 12.9791198,
+  "lng": 77.5912997,
+  "label": "Canara Bank",
+  "qid": "Q2003777"
+ },
+ "indianbank.bank.in": {
+  "lat": 13.0825,
+  "lng": 80.275,
+  "label": "Indian Bank",
+  "qid": "Q2003789"
+ },
+ "bankofbaroda.bank.in": {
+  "lat": 22.3,
+  "lng": 73.2,
+  "label": "Bank of Baroda",
+  "qid": "Q2003797"
+ },
+ "unionbankofindia.bank.in": {
+  "lat": 19.075833333333332,
+  "lng": 72.8775,
+  "label": "Union Bank of India",
+  "qid": "Q2004078"
+ },
+ "polyus.com": {
+  "lat": 55.75055555555556,
+  "lng": 37.6175,
+  "label": "Polyus",
+  "qid": "Q2005769"
+ },
+ "telefonica.com.br": {
+  "lat": -23.550394444444,
+  "lng": -46.633947222222,
+  "label": "Telefônica Brasil",
+  "qid": "Q20059505"
+ },
+ "brambles.com": {
+  "lat": -33.867777777777775,
+  "lng": 151.21,
+  "label": "Brambles Limited",
+  "qid": "Q200687"
+ },
+ "nochubank.or.jp": {
+  "lat": 35.683889,
+  "lng": 139.774444,
+  "label": "Norinchukin Bank",
+  "qid": "Q2007236"
+ },
+ "statefarm.com": {
+  "lat": 40.484166666667,
+  "lng": -88.993611111111,
+  "label": "State Farm Insurance",
+  "qid": "Q2007336"
+ },
+ "oxy.com": {
+  "lat": 29.762777777778,
+  "lng": -95.383055555556,
+  "label": "Occidental Petroleum",
+  "qid": "Q2013357"
+ },
+ "group.softbank": {
+  "lat": 35.658027777777775,
+  "lng": 139.75152777777777,
+  "label": "SoftBank Group",
+  "qid": "Q201653"
+ },
+ "gamestop.com": {
+  "lat": 32.935,
+  "lng": -97.0858,
+  "label": "GameStop",
+  "qid": "Q202210"
+ },
+ "internationalpaper.com": {
+  "lat": 35.14611111111111,
+  "lng": -90.05194444444444,
+  "label": "International Paper",
+  "qid": "Q202972"
+ },
+ "westpac.com.au": {
+  "lat": -33.86579305555556,
+  "lng": 151.2041411111111,
+  "label": "Westpac",
+  "qid": "Q2031726"
+ },
+ "ally.com": {
+  "lat": 42.331666666667,
+  "lng": -83.0475,
+  "label": "Ally Financial",
+  "qid": "Q2032800"
+ },
+ "statestreet.com": {
+  "lat": 42.360277777777775,
+  "lng": -71.05777777777777,
+  "label": "State Street Corporation",
+  "qid": "Q2037125"
+ },
+ "kotak.bank.in": {
+  "lat": 19.075833333333332,
+  "lng": 72.8775,
+  "label": "Kotak Mahindra Bank",
+  "qid": "Q2040404"
+ },
+ "ocbc.com": {
+  "lat": 1.3,
+  "lng": 103.8,
+  "label": "Oversea-Chinese Banking Corporation",
+  "qid": "Q2042423"
+ },
+ "pplweb.com": {
+  "lat": 40.6,
+  "lng": -75.483333333333,
+  "label": "PPL",
+  "qid": "Q2044512"
+ },
+ "dallascowboys.com": {
+  "lat": 33.1414,
+  "lng": -96.8131,
+  "label": "Dallas Cowboys",
+  "qid": "Q204862"
+ },
+ "welltower.com": {
+  "lat": 41.65277777777778,
+  "lng": -83.53777777777778,
+  "label": "Welltower",
+  "qid": "Q20486917"
+ },
+ "aholddelhaize.com": {
+  "lat": 52.441666666667,
+  "lng": 4.8422222222222,
+  "label": "Ahold Delhaize",
+  "qid": "Q20539261"
+ },
+ "creativemarket.com": {
+  "lat": 37.775,
+  "lng": -122.41944444444445,
+  "label": "Creative Market",
+  "qid": "Q20539296"
+ },
+ "gusto.com": {
+  "lat": 37.775,
+  "lng": -122.41944444444445,
+  "label": "Gusto",
+  "qid": "Q20540697"
+ },
+ "arrow.com": {
+  "lat": 39.6469,
+  "lng": -104.992,
+  "label": "Arrow Electronics",
+  "qid": "Q2059537"
+ },
+ "uobgroup.com": {
+  "lat": 1.3,
+  "lng": 103.8,
+  "label": "United Overseas Bank",
+  "qid": "Q2064074"
+ },
+ "south32.net": {
+  "lat": -31.955833333333334,
+  "lng": 115.85972222222222,
+  "label": "South32",
+  "qid": "Q20648697"
+ },
+ "illumina.com": {
+  "lat": 32.715,
+  "lng": -117.1625,
+  "label": "Illumina",
+  "qid": "Q2068984"
+ },
+ "pfizer.com": {
+  "lat": 40.71277777777778,
+  "lng": -74.00611111111111,
+  "label": "Pfizer",
+  "qid": "Q206921"
+ },
+ "pfgc.com": {
+  "lat": 37.54083333333333,
+  "lng": -77.43666666666667,
+  "label": "Performance Food Group",
+  "qid": "Q2070689"
+ },
+ "qatarairways.com": {
+  "lat": 25.28611111111111,
+  "lng": 51.529444444444444,
+  "label": "Qatar Airways",
+  "qid": "Q208033"
+ },
+ "cocacolaep.com": {
+  "lat": 48.823055555556,
+  "lng": 2.2691666666667,
+  "label": "Coca-Cola Europacific Partners",
+  "qid": "Q20811256"
+ },
+ "womenwhocode.com": {
+  "lat": 37.775,
+  "lng": -122.41944444444445,
+  "label": "Women Who Code",
+  "qid": "Q20819929"
+ },
+ "oppo.com": {
+  "lat": 22.80674,
+  "lng": 113.8033,
+  "label": "Oppo",
+  "qid": "Q2084900"
+ },
+ "acwapower.com": {
+  "lat": 24.638333333333332,
+  "lng": 46.715,
+  "label": "ACWA Power",
+  "qid": "Q20850809"
+ },
+ "norfolksouthern.com": {
+  "lat": 36.846944444444446,
+  "lng": -76.28527777777778,
+  "label": "Norfolk Southern Corporation",
+  "qid": "Q20858163"
+ },
+ "smfg.co.jp": {
+  "lat": 35.6849,
+  "lng": 139.7623,
+  "label": "Sumitomo Mitsui Financial Group",
+  "qid": "Q2094989"
+ },
+ "discovery.co.za": {
+  "lat": -26.107,
+  "lng": 28.051666666667,
+  "label": "Discovery Limited",
+  "qid": "Q20981515"
+ },
+ "hubbell.com": {
+  "lat": 41.304166666667,
+  "lng": -73.138055555556,
+  "label": "Hubbell Incorporated",
+  "qid": "Q21036456"
+ },
+ "gigster.com": {
+  "lat": 30.3,
+  "lng": -97.733333333333,
+  "label": "Gigster",
+  "qid": "Q21070780"
+ },
+ "wmg.com": {
+  "lat": 40.71277777777778,
+  "lng": -74.00611111111111,
+  "label": "Warner Music Group",
+  "qid": "Q21077"
+ },
+ "rbinternational.com": {
+  "lat": 48.208333333333336,
+  "lng": 16.3725,
+  "label": "Raiffeisen Bank International",
+  "qid": "Q2127528"
+ },
+ "textron.com": {
+  "lat": 41.82399,
+  "lng": -71.41283,
+  "label": "Textron",
+  "qid": "Q2140315"
+ },
+ "rethmann-gruppe.de": {
+  "lat": 51.683333333333,
+  "lng": 7.4833333333333,
+  "label": "Rethmann",
+  "qid": "Q2146152"
+ },
+ "conocophillips.com": {
+  "lat": 29.762777777778,
+  "lng": -95.383055555556,
+  "label": "ConocoPhillips",
+  "qid": "Q214763"
+ },
+ "aclu.org": {
+  "lat": 40.71277777777778,
+  "lng": -74.00611111111111,
+  "label": "American Civil Liberties Union",
+  "qid": "Q21637"
+ },
+ "tpg.com": {
+  "lat": 32.756388888888885,
+  "lng": -97.3325,
+  "label": "TPG",
+  "qid": "Q2164606"
+ },
+ "openai.com": {
+  "lat": 37.775,
+  "lng": -122.41944444444445,
+  "label": "OpenAI",
+  "qid": "Q21708200"
+ },
+ "jabil.com": {
+  "lat": 27.773055555556,
+  "lng": -82.64,
+  "label": "Jabil",
+  "qid": "Q2171646"
+ },
+ "freedomholdingcorp.com": {
+  "lat": 55.75055555555556,
+  "lng": 37.6175,
+  "label": "Freedom Holding",
+  "qid": "Q21843099"
+ },
+ "nec.com": {
+  "lat": 35.68944444444445,
+  "lng": 139.69166666666666,
+  "label": "NEC",
+  "qid": "Q219203"
+ },
+ "antgroup.com": {
+  "lat": 30.2619,
+  "lng": 120.12549,
+  "label": "Ant Group",
+  "qid": "Q21979415"
+ },
+ "lever.co": {
+  "lat": 37.775,
+  "lng": -122.41944444444445,
+  "label": "Lever",
+  "qid": "Q22077774"
+ },
+ "dupont.com": {
+  "lat": 39.748333333333,
+  "lng": -75.551388888889,
+  "label": "DuPont",
+  "qid": "Q221062"
+ },
+ "yokohamafg.co.jp": {
+  "lat": 35.681944,
+  "lng": 139.774167,
+  "label": "Yokohama Financial Group",
+  "qid": "Q22122898"
+ },
+ "softbank.jp": {
+  "lat": 35.68944444444445,
+  "lng": 139.69166666666666,
+  "label": "SoftBank Mobile",
+  "qid": "Q2214105"
+ },
+ "boe.com": {
+  "lat": 39.7254,
+  "lng": 116.33543,
+  "label": "BOE Technology",
+  "qid": "Q22234667"
+ },
+ "logitech.com": {
+  "lat": 46.533333333333,
+  "lng": 6.6333333333333,
+  "label": "Logitech",
+  "qid": "Q223127"
+ },
+ "lennox.com": {
+  "lat": 32.94833333333333,
+  "lng": -96.72972222222222,
+  "label": "Lennox International",
+  "qid": "Q224751"
+ },
+ "celestica.com": {
+  "lat": 43.670277777778,
+  "lng": -79.386666666667,
+  "label": "Celestica",
+  "qid": "Q225440"
+ },
+ "simon.com": {
+  "lat": 39.7667,
+  "lng": -86.1624,
+  "label": "Simon Property Group",
+  "qid": "Q2287759"
+ },
+ "kraken.com": {
+  "lat": 37.775,
+  "lng": -122.41944444444445,
+  "label": "Kraken",
+  "qid": "Q22906202"
+ },
+ "instacart.com": {
+  "lat": 37.775,
+  "lng": -122.41944444444445,
+  "label": "Instacart",
+  "qid": "Q22909236"
+ },
+ "flutter.com": {
+  "lat": 53.34972222222222,
+  "lng": -6.260277777777778,
+  "label": "Flutter Entertainment",
+  "qid": "Q23022611"
+ },
+ "synopsys.com": {
+  "lat": 37.392777777778,
+  "lng": -122.04194444444,
+  "label": "Synopsys",
+  "qid": "Q2303478"
+ },
+ "zurich.com": {
+  "lat": 47.37444444444444,
+  "lng": 8.54111111111111,
+  "label": "Zurich Insurance Group",
+  "qid": "Q230426"
+ },
+ "southerncompany.com": {
+  "lat": 33.754444444444445,
+  "lng": -84.38972222222222,
+  "label": "Southern Company",
+  "qid": "Q2304693"
+ },
+ "kfh.com": {
+  "lat": 29.375,
+  "lng": 47.98,
+  "label": "Kuwait Finance House",
+  "qid": "Q2336459"
+ },
+ "trentlimited.com": {
+  "lat": 19.075833333333332,
+  "lng": 72.8775,
+  "label": "Trent Limited",
+  "qid": "Q2336948"
+ },
+ "deliveryhero.com": {
+  "lat": 52.516666666667,
+  "lng": 13.383333333333,
+  "label": "Delivery Hero",
+  "qid": "Q23384493"
+ },
+ "bosch.com": {
+  "lat": 48.8,
+  "lng": 9.0652777777778,
+  "label": "Robert Bosch",
+  "qid": "Q234021"
+ },
+ "sysco.com": {
+  "lat": 29.762777777778,
+  "lng": -95.383055555556,
+  "label": "Sysco",
+  "qid": "Q2376711"
+ },
+ "talanx.com": {
+  "lat": 52.374444444444,
+  "lng": 9.7386111111111,
+  "label": "Talanx",
+  "qid": "Q2389856"
+ },
+ "stihl.com": {
+  "lat": 48.830277777778,
+  "lng": 9.3169444444444,
+  "label": "Stihl",
+  "qid": "Q239372"
+ },
+ "boomsupersonic.com": {
+  "lat": 37.8,
+  "lng": -122.25,
+  "label": "Boom Technology",
+  "qid": "Q24039775"
+ },
+ "teradyne.com": {
+  "lat": 42.360277777777775,
+  "lng": -71.05777777777777,
+  "label": "Teradyne",
+  "qid": "Q2404292"
+ },
+ "bpy.brookfield.com": {
+  "lat": 43,
+  "lng": -75,
+  "label": "Brookfield Property Partners",
+  "qid": "Q24110304"
+ },
+ "veeva.com": {
+  "lat": 37.6725,
+  "lng": -121.8825,
+  "label": "Veeva Systems",
+  "qid": "Q24204493"
+ },
+ "zebra.com": {
+  "lat": 42.196388888889,
+  "lng": -87.917222222222,
+  "label": "Zebra Technologies",
+  "qid": "Q2443609"
+ },
+ "bce.ca": {
+  "lat": 45.5033426,
+  "lng": -73.5868411,
+  "label": "BCE Inc.",
+  "qid": "Q24525746"
+ },
+ "home.barclays": {
+  "lat": 51.50527777777778,
+  "lng": -0.014444444444444446,
+  "label": "Barclays",
+  "qid": "Q245343"
+ },
+ "mebuki-fg.co.jp": {
+  "lat": 35.67058333333333,
+  "lng": 139.77197222222222,
+  "label": "Mebuki Financial Group",
+  "qid": "Q24870433"
+ },
+ "lendedu.com": {
+  "lat": 40.745,
+  "lng": -74.0325,
+  "label": "LendEDU",
+  "qid": "Q24912132"
+ },
+ "wolterskluwer.com": {
+  "lat": 52.133333333333,
+  "lng": 4.65,
+  "label": "Wolters Kluwer",
+  "qid": "Q249798"
+ },
+ "gflenv.com": {
+  "lat": 43.670277777778,
+  "lng": -79.386666666667,
+  "label": "GFL Environmental",
+  "qid": "Q25001278"
+ },
+ "novatek.ru": {
+  "lat": 64.914722222222,
+  "lng": 77.772777777778,
+  "label": "Novatek",
+  "qid": "Q251546"
+ },
+ "rabobank.com": {
+  "lat": 52.090833333333336,
+  "lng": 5.121666666666667,
+  "label": "Rabobank",
+  "qid": "Q252004"
+ },
+ "nytco.com": {
+  "lat": 40.75611111111111,
+  "lng": -73.99,
+  "label": "The New York Times Company",
+  "qid": "Q2529982"
+ },
+ "akerbp.com": {
+  "lat": 59.895833333333336,
+  "lng": 10.616666666666667,
+  "label": "Aker BP",
+  "qid": "Q25434685"
+ },
+ "wm.com": {
+  "lat": 29.762777777778,
+  "lng": -95.383055555556,
+  "label": "Waste Management, Inc",
+  "qid": "Q2552219"
+ },
+ "pinterest.com": {
+  "lat": 37.44444444444444,
+  "lng": -122.16,
+  "label": "",
+  "qid": "Q255381"
+ },
+ "whchem.com": {
+  "lat": 37.464444444444446,
+  "lng": 121.44777777777777,
+  "label": "Wanhua Chemical Group Co., Ltd.",
+  "qid": "Q2599552"
+ },
+ "bydglobal.com": {
+  "lat": 22.546666666666667,
+  "lng": 114.05444444444444,
+  "label": "",
+  "qid": "Q2608329"
+ },
+ "pinnaclewest.com": {
+  "lat": 33.44833333333333,
+  "lng": -112.07388888888889,
+  "label": "Pinnacle West Capital Corporation",
+  "qid": "Q26110522"
+ },
+ "allstate.com": {
+  "lat": 42.1292,
+  "lng": -87.8408,
+  "label": "Allstate",
+  "qid": "Q2645636"
+ },
+ "up.codes": {
+  "lat": 37.775,
+  "lng": -122.41944444444445,
+  "label": "UpCodes",
+  "qid": "Q26572838"
+ },
+ "bms.com": {
+  "lat": 40.71277777777778,
+  "lng": -74.00611111111111,
+  "label": "Bristol-Myers Squibb",
+  "qid": "Q266423"
+ },
+ "bmwgroup.com": {
+  "lat": 48.1375,
+  "lng": 11.575,
+  "label": "BMW",
+  "qid": "Q26678"
+ },
+ "admiralgroup.co.uk": {
+  "lat": 51.48166666666667,
+  "lng": -3.1791666666666667,
+  "label": "Admiral Group",
+  "qid": "Q267417"
+ },
+ "advantech.com": {
+  "lat": 25.0375,
+  "lng": 121.5625,
+  "label": "Advantech",
+  "qid": "Q26954687"
+ },
+ "ferrero.com": {
+  "lat": 44.691542,
+  "lng": 8.025636,
+  "label": "Ferrero SpA",
+  "qid": "Q269792"
+ },
+ "infosys.com": {
+  "lat": 12.9791198,
+  "lng": 77.5912997,
+  "label": "Infosys limited",
+  "qid": "Q26989"
+ },
+ "eon.com": {
+  "lat": 51.450833333333,
+  "lng": 7.0130555555556,
+  "label": "E.ON",
+  "qid": "Q270223"
+ },
+ "honor.com": {
+  "lat": 22.546666666666667,
+  "lng": 114.05444444444444,
+  "label": "Honor",
+  "qid": "Q27070331"
+ },
+ "aeon.info": {
+  "lat": 35.6518,
+  "lng": 140.038,
+  "label": "Aeon",
+  "qid": "Q271413"
+ },
+ "applovin.com": {
+  "lat": 37.44444444444444,
+  "lng": -122.16,
+  "label": "AppLovin",
+  "qid": "Q27150212"
+ },
+ "advantest.com": {
+  "lat": 35.69394444444445,
+  "lng": 139.7536111111111,
+  "label": "Advantest",
+  "qid": "Q2722179"
+ },
+ "bancobpm.it": {
+  "lat": 45.43861111111111,
+  "lng": 10.992777777777778,
+  "label": "BPM Bank",
+  "qid": "Q27331643"
+ },
+ "vrtx.com": {
+  "lat": 42.360277777777775,
+  "lng": -71.05777777777777,
+  "label": "Vertex Pharmaceuticals",
+  "qid": "Q2744099"
+ },
+ "fortinet.com": {
+  "lat": 37.368888888889,
+  "lng": -122.03694444444,
+  "label": "Fortinet",
+  "qid": "Q2749364"
+ },
+ "group.mercedes-benz.com": {
+  "lat": 48.7775,
+  "lng": 9.18,
+  "label": "Mercedes-Benz Group",
+  "qid": "Q27530"
+ },
+ "romgaz.ro": {
+  "lat": 46.163888888889,
+  "lng": 24.350833333333,
+  "label": "Romgaz",
+  "qid": "Q2757144"
+ },
+ "ferrari.com": {
+  "lat": 44.52638888888889,
+  "lng": 10.866666666666667,
+  "label": "Ferrari",
+  "qid": "Q27586"
+ },
+ "millicom.com": {
+  "lat": 49.77,
+  "lng": 6.13,
+  "label": "Millicom",
+  "qid": "Q276345"
+ },
+ "henkel.com": {
+  "lat": 50.776207,
+  "lng": 6.083788,
+  "label": "Henkel KGaA",
+  "qid": "Q276507"
+ },
+ "kasikornbank.com": {
+  "lat": 13.75,
+  "lng": 100.51666666667,
+  "label": "Kasikornbank",
+  "qid": "Q276557"
+ },
+ "licindia.in": {
+  "lat": 19.075833333333332,
+  "lng": 72.8775,
+  "label": "Life Insurance Corporation of India",
+  "qid": "Q2767170"
+ },
+ "mizrahi-tefahot.co.il": {
+  "lat": 32.070007,
+  "lng": 34.823541,
+  "label": "Mizrahi Tefahot Bank Ltd.",
+  "qid": "Q2777129"
+ },
+ "corporate.arcelormittal.com": {
+  "lat": 49.61138888888889,
+  "lng": 6.13,
+  "label": "ArcelorMittal",
+  "qid": "Q27893"
+ },
+ "essexapartmenthomes.com": {
+  "lat": 37.554166666667,
+  "lng": -122.31305555556,
+  "label": "Essex Property Trust, Inc.",
+  "qid": "Q27964091"
+ },
+ "udr.com": {
+  "lat": 39.544444444444,
+  "lng": -104.96805555556,
+  "label": "UDR",
+  "qid": "Q27988153"
+ },
+ "maac.com": {
+  "lat": 35.14611111111111,
+  "lng": -90.05194444444444,
+  "label": "MAA",
+  "qid": "Q27988239"
+ },
+ "asianpaints.com": {
+  "lat": 19.075833333333332,
+  "lng": 72.8775,
+  "label": "Asian Paints",
+  "qid": "Q28171825"
+ },
+ "longi.com": {
+  "lat": 37.775,
+  "lng": -122.41944444444445,
+  "label": "LONGi Green Energy Technology",
+  "qid": "Q28207127"
+ },
+ "novatek.com.tw": {
+  "lat": 24.804722222222,
+  "lng": 120.97138888889,
+  "label": "Novatek Microelectronics Corp.",
+  "qid": "Q28415452"
+ },
+ "ymtc.com": {
+  "lat": 30.595,
+  "lng": 114.2975,
+  "label": "Yangtze Memory Technology Corp",
+  "qid": "Q28415694"
+ },
+ "anker.com": {
+  "lat": 28.19874,
+  "lng": 112.97087,
+  "label": "Anker",
+  "qid": "Q28452620"
+ },
+ "commbank.com.au": {
+  "lat": -33.867777777777775,
+  "lng": 151.21,
+  "label": "Commonwealth Bank",
+  "qid": "Q285328"
+ },
+ "aristocrat.com": {
+  "lat": -33.867777777777775,
+  "lng": 151.21,
+  "label": "Aristocrat Leisure",
+  "qid": "Q2861391"
+ },
+ "abnamro.com": {
+  "lat": 52.36666666666667,
+  "lng": 4.883333333333333,
+  "label": "ABN AMRO",
+  "qid": "Q287471"
+ },
+ "bancochile.cl": {
+  "lat": -33.4375,
+  "lng": -70.65,
+  "label": "Banco de Chile",
+  "qid": "Q2882085"
+ },
+ "santander.com.br": {
+  "lat": -23.550394444444,
+  "lng": -46.633947222222,
+  "label": "Banco Santander (Brasil)",
+  "qid": "Q2882087"
+ },
+ "essential.co": {
+  "lat": 40.0211,
+  "lng": -75.3169,
+  "label": "Essential Utilities",
+  "qid": "Q2894362"
+ },
+ "borgwarner.com": {
+  "lat": 47.720833333333,
+  "lng": 9.3916666666667,
+  "label": "BorgWarner (Germany)",
+  "qid": "Q28979032"
+ },
+ "bat.com": {
+  "lat": 45.5033426,
+  "lng": -73.5868411,
+  "label": "British American Tobacco (Canada)",
+  "qid": "Q28979064"
+ },
+ "emerson.com": {
+  "lat": 50.008611111111,
+  "lng": 8.7755555555556,
+  "label": "Emerson (Germany)",
+  "qid": "Q29002330"
+ },
+ "airproducts.com": {
+  "lat": 51.386797222222,
+  "lng": -0.41339444444444,
+  "label": "Air Products",
+  "qid": "Q29002336"
+ },
+ "neuralink.com": {
+  "lat": 37.7623,
+  "lng": -122.4148,
+  "label": "Neuralink",
+  "qid": "Q29043471"
+ },
+ "csair.com": {
+  "lat": 23.13,
+  "lng": 113.26,
+  "label": "China Southern Airlines",
+  "qid": "Q291090"
+ },
+ "waters.com": {
+  "lat": 51.64,
+  "lng": -0.3,
+  "label": "Waters (United Kingdom)",
+  "qid": "Q29113573"
+ },
+ "volvogroup.com": {
+  "lat": 36.0725,
+  "lng": -79.79027777777777,
+  "label": "Volvo (United States)",
+  "qid": "Q29122962"
+ },
+ "safran-group.com": {
+  "lat": -23.550394444444,
+  "lng": -46.633947222222,
+  "label": "Safran (Brazil)",
+  "qid": "Q29123077"
+ },
+ "itt.com": {
+  "lat": 48.81311,
+  "lng": 9.36387,
+  "label": "ITT (Germany)",
+  "qid": "Q29123527"
+ },
+ "teliacompany.com": {
+  "lat": 60.170833333333334,
+  "lng": 24.9375,
+  "label": "TeliaSonera (Finland)",
+  "qid": "Q29123900"
+ },
+ "aes.com": {
+  "lat": 38.880277777778,
+  "lng": -77.108333333333,
+  "label": "AES Corporation",
+  "qid": "Q291508"
+ },
+ "ceair.com": {
+  "lat": 31.198056,
+  "lng": 121.336389,
+  "label": "China Eastern Airlines",
+  "qid": "Q291796"
+ },
+ "desjardins.com": {
+  "lat": 46.8,
+  "lng": -71.1833,
+  "label": "Desjardins Group",
+  "qid": "Q2933350"
+ },
+ "changan.com.cn": {
+  "lat": 29.55,
+  "lng": 106.50694444444,
+  "label": "Changan Automobile",
+  "qid": "Q29366"
+ },
+ "carrefour.com": {
+  "lat": 48.730555555556,
+  "lng": 2.2763888888889,
+  "label": "Carrefour Planet",
+  "qid": "Q2940197"
+ },
+ "bloomenergy.com": {
+  "lat": 37.368888888889,
+  "lng": -122.03694444444,
+  "label": "Bloom Energy",
+  "qid": "Q29526078"
+ },
+ "kbc.com": {
+  "lat": 50.846666666666664,
+  "lng": 4.351666666666667,
+  "label": "KBC Group",
+  "qid": "Q29560723"
+ },
+ "arcresources.com": {
+  "lat": 51.0475,
+  "lng": -114.0625,
+  "label": "ARC Resources",
+  "qid": "Q296498"
+ },
+ "asrnl.com": {
+  "lat": 52.090833333333336,
+  "lng": 5.121666666666667,
+  "label": "ASR Nederland",
+  "qid": "Q297996"
+ },
+ "cognex.com": {
+  "lat": 42.283333333333,
+  "lng": -71.35,
+  "label": "Cognex Corporation",
+  "qid": "Q2981857"
+ },
+ "biontech.de": {
+  "lat": 49.99944444444444,
+  "lng": 8.27361111111111,
+  "label": "BioNTech",
+  "qid": "Q30256699"
+ },
+ "beonemedicines.com": {
+  "lat": 42.375,
+  "lng": -71.106111111111,
+  "label": "BeiGene",
+  "qid": "Q30260298"
+ },
+ "aligntech.com": {
+  "lat": 37.304166666667,
+  "lng": -121.87277777778,
+  "label": "Align Technology",
+  "qid": "Q30272258"
+ },
+ "terumo.com": {
+  "lat": 40.5085,
+  "lng": -74.5002,
+  "label": "Terumo (United States)",
+  "qid": "Q30273376"
+ },
+ "elanco.com": {
+  "lat": 39.7914,
+  "lng": -85.7714,
+  "label": "Elanco",
+  "qid": "Q30280160"
+ },
+ "dimensional.com": {
+  "lat": 30.3,
+  "lng": -97.733333333333,
+  "label": "Dimensional Fund Advisors",
+  "qid": "Q3028075"
+ },
+ "insmed.com": {
+  "lat": 40.5931,
+  "lng": -74.6047,
+  "label": "Insmed",
+  "qid": "Q30281842"
+ },
+ "imc.com": {
+  "lat": 38.958888888888886,
+  "lng": -77.35861111111112,
+  "label": "Information Management Consultants (United States)",
+  "qid": "Q30282686"
+ },
+ "mks.com": {
+  "lat": 42.657222222222224,
+  "lng": -71.14083333333333,
+  "label": "MKS Instruments",
+  "qid": "Q30283915"
+ },
+ "group.bureauveritas.com": {
+  "lat": 45.466944444444,
+  "lng": 9.19,
+  "label": "Bureau Veritas",
+  "qid": "Q30285211"
+ },
+ "f5.com": {
+  "lat": 47.605,
+  "lng": -122.33,
+  "label": "F5, Inc.",
+  "qid": "Q3029296"
+ },
+ "devonenergy.com": {
+  "lat": 53.363333333333,
+  "lng": -113.73222222222,
+  "label": "Devon Energy (Canada)",
+  "qid": "Q30338132"
+ },
+ "alcoa.com": {
+  "lat": 51.22555555555556,
+  "lng": 6.776666666666666,
+  "label": "Alcoa (Germany)",
+  "qid": "Q30338162"
+ },
+ "genmab.com": {
+  "lat": 52.09083,
+  "lng": 5.12222,
+  "label": "Genmab (Netherlands)",
+  "qid": "Q30338310"
+ },
+ "unither.com": {
+  "lat": 51.3902,
+  "lng": -0.5074,
+  "label": "United Therapeutics (United Kingdom)",
+  "qid": "Q30338313"
+ },
+ "heico.com": {
+  "lat": 43.0375,
+  "lng": 2.3402777777778,
+  "label": "HEICO (France)",
+  "qid": "Q30338542"
+ },
+ "dow.com": {
+  "lat": 36.85667,
+  "lng": 127.44333,
+  "label": "Dow Chemical Company (South Korea)",
+  "qid": "Q30338756"
+ },
+ "dollarama.com": {
+  "lat": 45.5033426,
+  "lng": -73.5868411,
+  "label": "Dollarama",
+  "qid": "Q3033947"
+ },
+ "iff.com": {
+  "lat": 43.60444444444445,
+  "lng": 1.4433333333333334,
+  "label": "International Flavors & Fragrances (France)",
+  "qid": "Q30343776"
+ },
+ "novonordisk.com": {
+  "lat": 47.37444444444444,
+  "lng": 8.54111111111111,
+  "label": "Novo Nordisk (Switzerland)",
+  "qid": "Q30343886"
+ },
+ "doublerobotics.com": {
+  "lat": 37.392777777778,
+  "lng": -122.04194444444,
+  "label": "Double Robotics",
+  "qid": "Q3037479"
+ },
+ "eastwestbank.com": {
+  "lat": 34.1475,
+  "lng": -118.1438888888889,
+  "label": "East West Bank",
+  "qid": "Q3046549"
+ },
+ "mec.co.jp": {
+  "lat": 35.69394444444445,
+  "lng": 139.7536111111111,
+  "label": "Mitsubishi Estate",
+  "qid": "Q304962"
+ },
+ "iqvia.com": {
+  "lat": 35.994166666666665,
+  "lng": -78.89861111111111,
+  "label": "IQVIA Holdings, Inc.",
+  "qid": "Q305473"
+ },
+ "cboe.com": {
+  "lat": 41.88194444444444,
+  "lng": -87.62777777777778,
+  "label": "Cboe Global Markets, Inc.",
+  "qid": "Q30635731"
+ },
+ "sqm.com": {
+  "lat": -33.4375,
+  "lng": -70.65,
+  "label": "Sociedad Química y Minera de Chile",
+  "qid": "Q3067064"
+ },
+ "fastenal.com": {
+  "lat": 44.047888888889,
+  "lng": -91.640438888889,
+  "label": "Fastenal",
+  "qid": "Q3067119"
+ },
+ "pershingsquareholdings.com": {
+  "lat": 40.71277777777778,
+  "lng": -74.00611111111111,
+  "label": "Pershing Square Holdings",
+  "qid": "Q30682229"
+ },
+ "fresnilloplc.com": {
+  "lat": 19.353773,
+  "lng": -99.13589,
+  "label": "Fresnillo plc",
+  "qid": "Q3087545"
+ },
+ "tele2.com": {
+  "lat": 59.329444444444,
+  "lng": 18.068611111111,
+  "label": "Tele2",
+  "qid": "Q309865"
+ },
+ "mckinsey.com": {
+  "lat": 40.71277777777778,
+  "lng": -74.00611111111111,
+  "label": "McKinsey & Company",
+  "qid": "Q310207"
+ },
+ "goodman.com": {
+  "lat": -33.867777777777775,
+  "lng": 151.21,
+  "label": "Goodman Group",
+  "qid": "Q3110722"
+ },
+ "infineon.com": {
+  "lat": 48.07472222222222,
+  "lng": 11.676944444444445,
+  "label": "Infineon Technologies",
+  "qid": "Q311394"
+ },
+ "keurigdrpepper.com": {
+  "lat": 42.504722222222,
+  "lng": -71.196111111111,
+  "label": "Keurig Dr Pepper",
+  "qid": "Q3116111"
+ },
+ "tmx.com": {
+  "lat": 43.670277777778,
+  "lng": -79.386666666667,
+  "label": "TMX Group",
+  "qid": "Q3117577"
+ },
+ "tsingtao.com.cn": {
+  "lat": 36.116666666667,
+  "lng": 120.4,
+  "label": "Tsingtao Brewery",
+  "qid": "Q313542"
+ },
+ "intactfc.com": {
+  "lat": 43.670277777778,
+  "lng": -79.386666666667,
+  "label": "Intact Financial",
+  "qid": "Q3152974"
+ },
+ "jacobs.com": {
+  "lat": 32.785,
+  "lng": -96.797,
+  "label": "Jacobs Engineering Group",
+  "qid": "Q3157622"
+ },
+ "taisei.co.jp": {
+  "lat": 35.693888888888885,
+  "lng": 139.70341666666667,
+  "label": "Taisei Corporation",
+  "qid": "Q3178370"
+ },
+ "lamar.com": {
+  "lat": 30.4475,
+  "lng": -91.178611111111,
+  "label": "Lamar Advertising Company",
+  "qid": "Q3216588"
+ },
+ "singaporeair.com": {
+  "lat": 1.3,
+  "lng": 103.8,
+  "label": "Singapore Airlines",
+  "qid": "Q32245"
+ },
+ "garantibbva.com.tr": {
+  "lat": 41.01,
+  "lng": 28.960277777778,
+  "label": "Garanti BBVA",
+  "qid": "Q322962"
+ },
+ "true.th": {
+  "lat": 13.75,
+  "lng": 100.51666666667,
+  "label": "True Corporation",
+  "qid": "Q3268422"
+ },
+ "mtb.com": {
+  "lat": 42.88638888888889,
+  "lng": -78.87805555555556,
+  "label": "M&T Bank",
+  "qid": "Q3272257"
+ },
+ "wartsila.com": {
+  "lat": 60.170833333333334,
+  "lng": 24.9375,
+  "label": "Wärtsilä",
+  "qid": "Q327429"
+ },
+ "kraftheinzcompany.com": {
+  "lat": 42.1,
+  "lng": -87.766666666667,
+  "label": "Kraft Foods Group",
+  "qid": "Q327751"
+ },
+ "northropgrumman.com": {
+  "lat": 34.05223,
+  "lng": -118.24368,
+  "label": "Northrop Grumman Corporation",
+  "qid": "Q329953"
+ },
+ "tvsmotor.com": {
+  "lat": 13.0825,
+  "lng": 80.275,
+  "label": "TVS Motor Company",
+  "qid": "Q3300084"
+ },
+ "piraeusbank.gr": {
+  "lat": 37.98416666666667,
+  "lng": 23.728055555555557,
+  "label": "Piraeus Bank",
+  "qid": "Q3312"
+ },
+ "bombardier.com": {
+  "lat": 45.45,
+  "lng": -73.75,
+  "label": "Bombardier",
+  "qid": "Q333498"
+ },
+ "pepsico.com": {
+  "lat": 41.040555555556,
+  "lng": -73.714444444444,
+  "label": "PepsiCo",
+  "qid": "Q334800"
+ },
+ "cez.cz": {
+  "lat": 50.0875,
+  "lng": 14.421388888888888,
+  "label": "ČEZ Group",
+  "qid": "Q336735"
+ },
+ "kpn.com": {
+  "lat": 52.08,
+  "lng": 4.31,
+  "label": "KPN",
+  "qid": "Q338633"
+ },
+ "accenture.com": {
+  "lat": 53.34972222222222,
+  "lng": -6.260277777777778,
+  "label": "Accenture",
+  "qid": "Q338825"
+ },
+ "acciona.com": {
+  "lat": 40.533333333333,
+  "lng": -3.6333333333333,
+  "label": "Acciona",
+  "qid": "Q339142"
+ },
+ "metso.com": {
+  "lat": 60.170833333333334,
+  "lng": 24.9375,
+  "label": "Metso",
+  "qid": "Q339318"
+ },
+ "principal.com": {
+  "lat": 41.590833333333,
+  "lng": -93.620833333333,
+  "label": "Principal Financial Group",
+  "qid": "Q3403513"
+ },
+ "riyadbank.com": {
+  "lat": 24.638333333333332,
+  "lng": 46.715,
+  "label": "Riyad Bank",
+  "qid": "Q3433985"
+ },
+ "tsholdings.com.tw": {
+  "lat": 25.0375,
+  "lng": 121.5625,
+  "label": "TS Financial Holdings",
+  "qid": "Q3461686"
+ },
+ "starwoodcapital.com": {
+  "lat": 41.02649,
+  "lng": -73.62846,
+  "label": "Starwood Capital Group",
+  "qid": "Q3497260"
+ },
+ "t-mobile.com": {
+  "lat": 47.614444444444445,
+  "lng": -122.1925,
+  "label": "T-Mobile US",
+  "qid": "Q3511885"
+ },
+ "troweprice.com": {
+  "lat": 39.286388888889,
+  "lng": -76.615,
+  "label": "T. Rowe Price",
+  "qid": "Q3511946"
+ },
+ "tenethealth.com": {
+  "lat": 32.784694,
+  "lng": -96.802597,
+  "label": "Tenet Healthcare",
+  "qid": "Q3518066"
+ },
+ "almarai.com": {
+  "lat": 24.638333333333332,
+  "lng": 46.715,
+  "label": "Almarai Company",
+  "qid": "Q3535226"
+ },
+ "wayfair.com": {
+  "lat": 42.360277777777775,
+  "lng": -71.05777777777777,
+  "label": "Wayfair",
+  "qid": "Q3540193"
+ },
+ "tupras.com.tr": {
+  "lat": 40.760756,
+  "lng": 29.7839402,
+  "label": "Tüpraş",
+  "qid": "Q3546423"
+ },
+ "weichaipower.com": {
+  "lat": 36.716666666667,
+  "lng": 119.1,
+  "label": "Weichai Power",
+  "qid": "Q3567081"
+ },
+ "du.ae": {
+  "lat": 25.269722222222,
+  "lng": 55.309444444444,
+  "label": "du",
+  "qid": "Q3595390"
+ },
+ "bel-india.in": {
+  "lat": 12.9791198,
+  "lng": 77.5912997,
+  "label": "Bharat Electronics",
+  "qid": "Q3630918"
+ },
+ "nipponpaint-holdings.com": {
+  "lat": 35,
+  "lng": 136,
+  "label": "Nippon Paint",
+  "qid": "Q3661655"
+ },
+ "hoya.com": {
+  "lat": 35.693888888888885,
+  "lng": 139.70341666666667,
+  "label": "Hoya Corporation",
+  "qid": "Q368777"
+ },
+ "starbucks.com": {
+  "lat": 47.605,
+  "lng": -122.33,
+  "label": "Starbucks",
+  "qid": "Q37158"
+ },
+ "stengg.com": {
+  "lat": 1.3,
+  "lng": 103.8,
+  "label": "ST Engineering",
+  "qid": "Q3719328"
+ },
+ "obayashi.co.jp": {
+  "lat": 35.626889,
+  "lng": 139.741972,
+  "label": "Obayashi Corporation",
+  "qid": "Q384730"
+ },
+ "osakagas.co.jp": {
+  "lat": 34.68795833,
+  "lng": 135.5004694,
+  "label": "Osaka Gas",
+  "qid": "Q385775"
+ },
+ "universalmusic.com": {
+  "lat": 34.021944444444,
+  "lng": -118.48138888889,
+  "label": "Universal Music Group",
+  "qid": "Q38903"
+ },
+ "pnc.com": {
+  "lat": 40.4411,
+  "lng": -80.0006,
+  "label": "PNC Financial Services",
+  "qid": "Q38928"
+ },
+ "snam.it": {
+  "lat": 45.416666666667,
+  "lng": 9.2666666666667,
+  "label": "",
+  "qid": "Q3943953"
+ },
+ "a16z.com": {
+  "lat": 37.454166666667,
+  "lng": -122.17861111111,
+  "label": "Andreessen Horowitz",
+  "qid": "Q4034010"
+ },
+ "ball.com": {
+  "lat": 39.933333333333,
+  "lng": -105.05,
+  "label": "Ball Corporation",
+  "qid": "Q4034815"
+ },
+ "jbhunt.com": {
+  "lat": 36.260555555556,
+  "lng": -94.139444444444,
+  "label": "J. B. Hunt",
+  "qid": "Q4041705"
+ },
+ "nbk.com": {
+  "lat": 29.375,
+  "lng": 47.98,
+  "label": "National Bank of Kuwait",
+  "qid": "Q4045072"
+ },
+ "sumitomocorp.com": {
+  "lat": 40.71277777777778,
+  "lng": -74.00611111111111,
+  "label": "Sumitomo Corporation of Americas",
+  "qid": "Q4050338"
+ },
+ "airliquide.com": {
+  "lat": 48.862777777778,
+  "lng": 2.31,
+  "label": "Air Liquide",
+  "qid": "Q407448"
+ },
+ "airportthai.co.th": {
+  "lat": 13.75,
+  "lng": 100.51666666667,
+  "label": "Airports of Thailand",
+  "qid": "Q409075"
+ },
+ "alinma.com": {
+  "lat": 24.638333333333332,
+  "lng": 46.715,
+  "label": "Alinma Bank",
+  "qid": "Q4120111"
+ },
+ "ajinomoto.co.jp": {
+  "lat": 35.67700833,
+  "lng": 139.77331389,
+  "label": "Ajinomoto",
+  "qid": "Q412826"
+ },
+ "akamai.com": {
+  "lat": 42.375,
+  "lng": -71.106111111111,
+  "label": "Akamai Technologies",
+  "qid": "Q415598"
+ },
+ "moodys.com": {
+  "lat": 40.7133,
+  "lng": -74.012,
+  "label": "Moody's Investors Service",
+  "qid": "Q4159021"
+ },
+ "web.pln.co.id": {
+  "lat": -6.175277777777778,
+  "lng": 106.82694444444445,
+  "label": "Perusahaan Listrik Negara",
+  "qid": "Q4201636"
+ },
+ "sas-globalwafers.com": {
+  "lat": 24.804722222222,
+  "lng": 120.97138888889,
+  "label": "GlobalWafers",
+  "qid": "Q42260199"
+ },
+ "kline.co.jp": {
+  "lat": 35.670972,
+  "lng": 139.752778,
+  "label": "K Line",
+  "qid": "Q425880"
+ },
+ "coop.ch": {
+  "lat": 47.558055555555555,
+  "lng": 7.587777777777777,
+  "label": "Coop Cooperative",
+  "qid": "Q432564"
+ },
+ "hlb.com.my": {
+  "lat": 3.1477777777778,
+  "lng": 101.69527777778,
+  "label": "Hong Leong Bank",
+  "qid": "Q4383943"
+ },
+ "massmutual.com": {
+  "lat": 42.112411,
+  "lng": -72.547455,
+  "label": "Massachusetts Mutual Life Insurance Company",
+  "qid": "Q4385833"
+ },
+ "shionogi.com": {
+  "lat": 40.7758,
+  "lng": -74.3941,
+  "label": "Shionogi (United States)",
+  "qid": "Q43896301"
+ },
+ "wistron.com": {
+  "lat": 25.066666666667,
+  "lng": 121.66666666667,
+  "label": "Wistron",
+  "qid": "Q441821"
+ },
+ "thehartford.com": {
+  "lat": 41.6,
+  "lng": -72.7,
+  "label": "",
+  "qid": "Q444110"
+ },
+ "gea.com": {
+  "lat": 51.22555555555556,
+  "lng": 6.776666666666666,
+  "label": "GEA Group",
+  "qid": "Q446895"
+ },
+ "scotiabank.com": {
+  "lat": 43.6492,
+  "lng": -79.3794,
+  "label": "Scotiabank",
+  "qid": "Q451476"
+ },
+ "mongodb.com": {
+  "lat": 40.71277777777778,
+  "lng": -74.00611111111111,
+  "label": "MongoDB Inc.",
+  "qid": "Q4546965"
+ },
+ "marathonpetroleum.com": {
+  "lat": 41.042777777778,
+  "lng": -83.642222222222,
+  "label": "Marathon Petroleum",
+  "qid": "Q458363"
+ },
+ "fedex.com": {
+  "lat": 35.14611111111111,
+  "lng": -90.05194444444444,
+  "label": "FedEx",
+  "qid": "Q459477"
+ },
+ "amereninvestors.com": {
+  "lat": 38.62638888888889,
+  "lng": -90.19944444444444,
+  "label": "Ameren",
+  "qid": "Q462984"
+ },
+ "foxconn.com": {
+  "lat": 25.0125,
+  "lng": 121.465,
+  "label": "",
+  "qid": "Q463094"
+ },
+ "84lumber.com": {
+  "lat": 40.181944444444,
+  "lng": -80.133055555556,
+  "label": "84 Lumber",
+  "qid": "Q4644779"
+ },
+ "abcsupply.com": {
+  "lat": 42.508333333333,
+  "lng": -89.031666666667,
+  "label": "ABC Supply",
+  "qid": "Q4650247"
+ },
+ "aqr.com": {
+  "lat": 41.02649,
+  "lng": -73.62846,
+  "label": "AQR Capital",
+  "qid": "Q4653518"
+ },
+ "chipotle.com": {
+  "lat": 39.739166666667,
+  "lng": -104.98472222222,
+  "label": "Chipotle Mexican Grill",
+  "qid": "Q465751"
+ },
+ "ottogroup.com": {
+  "lat": 53.55,
+  "lng": 10,
+  "label": "Otto Group",
+  "qid": "Q466688"
+ },
+ "adcb.com": {
+  "lat": 24.45111111111111,
+  "lng": 54.39694444444444,
+  "label": "Abu Dhabi Commercial Bank",
+  "qid": "Q4670123"
+ },
+ "amwater.com": {
+  "lat": 39.9368,
+  "lng": -75.1066,
+  "label": "American Water Works",
+  "qid": "Q467238"
+ },
+ "gruppomps.it": {
+  "lat": 43.318333333333,
+  "lng": 11.331388888889,
+  "label": "Banca Monte dei Paschi di Siena",
+  "qid": "Q46730"
+ },
+ "verizon.com": {
+  "lat": 40.71277777777778,
+  "lng": -74.00611111111111,
+  "label": "Verizon",
+  "qid": "Q467752"
+ },
+ "adyen.com": {
+  "lat": 52.36666666666667,
+  "lng": 4.883333333333333,
+  "label": "Adyen",
+  "qid": "Q4686934"
+ },
+ "akerasa.com": {
+  "lat": 59.913333333333334,
+  "lng": 10.738888888888889,
+  "label": "Aker Holding",
+  "qid": "Q4700632"
+ },
+ "cencora.com": {
+  "lat": 40.074444444444,
+  "lng": -75.455,
+  "label": "Cencora",
+  "qid": "Q470156"
+ },
+ "ametek.com": {
+  "lat": 40.0456,
+  "lng": -75.4394,
+  "label": "Ametek",
+  "qid": "Q470317"
+ },
+ "gore.com": {
+  "lat": 39.683333333333,
+  "lng": -75.75,
+  "label": "W. L. Gore & Associates",
+  "qid": "Q471316"
+ },
+ "amkor.com": {
+  "lat": 33.425555555555555,
+  "lng": -111.94,
+  "label": "Amkor Technology",
+  "qid": "Q472536"
+ },
+ "alliantenergy.com": {
+  "lat": 43.07472222222222,
+  "lng": -89.38416666666667,
+  "label": "Alliant Energy",
+  "qid": "Q4732492"
+ },
+ "afginc.com": {
+  "lat": 39.1,
+  "lng": -84.5125,
+  "label": "American Financial Group",
+  "qid": "Q4743779"
+ },
+ "naturgy.com": {
+  "lat": 40.41694444444445,
+  "lng": -3.703333333333333,
+  "label": "Naturgy",
+  "qid": "Q474690"
+ },
+ "angel.co": {
+  "lat": 37.775,
+  "lng": -122.41944444444445,
+  "label": "AngelList",
+  "qid": "Q4762034"
+ },
+ "iflytek.com": {
+  "lat": 31.86389,
+  "lng": 117.28083,
+  "label": "iFlytek",
+  "qid": "Q4764375"
+ },
+ "cloudflare.com": {
+  "lat": 37.775,
+  "lng": -122.41944444444445,
+  "label": "Cloudflare",
+  "qid": "Q4778915"
+ },
+ "applied.com": {
+  "lat": 41.49916666666667,
+  "lng": -81.69472222222223,
+  "label": "Applied Industrial Technologies",
+  "qid": "Q4781544"
+ },
+ "assurant.com": {
+  "lat": 40.709722222222226,
+  "lng": -74.01166666666667,
+  "label": "Assurant",
+  "qid": "Q4810399"
+ },
+ "autozone.com": {
+  "lat": 35.14611111111111,
+  "lng": -90.05194444444444,
+  "label": "AutoZone",
+  "qid": "Q4826087"
+ },
+ "hhi.co.kr": {
+  "lat": 35.55,
+  "lng": 129.31666666667,
+  "label": "HD Hyundai Heavy Industries",
+  "qid": "Q483231"
+ },
+ "bjs.com": {
+  "lat": 42.269444444444,
+  "lng": -71.616666666667,
+  "label": "BJ's Wholesale Club",
+  "qid": "Q4835754"
+ },
+ "bxp.com": {
+  "lat": 42.360277777777775,
+  "lng": -71.05777777777777,
+  "label": "Boston Properties",
+  "qid": "Q4844439"
+ },
+ "sinopac.com": {
+  "lat": 25.0375,
+  "lng": 121.5625,
+  "label": "SinoPac Financial Holdings Company Limited",
+  "qid": "Q4855976"
+ },
+ "kepco.co.kr": {
+  "lat": 35.028333333333,
+  "lng": 126.7175,
+  "label": "Korea Electric Power Corporation",
+  "qid": "Q486737"
+ },
+ "basspro.com": {
+  "lat": 37.195,
+  "lng": -93.286111111111,
+  "label": "Bass Pro Shops",
+  "qid": "Q4867953"
+ },
+ "allianz.com": {
+  "lat": 48.1375,
+  "lng": 11.575,
+  "label": "Allianz SE",
+  "qid": "Q487292"
+ },
+ "nutrien.com": {
+  "lat": 52.133333333333,
+  "lng": -106.68333333333,
+  "label": "Nutrien",
+  "qid": "Q48742870"
+ },
+ "tescoplc.com": {
+  "lat": 51.8062,
+  "lng": -0.1932,
+  "label": "Tesco",
+  "qid": "Q487494"
+ },
+ "ppg.com": {
+  "lat": 40.44166666666667,
+  "lng": -80,
+  "label": "PPG Industries",
+  "qid": "Q48754"
+ },
+ "rpminc.com": {
+  "lat": 41.13583,
+  "lng": -81.86389,
+  "label": "RPM International",
+  "qid": "Q48755"
+ },
+ "sherwin-williams.com": {
+  "lat": 41.49916666666667,
+  "lng": -81.69472222222223,
+  "label": "Sherwin-Williams",
+  "qid": "Q48881"
+ },
+ "adp.com": {
+  "lat": 40.8199,
+  "lng": -74.3102,
+  "label": "Automatic Data Processing",
+  "qid": "Q489080"
+ },
+ "besi.com": {
+  "lat": 51.9472,
+  "lng": 6.0211,
+  "label": "Besi",
+  "qid": "Q48988067"
+ },
+ "doosanenerbility.com": {
+  "lat": 35.228055555556,
+  "lng": 128.68111111111,
+  "label": "Doosan Enerbility",
+  "qid": "Q492581"
+ },
+ "sktelecom.com": {
+  "lat": 37.555922222222,
+  "lng": 126.97034722222,
+  "label": "SK Telecom",
+  "qid": "Q493145"
+ },
+ "sse.com": {
+  "lat": 56.395833333333336,
+  "lng": -3.4333333333333336,
+  "label": "SSE plc",
+  "qid": "Q493854"
+ },
+ "deere.com": {
+  "lat": 41.485833333333,
+  "lng": -90.499722222222,
+  "label": "Deere & Company",
+  "qid": "Q496302"
+ },
+ "britannia.co.in": {
+  "lat": 22.5675,
+  "lng": 88.37,
+  "label": "Britannia Industries",
+  "qid": "Q4969284"
+ },
+ "ktng.com": {
+  "lat": 36.35,
+  "lng": 127.385,
+  "label": "KT&G",
+  "qid": "Q497054"
+ },
+ "broadridge.com": {
+  "lat": 40.770277777778,
+  "lng": -73.713333333333,
+  "label": "Broadridge Financial Solutions",
+  "qid": "Q4972280"
+ },
+ "jreast.co.jp": {
+  "lat": 35.6873,
+  "lng": 139.7,
+  "label": "East Japan Railway Company",
+  "qid": "Q499071"
+ },
+ "burlington.com": {
+  "lat": 40.0946,
+  "lng": -74.7838,
+  "label": "Burlington",
+  "qid": "Q4999220"
+ },
+ "ucb.com": {
+  "lat": 51.58888888888889,
+  "lng": 4.775833333333333,
+  "label": "UCB Pharma (Netherlands)",
+  "qid": "Q50038233"
+ },
+ "gd.com": {
+  "lat": 38.882222222222,
+  "lng": -77.171111111111,
+  "label": "General Dynamics",
+  "qid": "Q502940"
+ },
+ "unitedutilities.com": {
+  "lat": 53.38732,
+  "lng": -2.60288,
+  "label": "United Utilities",
+  "qid": "Q503038"
+ },
+ "southwest.com": {
+  "lat": 32.779166666667,
+  "lng": -96.808888888889,
+  "label": "Southwest Airlines",
+  "qid": "Q503308"
+ },
+ "centene.com": {
+  "lat": 38.62638888888889,
+  "lng": -90.19944444444444,
+  "label": "Centene Corporation",
+  "qid": "Q5059102"
+ },
+ "bankchb.com": {
+  "lat": 24.14388888888889,
+  "lng": 120.67944444444444,
+  "label": "Chang Hwa Bank",
+  "qid": "Q5071627"
+ },
+ "akzonobel.com": {
+  "lat": 52.36666666666667,
+  "lng": 4.883333333333333,
+  "label": "AkzoNobel",
+  "qid": "Q50912"
+ },
+ "cki.com.hk": {
+  "lat": 22.279444444444,
+  "lng": 114.16027777778,
+  "label": "CK Infrastructure Holdings",
+  "qid": "Q5094252"
+ },
+ "hold.coscoshipping.com": {
+  "lat": 39.146666666667,
+  "lng": 117.20555555556,
+  "label": "Cosco Shipping Holdings Co., Ltd.",
+  "qid": "Q5099614"
+ },
+ "chinagoldintl.com": {
+  "lat": 49.26083333333333,
+  "lng": -123.1138888888889,
+  "label": "China Gold International Resources",
+  "qid": "Q5099698"
+ },
+ "cicc.com": {
+  "lat": 35.844722222222224,
+  "lng": 103.45194444444445,
+  "label": "China International Capital Corp",
+  "qid": "Q5099737"
+ },
+ "cmoc.com": {
+  "lat": 33.78481,
+  "lng": 111.61345,
+  "label": "CMOC Group Limited",
+  "qid": "Q5099785"
+ },
+ "churchdwight.com": {
+  "lat": 40.2627,
+  "lng": -74.7983,
+  "label": "Church & Dwight",
+  "qid": "Q5116536"
+ },
+ "cinfin.com": {
+  "lat": 39.331156,
+  "lng": -84.542842,
+  "label": "Cincinnati Financial",
+  "qid": "Q5120253"
+ },
+ "citizensbank.com": {
+  "lat": 41.82399,
+  "lng": -71.41283,
+  "label": "Citizens Financial Group",
+  "qid": "Q5122694"
+ },
+ "cleanharbors.com": {
+  "lat": 42.161666666667,
+  "lng": -70.794444444444,
+  "label": "Clean Harbors",
+  "qid": "Q5130494"
+ },
+ "falabella.com": {
+  "lat": -33.4375,
+  "lng": -70.65,
+  "label": "Falabella",
+  "qid": "Q5135229"
+ },
+ "jr-central.co.jp": {
+  "lat": 35.17138889,
+  "lng": 136.88277778,
+  "label": "Central Japan Railway Company",
+  "qid": "Q513679"
+ },
+ "cokeconsolidated.com": {
+  "lat": 35.226944444444,
+  "lng": -80.843333333333,
+  "label": "Coca-Cola Consolidated, Inc.",
+  "qid": "Q5139058"
+ },
+ "comfortsystemsusa.com": {
+  "lat": 29.762777777778,
+  "lng": -95.383055555556,
+  "label": "Comfort Systems USA",
+  "qid": "Q5151691"
+ },
+ "crowncastle.com": {
+  "lat": 29.762777777778,
+  "lng": -95.383055555556,
+  "label": "Crown Castle International Corp.",
+  "qid": "Q5189320"
+ },
+ "crowncork.com": {
+  "lat": 40.2414,
+  "lng": -74.8364,
+  "label": "Crown Holdings",
+  "qid": "Q5189378"
+ },
+ "davita.com": {
+  "lat": 39.739166666667,
+  "lng": -104.98472222222,
+  "label": "DaVita",
+  "qid": "Q5207184"
+ },
+ "ms-ad-hd.com": {
+  "lat": 35.68944444444445,
+  "lng": 139.69166666666666,
+  "label": "MS&AD Insurance Group Holdings",
+  "qid": "Q5215769"
+ },
+ "sompo-hd.com": {
+  "lat": 35.69272222,
+  "lng": 139.69611111,
+  "label": "SOMPO",
+  "qid": "Q5215858"
+ },
+ "deltaww.com": {
+  "lat": 25.0375,
+  "lng": 121.5625,
+  "label": "Delta Electronics",
+  "qid": "Q5254620"
+ },
+ "ericsson.com": {
+  "lat": 59.329444444444,
+  "lng": 18.068611111111,
+  "label": "Ericsson",
+  "qid": "Q52618"
+ },
+ "dickssportinggoods.com": {
+  "lat": 40.5158,
+  "lng": -80.1628,
+  "label": "Dick's Sporting Goods",
+  "qid": "Q5272601"
+ },
+ "divislabs.com": {
+  "lat": 17.361666666666668,
+  "lng": 78.47472222222223,
+  "label": "Divi's Laboratories",
+  "qid": "Q52751473"
+ },
+ "disco.co.jp": {
+  "lat": 35.68944444444445,
+  "lng": 139.69166666666666,
+  "label": "Disco Corporation",
+  "qid": "Q5281524"
+ },
+ "discounttire.com": {
+  "lat": 33.493055555556,
+  "lng": -111.92611111111,
+  "label": "Discount Tire",
+  "qid": "Q5281735"
+ },
+ "global.abb": {
+  "lat": 47.37444444444444,
+  "lng": 8.54111111111111,
+  "label": "ABB Group",
+  "qid": "Q52825"
+ },
+ "alteogen.com": {
+  "lat": 36.35,
+  "lng": 127.385,
+  "label": "Alteogen (South Korea)",
+  "qid": "Q52853036"
+ },
+ "docusign.com": {
+  "lat": 37.775,
+  "lng": -122.41944444444445,
+  "label": "Docusign",
+  "qid": "Q5287613"
+ },
+ "dollartree.com": {
+  "lat": 36.767398,
+  "lng": -76.287405,
+  "label": "Dollar Tree",
+  "qid": "Q5289230"
+ },
+ "dib.ae": {
+  "lat": 25.269722222222,
+  "lng": 55.309444444444,
+  "label": "Dubai Islamic Bank",
+  "qid": "Q5310570"
+ },
+ "hitachi.com": {
+  "lat": 35.68138888888889,
+  "lng": 139.76583333333335,
+  "label": "Hitachi",
+  "qid": "Q53238"
+ },
+ "holdings.panasonic": {
+  "lat": 34.73913888888889,
+  "lng": 135.58686111111112,
+  "label": "Panasonic Holdings Corporation",
+  "qid": "Q53247"
+ },
+ "gallo.com": {
+  "lat": 37.661388888889,
+  "lng": -120.99444444444,
+  "label": "E & J Gallo Winery",
+  "qid": "Q5324773"
+ },
+ "mitsubishielectric.com": {
+  "lat": 35.69394444444445,
+  "lng": 139.7536111111111,
+  "label": "Mitsubishi Electric",
+  "qid": "Q53257"
+ },
+ "guardanthealth.com": {
+  "lat": 37.482777777778,
+  "lng": -122.23611111111,
+  "label": "Guardant Health",
+  "qid": "Q53308751"
+ },
+ "ebara.co.jp": {
+  "lat": 35.561277777777775,
+  "lng": 139.71602777777778,
+  "label": "Ebara Corporation",
+  "qid": "Q5331498"
+ },
+ "unicharm.co.jp": {
+  "lat": 35.658027777777775,
+  "lng": 139.75152777777777,
+  "label": "Unicharm",
+  "qid": "Q5361268"
+ },
+ "elliottmgmt.com": {
+  "lat": 40.71277777777778,
+  "lng": -74.00611111111111,
+  "label": "Elliott Investment Management",
+  "qid": "Q5365696"
+ },
+ "emcorgroup.com": {
+  "lat": 41.093888888889,
+  "lng": -73.419722222222,
+  "label": "EMCOR",
+  "qid": "Q5370289"
+ },
+ "vertiv.com": {
+  "lat": 40.1236,
+  "lng": -82.9214,
+  "label": "Vertiv",
+  "qid": "Q5370909"
+ },
+ "emiratesnbd.com": {
+  "lat": 25.269722222222,
+  "lng": 55.309444444444,
+  "label": "Emirates NBD",
+  "qid": "Q5372575"
+ },
+ "energytransfer.com": {
+  "lat": 32.779166666667,
+  "lng": -96.808888888889,
+  "label": "Energy Transfer",
+  "qid": "Q5377000"
+ },
+ "enterpriseproducts.com": {
+  "lat": 29.762777777778,
+  "lng": -95.383055555556,
+  "label": "Enterprise Products",
+  "qid": "Q5380346"
+ },
+ "erieinsurance.com": {
+  "lat": 42.129561111111,
+  "lng": -80.085213888889,
+  "label": "Erie Insurance Group",
+  "qid": "Q5388314"
+ },
+ "estes-express.com": {
+  "lat": 37.54083333333333,
+  "lng": -77.43666666666667,
+  "label": "Estes Express Lines",
+  "qid": "Q5401059"
+ },
+ "fisherinvestments.com": {
+  "lat": 33.05,
+  "lng": -96.75,
+  "label": "Fisher Investments",
+  "qid": "Q54074163"
+ },
+ "viciproperties.com": {
+  "lat": 40.71277777777778,
+  "lng": -74.00611111111111,
+  "label": "Vici Properties",
+  "qid": "Q54263910"
+ },
+ "eand.com": {
+  "lat": 24.45111111111111,
+  "lng": 54.39694444444444,
+  "label": "etisalat",
+  "qid": "Q543449"
+ },
+ "mapfre.com": {
+  "lat": 40.47277777777778,
+  "lng": -3.8722222222222222,
+  "label": "MAPFRE",
+  "qid": "Q544532"
+ },
+ "fidelityinternational.com": {
+  "lat": 32.32,
+  "lng": -64.74,
+  "label": "Fidelity International Ltd",
+  "qid": "Q5446786"
+ },
+ "fnf.com": {
+  "lat": 30.316666666667,
+  "lng": -81.65,
+  "label": "Fidelity National Financial",
+  "qid": "Q5446791"
+ },
+ "qualcomm.com": {
+  "lat": 32.715,
+  "lng": -117.1625,
+  "label": "Qualcomm",
+  "qid": "Q544847"
+ },
+ "firstcitizens.com": {
+  "lat": 35.78,
+  "lng": -78.64,
+  "label": "First Citizens BancShares",
+  "qid": "Q5452733"
+ },
+ "firsthorizon.com": {
+  "lat": 35.14611111111111,
+  "lng": -90.05194444444444,
+  "label": "First Horizon Bank",
+  "qid": "Q5453875"
+ },
+ "fivebelow.com": {
+  "lat": 39.952777777778,
+  "lng": -75.163611111111,
+  "label": "Five Below",
+  "qid": "Q5455836"
+ },
+ "tetrascience.com": {
+  "lat": 42.360277777777775,
+  "lng": -71.05777777777777,
+  "label": "TetraScience",
+  "qid": "Q54957095"
+ },
+ "fujikura.co.jp": {
+  "lat": 35.68944444444445,
+  "lng": 139.69166666666666,
+  "label": "Fujikura",
+  "qid": "Q5507432"
+ },
+ "furukawa.co.jp": {
+  "lat": 35.687105555555554,
+  "lng": 139.76428333333334,
+  "label": "Furukawa Electric",
+  "qid": "Q5509800"
+ },
+ "sitime.com": {
+  "lat": 37.35,
+  "lng": -121.96666666667,
+  "label": "SiTime",
+  "qid": "Q55360040"
+ },
+ "marubeni.com": {
+  "lat": 35.68944444444445,
+  "lng": 139.69166666666666,
+  "label": "Marubeni",
+  "qid": "Q553927"
+ },
+ "cnrspc.com": {
+  "lat": 30.25,
+  "lng": 120.1675,
+  "label": "Rongsheng Petrochemical (China)",
+  "qid": "Q55454117"
+ },
+ "okta.com": {
+  "lat": 37.775,
+  "lng": -122.41944444444445,
+  "label": "Okta",
+  "qid": "Q55627388"
+ },
+ "rubrik.com": {
+  "lat": 37.44444444444444,
+  "lng": -122.16,
+  "label": "Rubrik",
+  "qid": "Q55632076"
+ },
+ "graco.com": {
+  "lat": 44.981944444444444,
+  "lng": -93.26916666666666,
+  "label": "Graco",
+  "qid": "Q5591659"
+ },
+ "greatwestlifeco.com": {
+  "lat": 49.89555555555555,
+  "lng": -97.13861111111112,
+  "label": "Great-West Lifeco",
+  "qid": "Q5598598"
+ },
+ "tencentmusic.com": {
+  "lat": 22.546666666666667,
+  "lng": 114.05444444444444,
+  "label": "Tencent Music",
+  "qid": "Q56011958"
+ },
+ "guidewire.com": {
+  "lat": 37.554166666667,
+  "lng": -122.31305555556,
+  "label": "Guidewire Software",
+  "qid": "Q5615528"
+ },
+ "guosen.com.cn": {
+  "lat": 22.546666666666667,
+  "lng": 114.05444444444444,
+  "label": "Guosen Securities",
+  "qid": "Q5619672"
+ },
+ "nexon.co.jp": {
+  "lat": 35.683889,
+  "lng": 139.774444,
+  "label": "Nexon",
+  "qid": "Q562078"
+ },
+ "tapestry.com": {
+  "lat": 40.71277777777778,
+  "lng": -74.00611111111111,
+  "label": "Tapestry, Inc.",
+  "qid": "Q56273715"
+ },
+ "halozyme.com": {
+  "lat": 32.715,
+  "lng": -117.1625,
+  "label": "Halozyme Therapeutics",
+  "qid": "Q5643474"
+ },
+ "eni.com": {
+  "lat": 41.893055555556,
+  "lng": 12.482777777778,
+  "label": "Eni",
+  "qid": "Q565594"
+ },
+ "10xgenomics.com": {
+  "lat": 37.6725,
+  "lng": -121.8825,
+  "label": "10X Genomics",
+  "qid": "Q56585268"
+ },
+ "hecla.com": {
+  "lat": 47.692777777778,
+  "lng": -116.78,
+  "label": "Hecla Mining",
+  "qid": "Q5696498"
+ },
+ "mckesson.com": {
+  "lat": 32.811666666667,
+  "lng": -96.950833333333,
+  "label": "McKesson Corporation",
+  "qid": "Q570473"
+ },
+ "banorte.com": {
+  "lat": 10.50611111111111,
+  "lng": -66.91444444444444,
+  "label": "",
+  "qid": "Q5715890"
+ },
+ "rewe-group.com": {
+  "lat": 50.942222222222,
+  "lng": 6.9577777777778,
+  "label": "REWE Group",
+  "qid": "Q573266"
+ },
+ "hzlindia.com": {
+  "lat": 24.583333333333,
+  "lng": 73.683333333333,
+  "label": "Hindustan Zinc Limited",
+  "qid": "Q5766843"
+ },
+ "ebayinc.com": {
+  "lat": 37.304166666667,
+  "lng": -121.87277777778,
+  "label": "",
+  "qid": "Q58024"
+ },
+ "galderma.com": {
+  "lat": 47.168055555555554,
+  "lng": 8.516944444444444,
+  "label": "Galderma",
+  "qid": "Q581008"
+ },
+ "corning.com": {
+  "lat": 42.1411,
+  "lng": -77.0325,
+  "label": "Corning Inc.",
+  "qid": "Q5842736"
+ },
+ "hobbylobby.com": {
+  "lat": 35.48222222222222,
+  "lng": -97.53527777777778,
+  "label": "Hobby Lobby",
+  "qid": "Q5874938"
+ },
+ "hologic.com": {
+  "lat": 42.345833333333,
+  "lng": -71.552777777778,
+  "label": "Hologic",
+  "qid": "Q5884072"
+ },
+ "honeywellaerospace.com": {
+  "lat": 33.44833333333333,
+  "lng": -112.07388888888889,
+  "label": "",
+  "qid": "Q5893992"
+ },
+ "lotusbakeries.com": {
+  "lat": 51.1939,
+  "lng": 3.6328,
+  "label": "Lotus Bakeries",
+  "qid": "Q590113"
+ },
+ "credit-agricole.com": {
+  "lat": 48.816388888889,
+  "lng": 2.3211111111111,
+  "label": "Credit Agricole Group",
+  "qid": "Q590952"
+ },
+ "hudbayminerals.com": {
+  "lat": 43.670277777778,
+  "lng": -79.386666666667,
+  "label": "HudBay Minerals",
+  "qid": "Q5928181"
+ },
+ "upsolve.org": {
+  "lat": 40.71277777777778,
+  "lng": -74.00611111111111,
+  "label": "Upsolve",
+  "qid": "Q59505032"
+ },
+ "vestas.com": {
+  "lat": 50.701,
+  "lng": -1.288,
+  "label": "Vestas (United Kingdom)",
+  "qid": "Q59536037"
+ },
+ "idexcorp.com": {
+  "lat": 42.2347,
+  "lng": -87.8508,
+  "label": "IDEX Corporation",
+  "qid": "Q5970002"
+ },
+ "hilton.com": {
+  "lat": 31,
+  "lng": -100,
+  "label": "Hilton Hotels & Resorts",
+  "qid": "Q598884"
+ },
+ "att.com": {
+  "lat": 41.88194444444444,
+  "lng": -87.62777777777778,
+  "label": "Illinois Bell",
+  "qid": "Q5999344"
+ },
+ "foxcorporation.com": {
+  "lat": 40.71277777777778,
+  "lng": -74.00611111111111,
+  "label": "Fox Corporation",
+  "qid": "Q60238941"
+ },
+ "ies-co.com": {
+  "lat": 29.762777777778,
+  "lng": -95.383055555556,
+  "label": "Integrated Electrical Services",
+  "qid": "Q6042841"
+ },
+ "swissre.com": {
+  "lat": 47.37444444444444,
+  "lng": 8.54111111111111,
+  "label": "Swiss Re",
+  "qid": "Q605565"
+ },
+ "latour.se": {
+  "lat": 57.7075,
+  "lng": 11.9675,
+  "label": "Investment AB Latour",
+  "qid": "Q6060753"
+ },
+ "woolworthsgroup.com.au": {
+  "lat": -33.867777777777775,
+  "lng": 151.21,
+  "label": "Woolworths Group",
+  "qid": "Q607272"
+ },
+ "brex.com": {
+  "lat": 37.775,
+  "lng": -122.41944444444445,
+  "label": "Brex",
+  "qid": "Q60741065"
+ },
+ "vinhomes.vn": {
+  "lat": 21.0245,
+  "lng": 105.84117,
+  "label": "Vinhomes Joint Stock Company",
+  "qid": "Q60742976"
+ },
+ "greystar.com": {
+  "lat": 32.78333333333333,
+  "lng": -79.93194444444444,
+  "label": "Greystar Real Estate Partners",
+  "qid": "Q60749135"
+ },
+ "replit.com": {
+  "lat": 37.775,
+  "lng": -122.41944444444445,
+  "label": "Replit",
+  "qid": "Q60768699"
+ },
+ "cadence.com": {
+  "lat": 37.304166666667,
+  "lng": -121.87277777778,
+  "label": "Cadence Design Systems",
+  "qid": "Q608776"
+ },
+ "colgatepalmolive.com": {
+  "lat": 40.71277777777778,
+  "lng": -74.00611111111111,
+  "label": "Colgate-Palmolive Company",
+  "qid": "Q609466"
+ },
+ "bb.com.br": {
+  "lat": -15.793888888889,
+  "lng": -47.882777777778,
+  "label": "Bank of Brazil",
+  "qid": "Q610817"
+ },
+ "jameshardie.com": {
+  "lat": 53.351,
+  "lng": -7.921,
+  "label": "James Hardie",
+  "qid": "Q6135535"
+ },
+ "apollo.com": {
+  "lat": 40.7639,
+  "lng": -73.9748,
+  "label": "Apollo Global Management",
+  "qid": "Q619121"
+ },
+ "anduril.com": {
+  "lat": 37,
+  "lng": -120,
+  "label": "",
+  "qid": "Q61918830"
+ },
+ "realtek.com": {
+  "lat": 24.804722222222,
+  "lng": 120.97138888889,
+  "label": "Realtek",
+  "qid": "Q619364"
+ },
+ "implats.co.za": {
+  "lat": -26.204361111111,
+  "lng": 28.041638888889,
+  "label": "Impala Platinum",
+  "qid": "Q620398"
+ },
+ "gmexico.com": {
+  "lat": 19.353773,
+  "lng": -99.13589,
+  "label": "Grupo México",
+  "qid": "Q623591"
+ },
+ "cn.ca": {
+  "lat": 45.5088282,
+  "lng": -73.5540998,
+  "label": "Canadian National Railway",
+  "qid": "Q624798"
+ },
+ "aramark.com": {
+  "lat": 39.952777777778,
+  "lng": -75.163611111111,
+  "label": "Aramark",
+  "qid": "Q625708"
+ },
+ "lufthansagroup.com": {
+  "lat": 50.942222222222,
+  "lng": 6.9577777777778,
+  "label": "Lufthansa Group",
+  "qid": "Q62589018"
+ },
+ "global.canon": {
+  "lat": 35.561277777777775,
+  "lng": 139.71602777777778,
+  "label": "Canon Inc.",
+  "qid": "Q62621"
+ },
+ "autodesk.com": {
+  "lat": 37.775,
+  "lng": -122.41944444444445,
+  "label": "Autodesk",
+  "qid": "Q628051"
+ },
+ "hdfc.bank.in": {
+  "lat": 19.075833333333332,
+  "lng": 72.8775,
+  "label": "HDFC Bank‬",
+  "qid": "Q631047"
+ },
+ "argenx.com": {
+  "lat": 51.05361111111111,
+  "lng": 3.725277777777778,
+  "label": "Argenx SE",
+  "qid": "Q63152908"
+ },
+ "corteva.com": {
+  "lat": 39.748333333333,
+  "lng": -75.551388888889,
+  "label": "Corteva",
+  "qid": "Q63197674"
+ },
+ "adm.com": {
+  "lat": 41.8865,
+  "lng": -87.6305,
+  "label": "Archer Daniels Midland",
+  "qid": "Q632694"
+ },
+ "nbc.ca": {
+  "lat": 45.5019,
+  "lng": -73.5638,
+  "label": "National Bank of Canada",
+  "qid": "Q634298"
+ },
+ "motorolasolutions.com": {
+  "lat": 41.88194444444444,
+  "lng": -87.62777777777778,
+  "label": "Motorola Solutions",
+  "qid": "Q634815"
+ },
+ "taqa.com": {
+  "lat": 24.45111111111111,
+  "lng": 54.39694444444444,
+  "label": "Abu Dhabi National Energy Company",
+  "qid": "Q6349602"
+ },
+ "celonis.com": {
+  "lat": 48.1375,
+  "lng": 11.575,
+  "label": "Celonis",
+  "qid": "Q63725648"
+ },
+ "7andi.com": {
+  "lat": 35.68621388888889,
+  "lng": 139.7365888888889,
+  "label": "Seven & I Holdings Co.",
+  "qid": "Q639447"
+ },
+ "kimcorealty.com": {
+  "lat": 40.7322,
+  "lng": -73.6847,
+  "label": "Kimco Realty",
+  "qid": "Q6410043"
+ },
+ "tenaris.com": {
+  "lat": 49.61138888888889,
+  "lng": 6.13,
+  "label": "Tenaris",
+  "qid": "Q642106"
+ },
+ "medtronic.com": {
+  "lat": 53,
+  "lng": -8,
+  "label": "Medtronic plc",
+  "qid": "Q642189"
+ },
+ "knight-swift.com": {
+  "lat": 33.44833333333333,
+  "lng": -112.07388888888889,
+  "label": "Knight-Swift Transportation",
+  "qid": "Q6422289"
+ },
+ "swisscom.ch": {
+  "lat": 46.9775,
+  "lng": 7.4791666666667,
+  "label": "Swisscom",
+  "qid": "Q644324"
+ },
+ "lpl.com": {
+  "lat": 32.715,
+  "lng": -117.1625,
+  "label": "LPL Financial",
+  "qid": "Q6459734"
+ },
+ "labcorp.com": {
+  "lat": 36.089722222222,
+  "lng": -79.445555555556,
+  "label": "LabCorp",
+  "qid": "Q6466630"
+ },
+ "ltm.com": {
+  "lat": 19.075833333333332,
+  "lng": 72.8775,
+  "label": "LTM Limited",
+  "qid": "Q6491815"
+ },
+ "mitsubishicorp.com": {
+  "lat": 35.68138888888889,
+  "lng": 139.76583333333335,
+  "label": "Mitsubishi Corporation",
+  "qid": "Q650745"
+ },
+ "affirm.com": {
+  "lat": 37.775,
+  "lng": -122.41944444444445,
+  "label": "Affirm",
+  "qid": "Q65085822"
+ },
+ "group.schindler.com": {
+  "lat": 47.083888888889,
+  "lng": 8.3430555555556,
+  "label": "Schindler Elevator",
+  "qid": "Q651212"
+ },
+ "enel.com": {
+  "lat": 41.893055555556,
+  "lng": 12.482777777778,
+  "label": "Enel",
+  "qid": "Q651222"
+ },
+ "lifco.se": {
+  "lat": 59.640280006134,
+  "lng": 17.072521250874,
+  "label": "",
+  "qid": "Q65196379"
+ },
+ "ouraring.com": {
+  "lat": 65.059167,
+  "lng": 25.466111,
+  "label": "Oura Health",
+  "qid": "Q65241898"
+ },
+ "bridgewater.com": {
+  "lat": 41.1414855,
+  "lng": -73.3578955,
+  "label": "Bridgewater Associates",
+  "qid": "Q652431"
+ },
+ "leonardgreen.com": {
+  "lat": 34.05223,
+  "lng": -118.24368,
+  "label": "Leonard Green & Partners",
+  "qid": "Q6525321"
+ },
+ "veriff.com": {
+  "lat": 59.437222222222,
+  "lng": 24.745,
+  "label": "Veriff",
+  "qid": "Q65256461"
+ },
+ "hdksoe.co.kr": {
+  "lat": 37.555922222222,
+  "lng": 126.97034722222,
+  "label": "HD Korea Shipbuilding & Offshore Engineering",
+  "qid": "Q65312870"
+ },
+ "hannover-re.com": {
+  "lat": 52.374444444444,
+  "lng": 9.7386111111111,
+  "label": "Hannover Rück SE",
+  "qid": "Q657359"
+ },
+ "pttep.com": {
+  "lat": 13.75,
+  "lng": 100.51666666667,
+  "label": "PTT Exploration and Production Public Company Limited",
+  "qid": "Q6579845"
+ },
+ "boeing.com": {
+  "lat": 47.605,
+  "lng": -122.33,
+  "label": "Boeing",
+  "qid": "Q66"
+ },
+ "st.com": {
+  "lat": 46.166666666667,
+  "lng": 6.1166666666667,
+  "label": "STMicroelectronics",
+  "qid": "Q661845"
+ },
+ "liebherr.com": {
+  "lat": 46.616666666667,
+  "lng": 7.05,
+  "label": "Liebherr Group",
+  "qid": "Q662090"
+ },
+ "mercuria.com": {
+  "lat": 46.2,
+  "lng": 6.15,
+  "label": "Mercuria Energy Group",
+  "qid": "Q663926"
+ },
+ "straumann.com": {
+  "lat": 47.558055555555555,
+  "lng": 7.587777777777777,
+  "label": "Straumann",
+  "qid": "Q664481"
+ },
+ "deichmann.com": {
+  "lat": 51.450833333333,
+  "lng": 7.0130555555556,
+  "label": "Deichmann SE",
+  "qid": "Q664543"
+ },
+ "littelfuse.com": {
+  "lat": 41.88194444444444,
+  "lng": -87.62777777777778,
+  "label": "Littelfuse",
+  "qid": "Q6648755"
+ },
+ "gunvorgroup.com": {
+  "lat": 46.2,
+  "lng": 6.15,
+  "label": "Centalion",
+  "qid": "Q665870"
+ },
+ "cerebras.ai": {
+  "lat": 37.775,
+  "lng": -122.41944444444445,
+  "label": "Cerebras",
+  "qid": "Q66604886"
+ },
+ "cibc.com": {
+  "lat": 43.6481,
+  "lng": -79.3788,
+  "label": "Canadian Imperial Bank of Commerce",
+  "qid": "Q666694"
+ },
+ "swisslife.com": {
+  "lat": 47.37444444444444,
+  "lng": 8.54111111111111,
+  "label": "Swiss Life",
+  "qid": "Q667350"
+ },
+ "johnsoncontrols.com": {
+  "lat": 51.9,
+  "lng": -8.4730555555556,
+  "label": "Johnson Controls",
+  "qid": "Q667865"
+ },
+ "coloplast.com": {
+  "lat": 55.96,
+  "lng": 12.5328,
+  "label": "Coloplast",
+  "qid": "Q669141"
+ },
+ "airbus.com": {
+  "lat": 43.635555555556,
+  "lng": 1.39,
+  "label": "Airbus Commercial Aircraft",
+  "qid": "Q67"
+ },
+ "generali.com": {
+  "lat": 45.65027777777778,
+  "lng": 13.770277777777778,
+  "label": "Assicurazioni Generali",
+  "qid": "Q670482"
+ },
+ "corp.roblox.com": {
+  "lat": 37.554166666667,
+  "lng": -122.31305555556,
+  "label": "",
+  "qid": "Q67186598"
+ },
+ "maaden.com.sa": {
+  "lat": 24.638333333333332,
+  "lng": 46.715,
+  "label": "Maaden",
+  "qid": "Q6721006"
+ },
+ "publix.com": {
+  "lat": 28.041111111111,
+  "lng": -81.958888888889,
+  "label": "Publix",
+  "qid": "Q672170"
+ },
+ "mahindra.com": {
+  "lat": 19.075833333333332,
+  "lng": 72.8775,
+  "label": "Mahindra Group",
+  "qid": "Q6734045"
+ },
+ "lonza.com": {
+  "lat": 47.558055555555555,
+  "lng": 7.587777777777777,
+  "label": "Lonza Group",
+  "qid": "Q674216"
+ },
+ "mankindpharma.com": {
+  "lat": 28.5667,
+  "lng": 77.2833,
+  "label": "Human kind Pharma",
+  "qid": "Q6750540"
+ },
+ "dominionenergy.com": {
+  "lat": 37.54083333333333,
+  "lng": -77.43666666666667,
+  "label": "Dominion Energy",
+  "qid": "Q677464"
+ },
+ "martinmarietta.com": {
+  "lat": 35.78,
+  "lng": -78.64,
+  "label": "Martin Marietta Materials",
+  "qid": "Q6776123"
+ },
+ "mastec.com": {
+  "lat": 25.75,
+  "lng": -80.271111111111,
+  "label": "MasTec",
+  "qid": "Q6782217"
+ },
+ "saint-gobain.com": {
+  "lat": 48.8894,
+  "lng": 2.25139,
+  "label": "Saint-Gobain",
+  "qid": "Q678565"
+ },
+ "wuerth.com": {
+  "lat": 49.2803765,
+  "lng": 9.6901512,
+  "label": "Würth",
+  "qid": "Q679750"
+ },
+ "medline.com": {
+  "lat": 42.266666666667,
+  "lng": -88,
+  "label": "Medline Industries",
+  "qid": "Q6807236"
+ },
+ "partnersgroup.com": {
+  "lat": 47.195555555556,
+  "lng": 8.5263888888889,
+  "label": "Partners Group",
+  "qid": "Q684222"
+ },
+ "albaorbital.com": {
+  "lat": 55.861111111111114,
+  "lng": -4.25,
+  "label": "Alba Orbital",
+  "qid": "Q68442095"
+ },
+ "njcb.com.cn": {
+  "lat": 32.060833333333335,
+  "lng": 118.77888888888889,
+  "label": "Bank of Nanjing",
+  "qid": "Q6850542"
+ },
+ "alfalaval.com": {
+  "lat": 55.708313018551,
+  "lng": 13.199164196669,
+  "label": "Alfa Laval",
+  "qid": "Q686030"
+ },
+ "trafigura.com": {
+  "lat": 1.3,
+  "lng": 103.8,
+  "label": "Trafigura",
+  "qid": "Q687508"
+ },
+ "teck.com": {
+  "lat": 49.26083333333333,
+  "lng": -123.1138888888889,
+  "label": "Teck Resources",
+  "qid": "Q688725"
+ },
+ "axon.com": {
+  "lat": 33.493055555556,
+  "lng": -111.92611111111,
+  "label": "Axon Enterprise",
+  "qid": "Q690604"
+ },
+ "sika.com": {
+  "lat": 47.195555555556,
+  "lng": 8.5263888888889,
+  "label": "Sika AG",
+  "qid": "Q691382"
+ },
+ "gf.com": {
+  "lat": 42.966666666667,
+  "lng": -73.8,
+  "label": "GlobalFoundries",
+  "qid": "Q691592"
+ },
+ "motherson.com": {
+  "lat": 28.57,
+  "lng": 77.32,
+  "label": "Samvardhana Motherson",
+  "qid": "Q6917594"
+ },
+ "muthootfinance.com": {
+  "lat": 9.9666666666667,
+  "lng": 76.283333333333,
+  "label": "Muthoot Finance Ltd",
+  "qid": "Q6943861"
+ },
+ "nrg.com": {
+  "lat": 29.762777777778,
+  "lng": -95.383055555556,
+  "label": "NRG Energy",
+  "qid": "Q6955139"
+ },
+ "quantatw.com": {
+  "lat": 24.988888888889,
+  "lng": 121.31111111111,
+  "label": "Quanta Computer",
+  "qid": "Q696743"
+ },
+ "magna.com": {
+  "lat": 44,
+  "lng": -79.466666666667,
+  "label": "Magna International",
+  "qid": "Q697311"
+ },
+ "nationwide.com": {
+  "lat": 39.9685,
+  "lng": -83.0024,
+  "label": "Nationwide Mutual Insurance Company",
+  "qid": "Q6979886"
+ },
+ "navyfederal.org": {
+  "lat": 38.9,
+  "lng": -77.2667,
+  "label": "Navy Federal Credit Union",
+  "qid": "Q6982632"
+ },
+ "neurocrine.com": {
+  "lat": 32.715,
+  "lng": -117.1625,
+  "label": "Neurocrine Biosciences",
+  "qid": "Q7002174"
+ },
+ "evergreen-marine.com": {
+  "lat": 25.033333333333,
+  "lng": 121.28333333333,
+  "label": "Evergreen Marine",
+  "qid": "Q706946"
+ },
+ "oreillyauto.com": {
+  "lat": 37.195,
+  "lng": -93.286111111111,
+  "label": "O'Reilly Auto Parts",
+  "qid": "Q7071951"
+ },
+ "hengli.com": {
+  "lat": 33.63328,
+  "lng": 116.96833,
+  "label": "Hengli Group",
+  "qid": "Q70822135"
+ },
+ "odfl.com": {
+  "lat": 35.885833333333,
+  "lng": -80.077222222222,
+  "label": "Old Dominion Freight Line",
+  "qid": "Q7083862"
+ },
+ "gruppe.schwarz": {
+  "lat": 49.191666666667,
+  "lng": 9.2244444444444,
+  "label": "Schwarz Group",
+  "qid": "Q712034"
+ },
+ "panamericansilver.com": {
+  "lat": 49.26083333333333,
+  "lng": -123.1138888888889,
+  "label": "Pan American Silver",
+  "qid": "Q7129613"
+ },
+ "anz.com.au": {
+  "lat": -37.814166666666665,
+  "lng": 144.96305555555554,
+  "label": "Australia and New Zealand Banking Group",
+  "qid": "Q714641"
+ },
+ "pembina.com": {
+  "lat": 51.0475,
+  "lng": -114.0625,
+  "label": "Pembina Pipeline",
+  "qid": "Q7161915"
+ },
+ "toyota-tsusho.com": {
+  "lat": 35.18138888888889,
+  "lng": 136.9063888888889,
+  "label": "Toyota Tsusho",
+  "qid": "Q716457"
+ },
+ "bsf.sa": {
+  "lat": 24.638333333333332,
+  "lng": 46.715,
+  "label": "Banque Saudi Fransi",
+  "qid": "Q7181252"
+ },
+ "pidilite.com": {
+  "lat": 19.119166666667,
+  "lng": 72.846944444444,
+  "label": "Pidilite Industries",
+  "qid": "Q7191297"
+ },
+ "progressive.com": {
+  "lat": 41.54778,
+  "lng": -81.44333,
+  "label": "Progressive Corporation",
+  "qid": "Q7248721"
+ },
+ "up.com": {
+  "lat": 41.25861111111111,
+  "lng": -95.9375,
+  "label": "Union Pacific Railroad",
+  "qid": "Q725793"
+ },
+ "quantaservices.com": {
+  "lat": 29.737222222222,
+  "lng": -95.461388888889,
+  "label": "Quanta Services",
+  "qid": "Q7268886"
+ },
+ "quartzy.com": {
+  "lat": 37.44444444444444,
+  "lng": -122.16,
+  "label": "Quartzy",
+  "qid": "Q7269412"
+ },
+ "quiktrip.com": {
+  "lat": 36.131388888889,
+  "lng": -95.937222222222,
+  "label": "QuikTrip",
+  "qid": "Q7271953"
+ },
+ "netapp.com": {
+  "lat": 37.368888888889,
+  "lng": -122.03694444444,
+  "label": "NetApp",
+  "qid": "Q727883"
+ },
+ "raymondjames.com": {
+  "lat": 27.773055555556,
+  "lng": -82.64,
+  "label": "Raymond James Financial",
+  "qid": "Q7298901"
+ },
+ "regencycenters.com": {
+  "lat": 30.3254,
+  "lng": -81.6564,
+  "label": "Regency Centers",
+  "qid": "Q7308000"
+ },
+ "regeneron.com": {
+  "lat": 41.0815,
+  "lng": -73.82930556,
+  "label": "Regeneron Pharmaceuticals",
+  "qid": "Q7308054"
+ },
+ "republicservices.com": {
+  "lat": 33.44833333333333,
+  "lng": -112.07388888888889,
+  "label": "Republic Services",
+  "qid": "Q7314415"
+ },
+ "resmed.com": {
+  "lat": 32.715,
+  "lng": -117.1625,
+  "label": "ResMed",
+  "qid": "Q7314903"
+ },
+ "carrier.com": {
+  "lat": 35.226944444444,
+  "lng": -80.843333333333,
+  "label": "Carrier Corporation",
+  "qid": "Q731912"
+ },
+ "asklepios.com": {
+  "lat": 53.55,
+  "lng": 10,
+  "label": "Asklepios Kliniken",
+  "qid": "Q732068"
+ },
+ "symrise.com": {
+  "lat": 51.829722222222,
+  "lng": 9.4483333333333,
+  "label": "Symrise",
+  "qid": "Q73251"
+ },
+ "tcltech.com": {
+  "lat": 23.11147,
+  "lng": 114.41523,
+  "label": "TCL Technology",
+  "qid": "Q733958"
+ },
+ "rollins.com": {
+  "lat": 33.754444444444445,
+  "lng": -84.38972222222222,
+  "label": "Rollins Inc.",
+  "qid": "Q7361273"
+ },
+ "assaabloy.com": {
+  "lat": 59.329444444444,
+  "lng": 18.068611111111,
+  "label": "Assa Abloy",
+  "qid": "Q738421"
+ },
+ "seic.com": {
+  "lat": 40.1317,
+  "lng": -75.4597,
+  "label": "SEI Investments Company",
+  "qid": "Q7389686"
+ },
+ "usbank.com": {
+  "lat": 44.981944444444444,
+  "lng": -93.26916666666666,
+  "label": "U.S. Bancorp",
+  "qid": "Q739084"
+ },
+ "ssctech.com": {
+  "lat": 41.852777777778,
+  "lng": -72.643055555556,
+  "label": "SS&C Technologies",
+  "qid": "Q7392916"
+ },
+ "epicgames.com": {
+  "lat": 35.5,
+  "lng": -80,
+  "label": "",
+  "qid": "Q739711"
+ },
+ "samsungsds.com": {
+  "lat": 37.51646944,
+  "lng": 127.10040556,
+  "label": "Samsung SDS",
+  "qid": "Q7410538"
+ },
+ "wabteccorp.com": {
+  "lat": 40.3944,
+  "lng": -79.8086,
+  "label": "Wabtec",
+  "qid": "Q741707"
+ },
+ "darden.com": {
+  "lat": 28.51,
+  "lng": -81.32,
+  "label": "Darden Restaurants",
+  "qid": "Q742196"
+ },
+ "franklintempleton.com": {
+  "lat": 37.554166666667,
+  "lng": -122.31305555556,
+  "label": "Franklin Templeton Investments",
+  "qid": "Q744683"
+ },
+ "sempra.com": {
+  "lat": 32.715,
+  "lng": -117.1625,
+  "label": "Sempra",
+  "qid": "Q7449804"
+ },
+ "global.kyocera.com": {
+  "lat": 34.935555555556,
+  "lng": 135.76138888889,
+  "label": "Kyocera",
+  "qid": "Q745099"
+ },
+ "alpha.gr": {
+  "lat": 37.98416666666667,
+  "lng": 23.728055555555557,
+  "label": "Alpha Bank",
+  "qid": "Q747394"
+ },
+ "global.kawasaki.com": {
+  "lat": 34.68055556,
+  "lng": 135.18,
+  "label": "Kawasaki Heavy Industries",
+  "qid": "Q748148"
+ },
+ "mediobanca.com": {
+  "lat": 45.466944444444,
+  "lng": 9.19,
+  "label": "Mediobanca",
+  "qid": "Q749034"
+ },
+ "spgroup.com.sg": {
+  "lat": 1.3,
+  "lng": 103.8,
+  "label": "Singapore Power",
+  "qid": "Q7523084"
+ },
+ "skyworksinc.com": {
+  "lat": 42.479166666667,
+  "lng": -71.152777777778,
+  "label": "Skyworks Solutions",
+  "qid": "Q7538146"
+ },
+ "atlassian.com": {
+  "lat": -33.8673,
+  "lng": 151.2066,
+  "label": "Atlassian",
+  "qid": "Q757307"
+ },
+ "attijariwafabank.com": {
+  "lat": 33.599166666667,
+  "lng": -7.62,
+  "label": "Attijariwafa Bank",
+  "qid": "Q758052"
+ },
+ "sc.com": {
+  "lat": 27.71,
+  "lng": 85.32,
+  "label": "Standard Chartered Bank Nepal",
+  "qid": "Q7598199"
+ },
+ "stifel.com": {
+  "lat": 38.62638888888889,
+  "lng": -90.19944444444444,
+  "label": "Stifel",
+  "qid": "Q7616390"
+ },
+ "barillagroup.com": {
+  "lat": 44.801472222222,
+  "lng": 10.328,
+  "label": "Barilla Group",
+  "qid": "Q762787"
+ },
+ "bain.com": {
+  "lat": 42.360277777777775,
+  "lng": -71.05777777777777,
+  "label": "Bain & Company",
+  "qid": "Q764850"
+ },
+ "sig.com": {
+  "lat": 40.0075,
+  "lng": -75.2342,
+  "label": "Susquehanna International Group",
+  "qid": "Q7649307"
+ },
+ "sobi.com": {
+  "lat": 59.329444444444,
+  "lng": 18.068611111111,
+  "label": "Swedish Orphan Biovitrum",
+  "qid": "Q7654795"
+ },
+ "swireproperties.com": {
+  "lat": 22.28606,
+  "lng": 114.21336,
+  "label": "Swire Properties",
+  "qid": "Q7658810"
+ },
+ "teledyne.com": {
+  "lat": 34.189444444444,
+  "lng": -118.875,
+  "label": "Teledyne Technologies",
+  "qid": "Q7696127"
+ },
+ "texaspacific.com": {
+  "lat": 32.779166666667,
+  "lng": -96.808888888889,
+  "label": "Texas Pacific Land Trust",
+  "qid": "Q7707900"
+ },
+ "theemiratesgroup.com": {
+  "lat": 25.24,
+  "lng": 55.35027777777778,
+  "label": "The Emirates Group",
+  "qid": "Q7731899"
+ },
+ "grupobimbo.com": {
+  "lat": 19.353773,
+  "lng": -99.13589,
+  "label": "Grupo Bimbo",
+  "qid": "Q775031"
+ },
+ "thomabravo.com": {
+  "lat": 37.775,
+  "lng": -122.41944444444445,
+  "label": "Thoma Bravo",
+  "qid": "Q7786759"
+ },
+ "uber.com": {
+  "lat": 37.775,
+  "lng": -122.41944444444445,
+  "label": "Uber",
+  "qid": "Q780442"
+ },
+ "tollbrothers.com": {
+  "lat": 40.1825,
+  "lng": -75.1344,
+  "label": "Toll Brothers",
+  "qid": "Q7814310"
+ },
+ "compass-group.com": {
+  "lat": 51.3902,
+  "lng": -0.5074,
+  "label": "Compass Group",
+  "qid": "Q782697"
+ },
+ "transdigm.com": {
+  "lat": 41.49916666666667,
+  "lng": -81.69472222222223,
+  "label": "TransDigm Group Inc.",
+  "qid": "Q7833612"
+ },
+ "transunion.com": {
+  "lat": 41.88194444444444,
+  "lng": -87.62777777777778,
+  "label": "TransUnion",
+  "qid": "Q7833641"
+ },
+ "twilio.com": {
+  "lat": 37.775,
+  "lng": -122.41944444444445,
+  "label": "Twilio",
+  "qid": "Q7858039"
+ },
+ "uhaul.com": {
+  "lat": 33.44833333333333,
+  "lng": -112.07388888888889,
+  "label": "U-Haul",
+  "qid": "Q7862902"
+ },
+ "ui.com": {
+  "lat": 40.71277777777778,
+  "lng": -74.00611111111111,
+  "label": "Ubiquiti",
+  "qid": "Q7876533"
+ },
+ "uni-president.com.tw": {
+  "lat": 23.016666666667,
+  "lng": 120.25,
+  "label": "Uni-President Enterprises Corporation",
+  "qid": "Q7884615"
+ },
+ "unitedrentals.com": {
+  "lat": 41.02649,
+  "lng": -73.62846,
+  "label": "United Rentals",
+  "qid": "Q7889101"
+ },
+ "ustc.dk": {
+  "lat": 55.505833333333335,
+  "lng": 9.730555555555556,
+  "label": "United Shipping & Trading Company",
+  "qid": "Q7889139"
+ },
+ "unity.com": {
+  "lat": 37.775,
+  "lng": -122.41944444444445,
+  "label": "Unity Technologies",
+  "qid": "Q7893816"
+ },
+ "verisk.com": {
+  "lat": 40.71,
+  "lng": -74.06,
+  "label": "Verisk Analytics",
+  "qid": "Q7921370"
+ },
+ "vicorpower.com": {
+  "lat": 42.657222222222224,
+  "lng": -71.14083333333333,
+  "label": "Vicor Corporation",
+  "qid": "Q7925565"
+ },
+ "wpcarey.com": {
+  "lat": 40.71277777777778,
+  "lng": -74.00611111111111,
+  "label": "W. P. Carey & Co.",
+  "qid": "Q7945867"
+ },
+ "wesco.com": {
+  "lat": 40.44166666666667,
+  "lng": -80,
+  "label": "WESCO International",
+  "qid": "Q7949044"
+ },
+ "samsara.com": {
+  "lat": 37.775,
+  "lng": -122.41944444444445,
+  "label": "Samsara",
+  "qid": "Q79543668"
+ },
+ "truist.com": {
+  "lat": 36.1025,
+  "lng": -80.260555555556,
+  "label": "Truist Financial",
+  "qid": "Q795486"
+ },
+ "bseindia.com": {
+  "lat": 19.075833333333332,
+  "lng": 72.8775,
+  "label": "S&P BSE Sensex",
+  "qid": "Q796994"
+ },
+ "websterbank.com": {
+  "lat": 41.096666666667,
+  "lng": -73.552222222222,
+  "label": "Webster Bank",
+  "qid": "Q7978891"
+ },
+ "huntington.com": {
+  "lat": 39.96222222222222,
+  "lng": -83.00055555555555,
+  "label": "Huntington Bancshares",
+  "qid": "Q798819"
+ },
+ "woodward.com": {
+  "lat": 40.566666666667,
+  "lng": -105.08333333333,
+  "label": "Woodward",
+  "qid": "Q8033550"
+ },
+ "workday.com": {
+  "lat": 37.6725,
+  "lng": -121.8825,
+  "label": "Workday, Inc.",
+  "qid": "Q8034666"
+ },
+ "baincapital.com": {
+  "lat": 42.349277777778,
+  "lng": -71.074777777778,
+  "label": "Bain Capital",
+  "qid": "Q803873"
+ },
+ "xpo.com": {
+  "lat": 41.02649,
+  "lng": -73.62846,
+  "label": "XPO, Inc.",
+  "qid": "Q8042415"
+ },
+ "bakerhughes.com": {
+  "lat": 29.762777777778,
+  "lng": -95.383055555556,
+  "label": "Baker Hughes",
+  "qid": "Q804353"
+ },
+ "banco.bradesco": {
+  "lat": -23.532777777778,
+  "lng": -46.791944444444,
+  "label": "Bradesco",
+  "qid": "Q806181"
+ },
+ "bbva.com": {
+  "lat": 43.25976944,
+  "lng": -2.92243056,
+  "label": "Banco Bilbao Vizcaya Argentaria",
+  "qid": "Q806189"
+ },
+ "bandainamco.co.jp": {
+  "lat": 35.68944444444445,
+  "lng": 139.69166666666666,
+  "label": "Bandai Namco Holdings",
+  "qid": "Q806259"
+ },
+ "bangkokbank.com": {
+  "lat": 13.75,
+  "lng": 100.51666666667,
+  "label": "Bangkok Bank",
+  "qid": "Q806483"
+ },
+ "bca.co.id": {
+  "lat": -6.175277777777778,
+  "lng": 106.82694444444445,
+  "label": "Bank Central Asia",
+  "qid": "Q806626"
+ },
+ "bankmandiri.co.id": {
+  "lat": -6.175277777777778,
+  "lng": 106.82694444444445,
+  "label": "Bank Mandiri",
+  "qid": "Q806639"
+ },
+ "leumi.co.il": {
+  "lat": 32.08,
+  "lng": 34.78,
+  "label": "Bank Leumi Le- Israel B.m.",
+  "qid": "Q806641"
+ },
+ "erste.pl": {
+  "lat": 52.234089984644534,
+  "lng": 20.997206240990476,
+  "label": "Erste Bank Polska",
+  "qid": "Q806653"
+ },
+ "bankcomm.com": {
+  "lat": 31.241,
+  "lng": 121.499,
+  "label": "Bank of Communications",
+  "qid": "Q806680"
+ },
+ "bankofireland.com": {
+  "lat": 53.34972222222222,
+  "lng": -6.260277777777778,
+  "label": "Bank of Ireland",
+  "qid": "Q806689"
+ },
+ "bmo.com": {
+  "lat": 45.5049,
+  "lng": -73.5579,
+  "label": "Bank of Montreal",
+  "qid": "Q806693"
+ },
+ "zensho.co.jp": {
+  "lat": 35.63142222222222,
+  "lng": 139.75049166666668,
+  "label": "Zensho Holdings",
+  "qid": "Q8069229"
+ },
+ "zscaler.com": {
+  "lat": 37.304166666667,
+  "lng": -121.87277777778,
+  "label": "Zscaler",
+  "qid": "Q8074786"
+ },
+ "dnb.no": {
+  "lat": 59.913333333333334,
+  "lng": 10.738888888888889,
+  "label": "DNB Bank",
+  "qid": "Q80788"
+ },
+ "expediagroup.com": {
+  "lat": 47.605,
+  "lng": -122.33,
+  "label": "Expedia Group",
+  "qid": "Q8085893"
+ },
+ "steris.com": {
+  "lat": 53,
+  "lng": -8,
+  "label": "Steris",
+  "qid": "Q80947821"
+ },
+ "hp.com": {
+  "lat": 37.44444444444444,
+  "lng": -122.16,
+  "label": "Hewlett-Packard",
+  "qid": "Q80978"
+ },
+ "siemens.com": {
+  "lat": 52.516666666667,
+  "lng": 13.383333333333,
+  "label": "Siemens",
+  "qid": "Q81230"
+ },
+ "bd.com": {
+  "lat": 41.0157,
+  "lng": -74.2091,
+  "label": "Becton Dickinson",
+  "qid": "Q813780"
+ },
+ "hapag-lloyd.com": {
+  "lat": 53.55,
+  "lng": 10,
+  "label": "Hapag-Lloyd",
+  "qid": "Q819094"
+ },
+ "gm.com": {
+  "lat": 42.331666666667,
+  "lng": -83.0475,
+  "label": "General Motors",
+  "qid": "Q81965"
+ },
+ "hexagon.com": {
+  "lat": 59.329444444444,
+  "lng": 18.068611111111,
+  "label": "Hexagon AB",
+  "qid": "Q820970"
+ },
+ "riotinto.com": {
+  "lat": -37.814166666666665,
+  "lng": 144.96305555555554,
+  "label": "Rio Tinto Group",
+  "qid": "Q821293"
+ },
+ "adanienergysolutions.com": {
+  "lat": 23.021944444444443,
+  "lng": 72.57972222222222,
+  "label": "Adani Energy Solutions",
+  "qid": "Q83472792"
+ },
+ "adanigreenenergy.com": {
+  "lat": 23.021944444444443,
+  "lng": 72.57972222222222,
+  "label": "Adani Green Energy",
+  "qid": "Q83473736"
+ },
+ "linkreit.com": {
+  "lat": 22.313055555555554,
+  "lng": 114.22555555555556,
+  "label": "Link REIT",
+  "qid": "Q837533"
+ },
+ "fsitaliane.it": {
+  "lat": 41.893055555556,
+  "lng": 12.482777777778,
+  "label": "Ferrovie dello Stato Italiane",
+  "qid": "Q83823"
+ },
+ "smcworld.com": {
+  "lat": 35.683889,
+  "lng": 139.774444,
+  "label": "SMC Corporation",
+  "qid": "Q839552"
+ },
+ "euronext.com": {
+  "lat": 48.8905,
+  "lng": 2.24656,
+  "label": "Euronext",
+  "qid": "Q842108"
+ },
+ "santos.com": {
+  "lat": -34.9275,
+  "lng": 138.6,
+  "label": "Santos",
+  "qid": "Q846914"
+ },
+ "investor.vanguard.com": {
+  "lat": 40.03444,
+  "lng": -75.51417,
+  "label": "The Vanguard Group",
+  "qid": "Q849363"
+ },
+ "yanzhoucoal.com.cn": {
+  "lat": 35.4,
+  "lng": 116.56666666667,
+  "label": "Yanzhou Coal Mining Company",
+  "qid": "Q850451"
+ },
+ "tdk.com": {
+  "lat": 35.658027777777775,
+  "lng": 139.75152777777777,
+  "label": "TDK",
+  "qid": "Q855479"
+ },
+ "csx.com": {
+  "lat": 30.316666666667,
+  "lng": -81.65,
+  "label": "CSX Transportation",
+  "qid": "Q856783"
+ },
+ "lodhagroup.com": {
+  "lat": 19.075833333333332,
+  "lng": 72.8775,
+  "label": "Lodha Group",
+  "qid": "Q85781893"
+ },
+ "secom.co.jp": {
+  "lat": 35.68944444444445,
+  "lng": 139.69166666666666,
+  "label": "Secom",
+  "qid": "Q858957"
+ },
+ "biogen.com": {
+  "lat": 42.375,
+  "lng": -71.106111111111,
+  "label": "Biogen",
+  "qid": "Q864338"
+ },
+ "singtel.com": {
+  "lat": 1.3,
+  "lng": 103.8,
+  "label": "Singtel",
+  "qid": "Q864923"
+ },
+ "olc.co.jp": {
+  "lat": 35.63633333,
+  "lng": 139.88325,
+  "label": "The Oriental Land Company",
+  "qid": "Q868679"
+ },
+ "phoenixgroup.eu": {
+  "lat": 49.48777777777778,
+  "lng": 8.466111111111111,
+  "label": "Phoenix Pharmahandel",
+  "qid": "Q871799"
+ },
+ "blackstone.com": {
+  "lat": 40.71277777777778,
+  "lng": -74.00611111111111,
+  "label": "Blackstone Inc.",
+  "qid": "Q880942"
+ },
+ "boliden.com": {
+  "lat": 59.329444444444,
+  "lng": 18.068611111111,
+  "label": "Boliden AB",
+  "qid": "Q891345"
+ },
+ "siemens-energy.com": {
+  "lat": 48.1375,
+  "lng": 11.575,
+  "label": "Siemens Energy AG",
+  "qid": "Q89189545"
+ },
+ "honeywell.com": {
+  "lat": 35.226944444444,
+  "lng": -80.843333333333,
+  "label": "Honeywell",
+  "qid": "Q898208"
+ },
+ "jt.com": {
+  "lat": 35.66552829341388,
+  "lng": 139.74594998930675,
+  "label": "Japan Tobacco",
+  "qid": "Q898568"
+ },
+ "tevapharm.com": {
+  "lat": 32.11525833,
+  "lng": 34.83650833,
+  "label": "Teva Pharmaceutical Industries Ltd.",
+  "qid": "Q898750"
+ },
+ "lyondellbasell.com": {
+  "lat": 29.762777777778,
+  "lng": -95.383055555556,
+  "label": "LyondellBasell",
+  "qid": "Q899255"
+ },
+ "cardinalhealth.com": {
+  "lat": 40.1092,
+  "lng": -83.1403,
+  "label": "Cardinal Health",
+  "qid": "Q902397"
+ },
+ "shinetsu.co.jp": {
+  "lat": 35.69394444444445,
+  "lng": 139.7536111111111,
+  "label": "Shin-Etsu Chemical",
+  "qid": "Q904284"
+ },
+ "resonac.com": {
+  "lat": 35.658027777777775,
+  "lng": 139.75152777777777,
+  "label": "Shōwa Denkō",
+  "qid": "Q905412"
+ },
+ "cfindustries.com": {
+  "lat": 42.168333333333,
+  "lng": -87.851388888889,
+  "label": "CF Industries",
+  "qid": "Q905806"
+ },
+ "orix.co.jp": {
+  "lat": 35.68944444444445,
+  "lng": 139.69166666666666,
+  "label": "Orix",
+  "qid": "Q906055"
+ },
+ "grasim.com": {
+  "lat": 22.8,
+  "lng": 83,
+  "label": "Grasim Industries",
+  "qid": "Q906943"
+ },
+ "nanshan.com.cn": {
+  "lat": 37.65,
+  "lng": 120.325,
+  "label": "Nanshan Group",
+  "qid": "Q90836109"
+ },
+ "ril.com": {
+  "lat": 19.075833333333332,
+  "lng": 72.8775,
+  "label": "Reliance Industries Limited",
+  "qid": "Q908931"
+ },
+ "drreddys.com": {
+  "lat": 17.361666666666668,
+  "lng": 78.47472222222223,
+  "label": "Dr. Reddy's Laboratories",
+  "qid": "Q908961"
+ },
+ "loblaw.ca": {
+  "lat": 43.683333333333,
+  "lng": -79.766666666667,
+  "label": "Loblaw Companies",
+  "qid": "Q909856"
+ },
+ "td-holdings.co.jp": {
+  "lat": 35.681669444444445,
+  "lng": 139.77283055555554,
+  "label": "T&D Holdings",
+  "qid": "Q910310"
+ },
+ "leonardo.com": {
+  "lat": 41.893055555556,
+  "lng": 12.482777777778,
+  "label": "Leonardo",
+  "qid": "Q910379"
+ },
+ "humana.com": {
+  "lat": 38.25611111111111,
+  "lng": -85.75138888888888,
+  "label": "Humana",
+  "qid": "Q910866"
+ },
+ "edison.it": {
+  "lat": 45.466944444444,
+  "lng": 9.19,
+  "label": "Edison",
+  "qid": "Q912872"
+ },
+ "regions.com": {
+  "lat": 33.5175,
+  "lng": -86.80944444444444,
+  "label": "Regions Financial Corporation",
+  "qid": "Q917131"
+ },
+ "ternium.com": {
+  "lat": -34.599722222222,
+  "lng": -58.381944444444,
+  "label": "Ternium",
+  "qid": "Q918208"
+ },
+ "qlik.com": {
+  "lat": 40.094722222222,
+  "lng": -75.378055555556,
+  "label": "Qlik",
+  "qid": "Q923062"
+ },
+ "kindermorgan.com": {
+  "lat": 29.762777777778,
+  "lng": -95.383055555556,
+  "label": "Kinder Morgan",
+  "qid": "Q931032"
+ },
+ "chrobinson.com": {
+  "lat": 47.925277777778,
+  "lng": -97.0325,
+  "label": "C. H. Robinson Worldwide",
+  "qid": "Q931200"
+ },
+ "deutschebahn.com": {
+  "lat": 52.509722,
+  "lng": 13.375,
+  "label": "Deutsche Bahn",
+  "qid": "Q9322"
+ },
+ "terna.it": {
+  "lat": 41.893055555556,
+  "lng": 12.482777777778,
+  "label": "Terna S.p.A.",
+  "qid": "Q936325"
+ },
+ "telekom.com": {
+  "lat": 50.735277777777775,
+  "lng": 7.102222222222222,
+  "label": "Deutsche Telekom",
+  "qid": "Q9396"
+ },
+ "travelers.com": {
+  "lat": 40.71277777777778,
+  "lng": -74.00611111111111,
+  "label": "",
+  "qid": "Q942471"
+ },
+ "mccain.com": {
+  "lat": 46.443472222222,
+  "lng": -67.615222222222,
+  "label": "McCain Foods",
+  "qid": "Q944414"
+ },
+ "paychex.com": {
+  "lat": 43.165555555556,
+  "lng": -77.611388888889,
+  "label": "Paychex",
+  "qid": "Q946080"
+ },
+ "mercadolibre.com": {
+  "lat": -34.55,
+  "lng": -58.483333333333,
+  "label": "Mercado Libre",
+  "qid": "Q950419"
+ },
+ "krungthai.com": {
+  "lat": 13.75,
+  "lng": 100.51666666667,
+  "label": "Krungthai Bank",
+  "qid": "Q962865"
+ },
+ "tatasteel.com": {
+  "lat": 18.9318,
+  "lng": 72.8317,
+  "label": "Tata Steel",
+  "qid": "Q963101"
+ },
+ "lauruslabs.com": {
+  "lat": 17.361666666666668,
+  "lng": 78.47472222222223,
+  "label": "Laurus Labs",
+  "qid": "Q96387060"
+ },
+ "standardindustries.com": {
+  "lat": 40.71277777777778,
+  "lng": -74.00611111111111,
+  "label": "Standard Industries",
+  "qid": "Q96406411"
+ },
+ "replika.ai": {
+  "lat": 37.775,
+  "lng": -122.41944444444445,
+  "label": "Luka",
+  "qid": "Q96625584"
+ },
+ "nexteraenergy.com": {
+  "lat": 26.873333333333,
+  "lng": -80.054166666667,
+  "label": "NextEra Energy",
+  "qid": "Q967868"
+ },
+ "northerntrust.com": {
+  "lat": 41.88194444444444,
+  "lng": -87.62777777777778,
+  "label": "Northern Trust",
+  "qid": "Q970695"
+ },
+ "royaltypharma.com": {
+  "lat": 40.71277777777778,
+  "lng": -74.00611111111111,
+  "label": "Royalty Pharma",
+  "qid": "Q97160437"
+ },
+ "sharkninja.com": {
+  "lat": 42.283333333333,
+  "lng": -71.233333333333,
+  "label": "SharkNinja",
+  "qid": "Q97164583"
+ },
+ "orlen.pl": {
+  "lat": 52.55,
+  "lng": 19.7,
+  "label": "Orlen",
+  "qid": "Q971649"
+ },
+ "popmart.com": {
+  "lat": 39.92038,
+  "lng": 116.43737,
+  "label": "Pop Mart",
+  "qid": "Q97180096"
+ },
+ "kddi.com": {
+  "lat": 35.69394444444445,
+  "lng": 139.7536111111111,
+  "label": "KDDI",
+  "qid": "Q971946"
+ },
+ "lasertec.co.jp": {
+  "lat": 35.50964444444445,
+  "lng": 139.61492222222222,
+  "label": "Lasertec Corporation",
+  "qid": "Q97310182"
+ },
+ "stellantis.com": {
+  "lat": 52.36666666666667,
+  "lng": 4.883333333333333,
+  "label": "Stellantis",
+  "qid": "Q97439162"
+ },
+ "zbiotics.com": {
+  "lat": 37.775,
+  "lng": -122.41944444444445,
+  "label": "ZBiotics Company",
+  "qid": "Q98401679"
+ },
+ "jfrog.com": {
+  "lat": 37.368888888889,
+  "lng": -122.03694444444,
+  "label": "JFrog Ltd",
+  "qid": "Q98608948"
+ },
+ "psbc.com": {
+  "lat": 39.91,
+  "lng": 116.36,
+  "label": "Postal Savings Bank of China",
+  "qid": "Q986744"
+ },
+ "ukg.com": {
+  "lat": 42.639444444444,
+  "lng": -71.314722222222,
+  "label": "Ultimate Kronos Group",
+  "qid": "Q98785197"
+ }
+}
