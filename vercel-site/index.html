@@ -1,77 +1,28 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Co-Apply GPT · Find your next company</title>
-  <meta name="description" content="Explore startups and established companies on an interactive map. Filter public company facts, inspect sources, and prepare applications in the local Co-Apply GPT app.">
-  <meta property="og:title" content="Co-Apply GPT · Find your next company">
-  <meta property="og:description" content="A public company map. A private career workspace. Explore from early-stage startups to established companies.">
-  <meta property="og:type" content="website">
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%231F1B16'/%3E%3Ctext x='50' y='68' font-size='52' text-anchor='middle' fill='%23FFFAF3' font-family='Georgia'%3EC%3C/text%3E%3C/svg%3E">
-  <link rel="stylesheet" href="vendor/maplibre-gl.css">
-  <link rel="stylesheet" href="styles.css">
-  <script defer src="vendor/maplibre-gl.js"></script>
-  <script type="module" src="app.mjs"></script>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Hired · European jobs, mapped to you</title>
+  <meta name="description" content="Explore source-linked European roles from startups and established companies. Compare job locations, review skill overlap, and apply on the official employer site.">
+  <meta property="og:title" content="Hired · European jobs, mapped to you"><meta property="og:description" content="A focused European job explorer. Real listing locations, clear sources, deliberate applications."><meta property="og:type" content="website">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='25' fill='%23ed6a2c'/%3E%3Cpath d='M28 25v50M72 25v50M28 50h44' stroke='%23fff' stroke-width='12'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="vendor/maplibre-gl.css"><link rel="stylesheet" href="styles.css"><script defer src="vendor/maplibre-gl.js"></script><script type="module" src="app.mjs"></script>
 </head>
 <body>
-<a class="skip-link" href="#results-heading">Skip map to company list</a>
-<header class="site-header">
-  <a class="brand" href="./" aria-label="Co-Apply GPT home"><span class="brand-mark" aria-hidden="true">C</span> Co-Apply <span class="brand-light">GPT</span></a>
-  <nav aria-label="Main navigation"><a href="#explore" aria-current="page">Explore companies</a><a href="#how">How it works</a></nav>
-  <a class="button primary compact" href="#local-app">Get the local app <span aria-hidden="true">↗</span></a>
-</header>
+<a class="skip-link" href="#jobs-heading">Skip to job results</a>
+<header class="site-header"><a class="brand" href="./" aria-label="Hired home"><span class="brand-mark" aria-hidden="true">H</span> hired<span class="brand-dot">.</span></a><nav aria-label="Main navigation"><button id="nav-jobs" aria-current="page">Jobs</button><button id="nav-map">Map</button></nav><a class="button compact" href="https://github.com/X-curiosity/Personal_AI_agent_job_application#1-run-locally" target="_blank" rel="noopener noreferrer">Prepare privately ↗</a></header>
 <main>
-  <section class="intro" aria-labelledby="page-title">
-    <div><p class="eyebrow">A public map. A private career workspace.</p><h1 id="page-title">Your next chapter has a place.</h1><p>Explore companies from first hires to global teams. Find a direction, then build the evidence to apply.</p></div>
-    <div class="snapshot"><span class="snapshot-dot" aria-hidden="true"></span><strong id="catalogue-total">Public company catalogue</strong><span id="snapshot-date">Loading saved public facts…</span></div>
-  </section>
-
-  <section id="explore" class="explorer" aria-label="Company explorer">
-    <form id="filters" class="filters" role="search" aria-label="Filter companies">
-      <div class="chip-bar" role="group" aria-label="Quick filters">
-        <select id="role" name="role" class="chip-select" aria-label="Role area"><option value="">Role</option></select>
-        <select id="industry" name="industry" class="chip-select" aria-label="Sector"><option value="">Sector</option></select>
-        <select id="type" name="type" class="chip-select" aria-label="Company type"><option value="">Type</option><option value="startup">Startup</option><option value="public">Public company</option><option value="private">Private company</option></select>
-        <select id="location" name="location" class="chip-select" aria-label="Hiring in"><option value="">Hiring in</option></select>
-        <button class="chip-clear" type="reset" hidden id="clear-filters">Clear</button>
-      </div>
-    </form>
-    <div class="explorer-meta"><p id="result-count" role="status" aria-live="polite">Loading companies…</p><p>Saved facts, not a live vacancy feed. <a href="#data-notes">About this data</a></p></div>
-    <div class="mobile-switch" role="group" aria-label="Explorer view"><button type="button" id="list-view" aria-pressed="false">List</button><button type="button" id="map-view" aria-pressed="true">Map</button></div>
-    <div class="explorer-body" data-view="map">
-      <aside class="results-panel" aria-labelledby="results-heading">
-        <div id="list-panel">
-          <div class="search-field"><label for="search">Search companies</label><input id="search" name="q" type="search" placeholder="Company, sector, or place…" maxlength="200" autocomplete="off" form="filters"></div>
-          <div class="list-heading"><div><p class="eyebrow">Discover your options</p><h2 id="results-heading" tabindex="-1">Companies</h2></div><button id="clear-group" class="text-button" type="button" hidden>Show all results</button></div>
-          <p class="list-note">Company stage appears in each startup profile. Unknown facts stay unknown.</p>
-          <p id="group-note" class="group-note" hidden></p>
-          <div id="load-error" class="error" role="alert" hidden><p>We couldn’t load the catalogue. Check your connection and try again.</p><button type="button" class="button" id="retry">Try again</button></div>
-          <p id="empty-state" class="empty" hidden>No companies match these filters. Try another place or clear a filter.</p>
-          <ul id="company-list" class="company-list" aria-label="Matching companies"></ul>
-          <div id="pagination" class="pagination" hidden><button type="button" class="button" id="previous">Previous</button><span id="page-label"></span><button type="button" class="button" id="next">Next</button></div>
-        </div>
-        <article id="company-detail" hidden aria-labelledby="detail-title"></article>
-      </aside>
-      <div class="map-panel">
-        <div id="map" role="region" aria-label="Company locations map; the company list provides the same records" tabindex="0"></div>
-        <div class="map-tools"><button class="button" id="fit-map" type="button">Fit results</button><label><input type="checkbox" id="group-pins" checked> Group nearby pins</label><label><input type="checkbox" id="show-names" checked> Show names</label></div>
-        <p id="map-status" role="status" class="map-status" hidden></p>
-        <div class="map-legend" aria-label="Map legend"><span><i class="pin-sample" aria-hidden="true"></i> Company pin</span><span><i class="hiring-sample" aria-hidden="true"></i> Hiring flag (unverified)</span><span><i class="count-sample" aria-hidden="true">12</i> Grouped companies</span></div>
-      </div>
-    </div>
-    <p id="map-spread-note" class="map-footnote" hidden>Companies sharing a city centre are spread around it for display — spread positions are not addresses. The list is the complete record.</p>
-    <p class="map-footnote">Pins represent approximate city or country centres, not office addresses. For multiple offices, the first resolvable place is shown. Companies without a resolved location remain in the list. Zoom out for country and region cards; zoom in for city cards and individual company pins.</p>
-    <noscript><p class="error">Enable JavaScript for the interactive map and filters. You can also <a href="data/companies.json">download the public catalogue</a>.</p></noscript>
-  </section>
-
-  <section id="how" class="how section-wrap">
-    <div class="section-intro"><p class="eyebrow">Discover here. Prepare locally.</p><h2>A company is a starting point.<br>Your evidence gets you further.</h2><p>The public explorer helps you research companies. The local app gives each target role its own preparation workspace.</p></div>
-    <div class="steps"><article><span class="step-number">01</span><h3>Find your direction</h3><p>Compare company stages, industries and places. Follow the source to verify facts and current openings.</p></article><article><span class="step-number">02</span><h3>Build your evidence</h3><p>In the local app, review real job requirements, draft your CV and letter, and connect completed projects to the role.</p></article><article><span class="step-number">03</span><h3>Apply deliberately</h3><p>Track applications and rehearse interviews. Review every document and submit at the employer yourself.</p></article></div>
-  </section>
-  <section id="data-notes" class="data-notes section-wrap" aria-labelledby="data-title"><div><p class="eyebrow">Sources &amp; limitations</p><h2 id="data-title">Useful signals.<br>Not promises.</h2></div><div><p>This is a curated snapshot of public company facts, not a complete market directory. A directory’s hiring flag is unverified; even a board snapshot is historical, not a guarantee of an open role. Dates in company details describe when facts were imported, not when jobs were posted.</p><p>Stage is a documented estimate from available company facts. Unknown facts stay unknown. Location resolution is approximate, and broad country pins do not imply an office at that point.</p><p>Search and filters run in your browser. No profile, CV, email address, applications or private local preferences are published here. No analytics are added. Street map tiles load from CARTO (OpenStreetMap data) when you view the map; company logos and data are self-hosted, so no logo or geocoding service is contacted. The hosting provider may retain ordinary request logs.</p><p><a href="data/companies.json" download>Download the public snapshot</a> · <a href="vendor/README.md">Map assets &amp; attribution</a></p></div></section>
-  <section id="local-app" class="local-app section-wrap"><div><p class="eyebrow">Keep your career workspace yours</p><h2>Public discovery.<br>Local preparation.</h2><p>Your profile and application records are stored in local SQLite. Optional providers and integrations can send selected data when you enable them. This website does not connect to your local database.</p><a class="button primary" href="https://github.com/X-curiosity/Personal_AI_agent_job_application#1-run-locally">Install from GitHub <span aria-hidden="true">↗</span></a></div><div class="local-note"><strong>Inside the local app</strong><ul><li>Name and email profile, saved on your device</li><li>Role clusters and application tracking</li><li>Evidence-based CV and project review</li><li>Application-scoped interview practice</li></ul><p>No hosted login. No automatic applications.</p></div></section>
-</main>
-<footer><a class="brand" href="#">Co-Apply GPT</a><p>Independent project. Not affiliated with StartupMap.</p><a href="https://github.com/X-curiosity/Personal_AI_agent_job_application">Source on GitHub ↗</a></footer>
-</body>
-</html>
+<section class="intro"><div><p class="eyebrow">The European opportunity explorer</p><h1 id="page-title">Find work worth<br><em>showing up for.</em></h1><p>Startups to global teams. Real job locations. Your skills in focus.</p></div><div class="intro-art" aria-hidden="true"><span>DISCOVER</span><b>↗</b><small>EUROPE / ROLES / POSSIBILITIES</small></div></section>
+<section class="explorer" aria-label="European job explorer">
+  <div class="hero-strip"><div><span class="live-dot" aria-hidden="true"></span><strong id="job-total">Loading public roles…</strong><p id="snapshot-date">A saved snapshot, not a live feed.</p></div><span class="hero-note">New perspectives.<br>Every search.</span></div>
+  <form id="filters" class="filters" role="search" aria-label="Filter jobs"><div class="search-field"><label for="search">Search roles, companies, skills or places</label><input id="search" name="q" type="search" placeholder="Try “machine learning” or “Paris”" maxlength="200" autocomplete="off"></div><div class="chip-bar"><select id="area" aria-label="Role area"><option value="">All roles</option></select><select id="type" aria-label="Company type"><option value="">All companies</option><option value="Startup">Startups</option><option value="Public">Established companies</option><option value="Private">Private companies</option></select><select id="location" aria-label="Job location"><option value="">Everywhere</option></select><button class="chip-clear" type="reset" id="clear-filters" hidden>Clear filters</button></div></form>
+  <div class="explorer-meta"><p id="result-count" role="status" aria-live="polite">Loading vacancies…</p><p>Sources are employer boards · <a href="#data-notes">How this works</a></p></div>
+  <div class="explorer-body" data-view="jobs">
+    <aside class="results-panel" aria-labelledby="jobs-heading"><div class="list-heading"><div><p class="eyebrow">Curated public openings</p><h2 id="jobs-heading" tabindex="-1">Jobs for you to explore</h2></div></div><p class="list-note">“For you” means discovery, not a hiring prediction. Check the original advert before applying.</p><div id="load-error" class="error" role="alert" hidden><p>We couldn’t load the vacancy snapshot.</p><button type="button" class="button" id="retry">Try again</button></div><p id="empty-state" class="empty" hidden>No roles match. Try a broader search or clear a filter.</p><ul id="job-list" class="company-list" aria-label="Matching jobs"></ul><div id="pagination" class="pagination" hidden><button type="button" class="button" id="previous">Previous</button><span id="page-label"></span><button type="button" class="button" id="next">Next</button></div></aside>
+    <section id="job-detail" class="detail-panel" aria-labelledby="detail-title"><div class="detail-placeholder"><span aria-hidden="true">✳</span><h2>Choose a role.<br>See the whole picture.</h2><p>Review the job, its locations, skill overlap and contact-search options.</p></div></section>
+    <div class="map-panel"><div id="map" role="region" aria-label="Vacancy locations; all roles are also available in the job list" tabindex="0"></div><div class="map-tools"><button class="button" id="fit-map" type="button">Fit jobs</button></div><p id="map-status" role="status" class="map-status" hidden></p><div class="map-legend">Pins are listing city centres or country estimates—not exact offices.</div></div>
+  </div><noscript><p class="error">Enable JavaScript to browse the vacancy snapshot, or <a href="data/jobs.json">download its public data</a>.</p></noscript>
+</section>
+<section id="data-notes" class="data-notes section-wrap"><div><p class="eyebrow">Clarity before clicking apply</p><h2>A shortlist,<br>not a black box.</h2></div><div><p>Hired reads a bounded set of reviewed Greenhouse and Ashby employer-board APIs. The saved snapshot includes startups and established companies, but is not a complete market index or an automatically updated daily feed. Availability and timestamps must be checked on the official advert.</p><p>Each pin comes from the vacancy’s stated location, not a company headquarters. Multiple locations remain attached to the same role. Unresolved or non-European places are not mapped in this snapshot.</p><p>Skill comparison runs in your browser from skills you type. Do not enter private data. This public site does not upload CVs, scrape LinkedIn, identify employees, or submit applications. For private CV, GitHub and portfolio analysis plus reviewable application preparation, use the local app.</p><p><a href="data/jobs.json" download>Download vacancy snapshot</a> · <a href="https://github.com/X-curiosity/Personal_AI_agent_job_application">Local preparation app ↗</a></p></div></section>
+</main><footer><a class="brand" href="./">hired<span class="brand-dot">.</span></a><p>Independent project. Better context for deliberate career moves.</p><a href="https://github.com/X-curiosity/Personal_AI_agent_job_application">Source on GitHub ↗</a></footer>
+</body></html>

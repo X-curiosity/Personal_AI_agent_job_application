@@ -140,6 +140,16 @@ def test_public_board_openings_keep_ashby_secondary_locations(monkeypatch) -> No
     ]
 
 
+def test_ashby_country_only_address_does_not_discard_listing_locality(monkeypatch) -> None:
+    monkeypatch.setattr(sources, "_get_json", lambda _url: {"jobs": [{
+        "id": "ashby-locality", "title": "Technician", "location": "Bessé-sur-Braye, Pays de la Loire",
+        "address": {"postalAddress": {"addressCountry": "France"}},
+        "jobUrl": "https://jobs.ashbyhq.com/example/ashby-locality", "descriptionPlain": "On-site work.",
+    }]})
+    opening = sources.fetch_public_board_openings("Ashby", "example", company="Example")[0]
+    assert opening["location"] == "Bessé-sur-Braye, Pays de la Loire, France"
+
+
 def test_public_board_openings_rejects_unsupported_provider() -> None:
     with pytest.raises(ValueError, match="registered Greenhouse, Lever, and Ashby"):
         sources.fetch_public_board_openings("LinkedIn", "example", company="Example")

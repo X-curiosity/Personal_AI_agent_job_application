@@ -2,6 +2,7 @@
 
 import argparse
 import asyncio
+import json
 from pathlib import Path
 import subprocess
 import sys
@@ -35,6 +36,18 @@ def _parser() -> argparse.ArgumentParser:
     team.add_argument("--specialist", choices=["company_scout", "eligibility_advisor", "application_prep"], default=None)
     commands.add_parser("refresh-data", help="Refresh company snapshots and rebuild the actively-hiring index (used by the schedule)")
     commands.add_parser("ui", help="Launch the local Streamlit application")
+    auto = commands.add_parser("auto-apply", help="Fill and review one application in a visible local browser without an LLM")
+    auto.add_argument("candidate", type=Path, help="Local CV to attach")
+    auto.add_argument("job_url", help="Public HTTPS vacancy URL")
+    auto.add_argument("--application-id", required=True, help="Unique ID for this reviewed application")
+    auto.add_argument("--full-name", required=True)
+    auto.add_argument("--email", required=True)
+    auto.add_argument("--phone", default="")
+    auto.add_argument("--location", default="")
+    auto.add_argument("--skills", default="")
+    auto.add_argument("--custom-answers", default="{}", help="JSON object of exact-label string/boolean answers")
+    auto.add_argument("--form-selector", default="form")
+    auto.add_argument("--allow-json", action="store_true")
     return parser
 
 
@@ -50,8 +63,33 @@ def main() -> None:
         asyncio.run(_run_agent_team(args.request, specialist=args.specialist))
     elif args.command == "refresh-data":
         _refresh_data()
+    elif args.command == "auto-apply":
+        _auto_apply(args)
     else:
         asyncio.run(_run_agent(args.candidate, args.job))
+
+
+def _auto_apply(args: argparse.Namespace) -> None:
+    """Run one deterministic application; approval is interactive every time."""
+    from tau_job_application.rule_based_apply import RuleBasedApplyConfig, run, validate_custom_answers
+    try:
+        custom = validate_custom_answers(json.loads(args.custom_answers))
+    except (json.JSONDecodeError, ValueError) as exc:
+        raise SystemExit(f"Invalid --custom-answers: {exc}") from exc
+
+    def approve(fingerprint: str, details: dict) -> bool:
+        print("Submission paused. Review the visible browser form and target:", dict(details))
+        return input(f"Type SUBMIT {fingerprint[:12]} to submit once: ").strip() == f"SUBMIT {fingerprint[:12]}"
+
+    outcome = run(RuleBasedApplyConfig(
+        job_url=args.job_url, application_id=args.application_id, form_selector=args.form_selector,
+        full_name=args.full_name, email=args.email, phone=args.phone, location=args.location,
+        skills=args.skills, custom_answers=custom, cv_file_path=str(args.candidate), cv_required=True,
+        allow_json_submission=args.allow_json,
+    ), approve_submit=approve)
+    print(f"Auto-apply outcome: {outcome.status} — {outcome.reason}")
+    if outcome.status != "submitted":
+        raise SystemExit(1)
 
 
 async def _run_agent(candidate_path: Path, job_path: Path) -> None:

@@ -1,0 +1,37 @@
+name: Refresh public European jobs
+
+on:
+  schedule:
+    - cron: "0 6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+concurrency:
+  group: refresh-public-jobs
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: astral-sh/setup-uv@v5
+        with:
+          python-version: "3.12"
+      - run: uv sync --frozen --no-dev
+      - run: PYTHONPATH=src uv run --no-sync python scripts/export_public_jobs.py
+      - name: Publish only a changed public snapshot
+        run: |
+          if git diff --quiet -- vercel-site/data/jobs.json; then
+            echo "No vacancy changes"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -- vercel-site/data/jobs.json
+          git commit -m "Refresh public European job snapshot"
+          git push origin HEAD:main

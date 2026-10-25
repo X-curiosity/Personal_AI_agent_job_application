@@ -217,6 +217,14 @@ def render_accounts(api, track: str) -> None:
                     "Keep your CV and interests here as the source of truth."
                 )
 
+    st.subheader("Rule-based auto-apply")
+    st.caption("No provider key or LLM. Fill supported forms locally and approve each application before submission.")
+    if st.button("Open local auto-apply", key="open-computer-use"):
+        st.query_params.clear()
+        st.query_params["view"] = "autoapply"
+        st.session_state.pop("topnav", None)
+        st.rerun()
+
     st.subheader("Gmail")
     with st.container(border=True):
         st.markdown("**Gmail** · per-conversation replies")

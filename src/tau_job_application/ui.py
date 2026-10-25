@@ -22,6 +22,7 @@ from tau_job_application.career_hub_ui import render_portal, render_onboarding
 from tau_job_application.career_hub_ui import go as _hub_go
 from tau_job_application.accounts import ConnectedAccountStore
 from tau_job_application.accounts_ui import render_accounts
+from tau_job_application.computer_use_ui import render_computer_use
 from tau_job_application.agents_ui import render_agents_console
 from tau_job_application.company_branding import CompanyBrandStore, validate_public_https_logo_url
 from tau_job_application.company_catalog import CompanyCatalogStore
@@ -344,6 +345,7 @@ _NAV_ITEMS = {
     "Companies": "companies",
     "Eligibility": "eligibility",
     "Agent team": "agents",
+    "Auto-apply": "autoapply",
     "Accounts": "account",
 }
 
@@ -357,7 +359,7 @@ def _top_nav() -> None:
         "career": "Role pages", "onboarding": "Role pages", "role": "Role pages",
         "application": "Applications", "applications": "Applications",
         "companies": "Companies", "eligibility": "Eligibility", "agents": "Agent team",
-        "account": "Accounts",
+        "account": "Accounts", "autoapply": "Auto-apply",
     }
     current_label = view_aliases.get(current, "Workspace")
     bar = st.columns((2.1, 5.9))
@@ -379,13 +381,20 @@ def _on_nav_change() -> None:
 
 
 def main() -> None:
+    if _route_value("view") != "autoapply" and st.session_state.get("computer_running"):
+        cancel = st.session_state.get("computer_cancel")
+        if cancel is not None:
+            cancel.set()
+        answers = st.session_state.get("computer_answers")
+        if answers is not None:
+            answers.put(False)
     st.set_page_config(page_title="Co-Apply GPT", page_icon="◒", layout="wide")
     st.markdown(STYLES, unsafe_allow_html=True)
     if _route_value("view") == "landing":
         _product_landing()
         return
 
-    workspace_id, thread_id = choose_scope(WORKSPACES, compact=_route_value("view") in {"career", "onboarding", "role", "application", "companies", "match", "eligibility", "agents", "account"})
+    workspace_id, thread_id = choose_scope(WORKSPACES, compact=_route_value("view") in {"career", "onboarding", "role", "application", "companies", "match", "eligibility", "agents", "account", "autoapply"})
     _top_nav()
     with st.sidebar:
         st.caption("Your career track and job workspace live here. Everything else is in the top bar.")
@@ -397,6 +406,9 @@ def main() -> None:
         return
     if _route_value("view") == "agents":
         render_agents_console(sys.modules[__name__], workspace_id)
+        return
+    if _route_value("view") == "autoapply":
+        render_computer_use()
         return
     if _route_value("view") == "account":
         render_accounts(sys.modules[__name__], workspace_id)

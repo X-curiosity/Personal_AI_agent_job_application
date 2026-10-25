@@ -34,7 +34,7 @@ def test_top_nav_bar_renders_and_navigates(tmp_path, monkeypatch):
     app.run()
     assert not app.exception
     nav = app.segmented_control[0]
-    assert set(nav.options) == {"Home", "Workspace", "Role pages", "Applications", "Companies", "Eligibility", "Agent team", "Accounts"}
+    assert set(nav.options) == {"Home", "Workspace", "Role pages", "Applications", "Companies", "Eligibility", "Agent team", "Auto-apply", "Accounts"}
     assert nav.value == "Workspace"
     nav.set_value("Companies").run()
     assert not app.exception

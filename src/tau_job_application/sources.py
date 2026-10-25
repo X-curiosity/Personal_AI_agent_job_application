@@ -210,7 +210,19 @@ def _lever_opening(item: dict, site: str, company: str) -> dict[str, str | None]
 
 def _ashby_opening(item: dict, board: str, company: str) -> dict[str, str | None]:
     """Normalize Ashby's documented public Job Postings API response."""
-    primary_location = _address_location(item.get("address")) or _location_name(item.get("location"))
+    address = item.get("address")
+    primary_location = _address_location(address)
+    listing_location = _location_name(item.get("location"))
+    # Ashby can supply a locality in ``location`` while its structured address
+    # contains only a country. Combine them rather than discarding the city.
+    postal = address.get("postalAddress") if isinstance(address, dict) and isinstance(address.get("postalAddress"), dict) else address
+    if primary_location and listing_location and isinstance(postal, dict):
+        country = _text_or_none(postal.get("addressCountry"))
+        locality = _text_or_none(postal.get("addressLocality"))
+        region = _text_or_none(postal.get("addressRegion"))
+        if country and not locality and not region:
+            primary_location = f"{listing_location}, {country}"
+    primary_location = primary_location or listing_location
     secondary_locations = [
         _address_location(location.get("address")) or _location_name(location)
         for location in item.get("secondaryLocations", [])

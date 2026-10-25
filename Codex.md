@@ -8,6 +8,8 @@ Local, single-user career preparation prototype. Python 3.12+, Streamlit, Pydant
 
 Primary context: [README.md](README.md). Module context: [src/tau_job_application/codex.md](src/tau_job_application/codex.md). Delivery reports: [role-first portal](docs/ROLE_FIRST_IMPLEMENTATION_REPORT.md) and [company catalogue](docs/COMPANY_CATALOG_IMPLEMENTATION_REPORT.md).
 
+Hosted MVP scaffold: `hosted_ui.py` is separate from the local `ui.py`; `hosted.py` uses per-user Supabase clients and RLS-backed private rows/files, with SQL in `supabase/migrations/`. `render.yaml` defines an unconfigured free preview with public sign-up and account deletion off by default. Password recovery needs the documented OTP template; account deletion uses a separate Supabase Edge Function with its privileged key confined to that function. No hosted provider project is live; local SQLite remains the full app's store of record, and no local records are migrated. Never use a Supabase service-role key in the Streamlit app. See [docs/HOSTED_MVP.md](docs/HOSTED_MVP.md) and [the privacy notice draft](docs/PRIVACY_NOTICE_DRAFT.md) for scope, setup, and limitations.
+
 ## Entry points and checks
 
 - UI: `src/tau_job_application/ui.py`; CLI: `src/tau_job_application/cli.py`.

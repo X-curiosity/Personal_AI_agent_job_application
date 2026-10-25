@@ -1,0 +1,33 @@
+services:
+  - type: web
+    name: co-apply-gpt-hosted
+    runtime: python
+    plan: free
+    region: frankfurt
+    buildCommand: pip install .
+    startCommand: streamlit run src/tau_job_application/hosted_ui.py --server.address 0.0.0.0 --server.port $PORT --server.headless true --browser.gatherUsageStats false
+    healthCheckPath: /_stcore/health
+    autoDeploy: false
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.8
+      - key: HOSTED_SIGNUPS_ENABLED
+        value: "false"
+      - key: HOSTED_ACCOUNT_DELETION_ENABLED
+        value: "false"
+      - key: HOSTED_PRIVACY_NOTICE_URL
+        sync: false
+      - key: HOSTED_PRIVACY_NOTICE_VERSION
+        sync: false
+      - key: HOSTED_SUPPORT_EMAIL
+        sync: false
+      - key: HOSTED_PUBLIC_URL
+        sync: false
+      - key: HOSTED_JOBS_URL
+        sync: false
+      - key: HOSTED_LINKEDIN_ENABLED
+        value: "false"
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_PUBLISHABLE_KEY
+        sync: false
