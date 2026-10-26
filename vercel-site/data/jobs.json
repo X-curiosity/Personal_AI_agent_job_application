@@ -1,10 +1,11 @@
 {
   "schemaVersion": 1,
-  "exportedAt": "2026-10-25T10:49:19.471150+00:00",
+  "exportedAt": "2026-10-26T00:22:41.716558+00:00",
   "live": false,
   "jobs": [
     {
       "id": "job_5258a172b6a726d8c361",
+      "logo": "data/job-logos/f1fff94a8e80.ico",
       "title": "IP Rights Manager",
       "company": "Mistral AI",
       "companyType": "Startup",
@@ -47,6 +48,7 @@
     },
     {
       "id": "job_8aec460958aef154ae31",
+      "logo": "data/job-logos/f1fff94a8e80.ico",
       "title": "Data Center Hardware Engineer",
       "company": "Mistral AI",
       "companyType": "Startup",
@@ -76,6 +78,7 @@
     },
     {
       "id": "job_0cb81217ab04cea3b57d",
+      "logo": "data/job-logos/f1fff94a8e80.ico",
       "title": "Chief of Staff – SEUR Sales",
       "company": "Mistral AI",
       "companyType": "Startup",
@@ -102,6 +105,7 @@
     },
     {
       "id": "job_d07a4d00f1ac999a4b2d",
+      "logo": "data/job-logos/f1fff94a8e80.ico",
       "title": "Logistics Manager",
       "company": "Mistral AI",
       "companyType": "Startup",
@@ -130,6 +134,7 @@
     },
     {
       "id": "job_e70e16ad1f733ac888c9",
+      "logo": "data/job-logos/f1fff94a8e80.ico",
       "title": "Data Center Operations Manager",
       "company": "Mistral AI",
       "companyType": "Startup",
@@ -158,6 +163,7 @@
     },
     {
       "id": "job_3c0605652d08edd74fa0",
+      "logo": "data/job-logos/f1fff94a8e80.ico",
       "title": "Data Centre Safety Manager",
       "company": "Mistral AI",
       "companyType": "Startup",
@@ -186,6 +192,7 @@
     },
     {
       "id": "job_28d2f8987bb756625486",
+      "logo": "data/job-logos/f1fff94a8e80.ico",
       "title": "Data Center Hardware Engineer",
       "company": "Mistral AI",
       "companyType": "Startup",
@@ -215,6 +222,7 @@
     },
     {
       "id": "job_91692aed2ffcb8738bec",
+      "logo": "data/job-logos/f9191531404c.ico",
       "title": "Systems Engineer, Network Automation",
       "company": "Cloudflare",
       "companyType": "Public",
@@ -246,6 +254,7 @@
     },
     {
       "id": "job_1a9b44609140931e9a2a",
+      "logo": "data/job-logos/f1fff94a8e80.ico",
       "title": "Software Engineer (Golang), Sandbox",
       "company": "Mistral AI",
       "companyType": "Startup",
@@ -277,6 +286,7 @@
     },
     {
       "id": "job_f37ea4ae4a0b8ceeeb9b",
+      "logo": "data/job-logos/f1fff94a8e80.ico",
       "title": "Software Engineer (Golang), Storage",
       "company": "Mistral AI",
       "companyType": "Startup",
@@ -308,6 +318,7 @@
     },
     {
       "id": "job_f1ff8f11ff1d5d1a0f71",
+      "logo": "data/job-logos/f1fff94a8e80.ico",
       "title": "Software Engineer (Golang), Managed K8s",
       "company": "Mistral AI",
       "companyType": "Startup",
@@ -338,6 +349,7 @@
     },
     {
       "id": "job_e16f84cd9ae9d9d65e61",
+      "logo": "data/job-logos/f1fff94a8e80.ico",
       "title": "Software Engineer (Golang), Fleet Delivery",
       "company": "Mistral AI",
       "companyType": "Startup",
@@ -368,6 +380,7 @@
     },
     {
       "id": "job_4bfe5dc64bc9298ddc4b",
+      "logo": "data/job-logos/f1fff94a8e80.ico",
       "title": "Software Engineer (Golang), Serverless Containers",
       "company": "Mistral AI",
       "companyType": "Startup",
@@ -398,6 +411,7 @@
     },
     {
       "id": "job_5ab677512f168c5cdcc9",
+      "logo": "data/job-logos/f1fff94a8e80.ico",
       "title": "Critical Infrastructure Engineering Lead",
       "company": "Mistral AI",
       "companyType": "Startup",
@@ -424,6 +438,7 @@
     },
     {
       "id": "job_551b11abd9d1fe4c9568",
+      "logo": "data/job-logos/f1fff94a8e80.ico",
       "title": "Design & Reliability Engineering Manager",
       "company": "Mistral AI",
       "companyType": "Startup",
@@ -450,6 +465,7 @@
     },
     {
       "id": "job_9e30d97be123a8b20f40",
+      "logo": "data/job-logos/f1fff94a8e80.ico",
       "title": "Applied Scientist - Research Engineer (Formal Methods), EMEA",
       "company": "Mistral AI",
       "companyType": "Startup",
@@ -488,6 +504,7 @@
     },
     {
       "id": "job_f4acbf2d9d56f6fc5d84",
+      "logo": "data/job-logos/f1fff94a8e80.ico",
       "title": "Research Engineer, Latency & Throughput",
       "company": "Mistral AI",
       "companyType": "Startup",
@@ -529,6 +546,7 @@
     },
     {
       "id": "job_3cc71dbf85f9a71e0ce4",
+      "logo": "data/job-logos/ce46041005a8.ico",
       "title": "Senior Program Manager, Scale Onboarding (London, United Kingdom) ",
       "company": "Figma",
       "companyType": "Public",
@@ -557,6 +575,7 @@
     },
     {
       "id": "job_06a5eb6fb22baa71fcee",
+      "logo": "data/job-logos/ce46041005a8.ico",
       "title": "Manager, Recruiting (London, United Kingdom)",
       "company": "Figma",
       "companyType": "Public",
@@ -585,6 +604,7 @@
     },
     {
       "id": "job_2cb4fa661e15fd5cceef",
+      "logo": "data/job-logos/f1fff94a8e80.ico",
       "title": "Applied Science - Research Engineer (Robotics)",
       "company": "Mistral AI",
       "companyType": "Startup",
@@ -623,6 +643,7 @@
     },
     {
       "id": "job_29a33dfd28c2e6ad8db5",
+      "logo": "data/job-logos/f1fff94a8e80.ico",
       "title": "Evaluation Engineer, Applied AI",
       "company": "Mistral AI",
       "companyType": "Startup",
@@ -652,6 +673,7 @@
     },
     {
       "id": "job_70fb80e65db599ced67c",
+      "logo": "data/job-logos/f1fff94a8e80.ico",
       "title": "International mobility expert",
       "company": "Mistral AI",
       "companyType": "Startup",
@@ -704,6 +726,7 @@
     },
     {
       "id": "job_4e3e9cbebbc9f1f8fd25",
+      "logo": "data/job-logos/f1fff94a8e80.ico",
       "title": "Head of Analyst Relations",
       "company": "Mistral AI",
       "companyType": "Startup",
@@ -738,6 +761,7 @@
     },
     {
       "id": "job_d8986ee20e0af77defe5",
+      "logo": "data/job-logos/f1fff94a8e80.ico",
       "title": "Research Engineer, Sandboxes",
       "company": "Mistral AI",
       "companyType": "Startup",
@@ -795,6 +819,7 @@
     },
     {
       "id": "job_636b8d2dc225c1111144",
+      "logo": "data/job-logos/f1fff94a8e80.ico",
       "title": "Research Engineer - Search and Services ",
       "company": "Mistral AI",
       "companyType": "Startup",
@@ -833,6 +858,7 @@
     },
     {
       "id": "job_4e8f8e41d74bc53382af",
+      "logo": "data/job-logos/f1fff94a8e80.ico",
       "title": "Head of Solution Operations",
       "company": "Mistral AI",
       "companyType": "Startup",
@@ -861,6 +887,7 @@
     },
     {
       "id": "job_4441d1c5520d66c444de",
+      "logo": "data/job-logos/f1fff94a8e80.ico",
       "title": "Research Engineer, Orchestral",
       "company": "Mistral AI",
       "companyType": "Startup",
@@ -907,6 +934,7 @@
     },
     {
       "id": "job_8e19da54da54694d8495",
+      "logo": "data/job-logos/f1fff94a8e80.ico",
       "title": "IP & Licensing - Intern",
       "company": "Mistral AI",
       "companyType": "Startup",
@@ -935,6 +963,7 @@
     },
     {
       "id": "job_e28eb1c34c011a7e401e",
+      "logo": "data/job-logos/f1fff94a8e80.ico",
       "title": "Finance Data Annotation Quality Analyst",
       "company": "Mistral AI",
       "companyType": "Startup",
@@ -964,6 +993,7 @@
     },
     {
       "id": "job_5d5138c0b51a7beff485",
+      "logo": "data/job-logos/f1fff94a8e80.ico",
       "title": "Internal Event Manager - Paris",
       "company": "Mistral AI",
       "companyType": "Startup",
@@ -990,6 +1020,7 @@
     },
     {
       "id": "job_59d5ac6432ce4b0d253c",
+      "logo": "data/job-logos/f1fff94a8e80.ico",
       "title": "Research Engineer, GPU Performance",
       "company": "Mistral AI",
       "companyType": "Startup",
@@ -1018,6 +1049,7 @@
     },
     {
       "id": "job_15bb7687cc1a02f0bd54",
+      "logo": "data/job-logos/f1fff94a8e80.ico",
       "title": "VP Product, Cloud & Inference",
       "company": "Mistral AI",
       "companyType": "Startup",
@@ -1054,6 +1086,7 @@
     },
     {
       "id": "job_b385389e7a2056de9282",
+      "logo": "data/job-logos/f1fff94a8e80.ico",
       "title": "Public Affairs, Head of Germany",
       "company": "Mistral AI",
       "companyType": "Startup",
@@ -1080,6 +1113,7 @@
     },
     {
       "id": "job_fb0428e810e16bc20139",
+      "logo": "data/job-logos/f1fff94a8e80.ico",
       "title": "Engineering Team Lead, Serverless Containers",
       "company": "Mistral AI",
       "companyType": "Startup",
@@ -1141,6 +1175,7 @@
     },
     {
       "id": "job_2f04eb1999a8f8440548",
+      "logo": "data/job-logos/f1fff94a8e80.ico",
       "title": "Applied AI, Technical Lead, Forward Deployed AI Engineer - London",
       "company": "Mistral AI",
       "companyType": "Startup",
@@ -1172,6 +1207,7 @@
     },
     {
       "id": "job_02803f79790334959281",
+      "logo": "data/job-logos/f1fff94a8e80.ico",
       "title": "Applied AI, Forward Deployed Machine Learning Engineer - Amsterdam",
       "company": "Mistral AI",
       "companyType": "Startup",
@@ -1203,6 +1239,7 @@
     },
     {
       "id": "job_312ed11b5a0f8d0656ad",
+      "logo": "data/job-logos/f1fff94a8e80.ico",
       "title": "Applied AI, Forward Deployed Machine Learning Engineer - London",
       "company": "Mistral AI",
       "companyType": "Startup",
@@ -1234,6 +1271,7 @@
     },
     {
       "id": "job_daacc744621c19259112",
+      "logo": "data/job-logos/f1fff94a8e80.ico",
       "title": "Head of HR Business Partner",
       "company": "Mistral AI",
       "companyType": "Startup",
@@ -1260,6 +1298,7 @@
     },
     {
       "id": "job_40e84ab2f7df9f05ab77",
+      "logo": "data/job-logos/f1fff94a8e80.ico",
       "title": "Benefits Manager",
       "company": "Mistral AI",
       "companyType": "Startup",
@@ -1296,6 +1335,7 @@
     },
     {
       "id": "job_ca28406d6515a548cec9",
+      "logo": "data/job-logos/f1fff94a8e80.ico",
       "title": "Talent Acquisition Specialist, Early Careers - EMEA",
       "company": "Mistral AI",
       "companyType": "Startup",
@@ -1322,6 +1362,7 @@
     },
     {
       "id": "job_4ac9817ee033b0f1b956",
+      "logo": "data/job-logos/f1fff94a8e80.ico",
       "title": "HRBP",
       "company": "Mistral AI",
       "companyType": "Startup",
@@ -1348,6 +1389,7 @@
     },
     {
       "id": "job_a23e1ab034cd93bd7d94",
+      "logo": "data/job-logos/f1fff94a8e80.ico",
       "title": "Research Engineer - Eval Platform",
       "company": "Mistral AI",
       "companyType": "Startup",
@@ -1379,6 +1421,7 @@
     },
     {
       "id": "job_2838926474c6966a4715",
+      "logo": "data/job-logos/f1fff94a8e80.ico",
       "title": "M&A & Equity Financing Legal Counsel",
       "company": "Mistral AI",
       "companyType": "Startup",
@@ -1408,6 +1451,7 @@
     },
     {
       "id": "job_58ef4069dcd88cda43ed",
+      "logo": "data/job-logos/ce46041005a8.ico",
       "title": "Senior Manager, Enterprise Sales (London, United Kingdom)",
       "company": "Figma",
       "companyType": "Public",
@@ -1436,6 +1480,7 @@
     },
     {
       "id": "job_5ff7a71b40a1b37e7770",
+      "logo": "data/job-logos/ce46041005a8.ico",
       "title": "Inside Sales Representative (Berlin, Germany) ",
       "company": "Figma",
       "companyType": "Public",
@@ -1464,6 +1509,7 @@
     },
     {
       "id": "job_04c79f2465b1cfba0e49",
+      "logo": "data/job-logos/ce46041005a8.ico",
       "title": "Senior Customer Enablement Manager (London, United Kingdom)",
       "company": "Figma",
       "companyType": "Public",
@@ -1492,6 +1538,7 @@
     },
     {
       "id": "job_b9a761762f3c09c63ce1",
+      "logo": "data/job-logos/ce46041005a8.ico",
       "title": "Account Executive, Strategic (London, United Kingdom)  ",
       "company": "Figma",
       "companyType": "Public",
@@ -1520,6 +1567,7 @@
     },
     {
       "id": "job_6714427093c36306c693",
+      "logo": "data/job-logos/ce46041005a8.ico",
       "title": "Account Executive, Enterprise (London, United Kingdom)",
       "company": "Figma",
       "companyType": "Public",
@@ -1548,6 +1596,7 @@
     },
     {
       "id": "job_56105e64b7f2486d7fa4",
+      "logo": "data/job-logos/ce46041005a8.ico",
       "title": "Designer Advocate (Berlin, Germany)",
       "company": "Figma",
       "companyType": "Public",
@@ -1576,6 +1625,7 @@
     },
     {
       "id": "job_ce72c4873ab09cd234d7",
+      "logo": "data/job-logos/ce46041005a8.ico",
       "title": "Software Engineer - AI Product (London, United Kingdom)",
       "company": "Figma",
       "companyType": "Public",
@@ -1607,6 +1657,7 @@
     },
     {
       "id": "job_4be29f71ed601d907f9e",
+      "logo": "data/job-logos/ce46041005a8.ico",
       "title": "Inside Sales Representative (Paris, France)",
       "company": "Figma",
       "companyType": "Public",
@@ -1635,6 +1686,7 @@
     },
     {
       "id": "job_d26036a895b4c21efc77",
+      "logo": "data/job-logos/ce46041005a8.ico",
       "title": "Product Designer, Roundtripping (London, United Kingdom)",
       "company": "Figma",
       "companyType": "Public",
@@ -1663,6 +1715,7 @@
     },
     {
       "id": "job_864810e9baa32eb4f783",
+      "logo": "data/job-logos/ce46041005a8.ico",
       "title": "Manager, Technical Support (London, United Kingdom)",
       "company": "Figma",
       "companyType": "Public",
@@ -1694,6 +1747,7 @@
     },
     {
       "id": "job_f04b94eae3403de33f71",
+      "logo": "data/job-logos/ce46041005a8.ico",
       "title": "Software Engineer Intern (London, United Kingdom) (Summer 2027) ",
       "company": "Figma",
       "companyType": "Public",
@@ -1729,6 +1783,7 @@
     },
     {
       "id": "job_2b699c69b345d6f044f9",
+      "logo": "data/job-logos/ce46041005a8.ico",
       "title": "Director, SMB Sales (London, United Kingdom)",
       "company": "Figma",
       "companyType": "Public",
@@ -1757,6 +1812,7 @@
     },
     {
       "id": "job_71492733a108af87fdb1",
+      "logo": "data/job-logos/ce46041005a8.ico",
       "title": "Manager, Mid-Market Sales (London, United Kingdom) ",
       "company": "Figma",
       "companyType": "Public",
@@ -1785,6 +1841,7 @@
     },
     {
       "id": "job_dd42de93b80112a4e17d",
+      "logo": "data/job-logos/ce46041005a8.ico",
       "title": "Manager, Product Management - Roundtripping (London, United Kingdom)",
       "company": "Figma",
       "companyType": "Public",
@@ -1813,6 +1870,7 @@
     },
     {
       "id": "job_27e2e891426af3bb9461",
+      "logo": "data/job-logos/ce46041005a8.ico",
       "title": "Customer Enablement Manager (Paris, France)   ",
       "company": "Figma",
       "companyType": "Public",
@@ -1841,6 +1899,7 @@
     },
     {
       "id": "job_eca5a70fbc1bd23100b7",
+      "logo": "data/job-logos/ce46041005a8.ico",
       "title": "Director, Strategic Sales (Berlin, Germany)",
       "company": "Figma",
       "companyType": "Public",
@@ -1869,6 +1928,7 @@
     },
     {
       "id": "job_b2d89c8e625a3e4075a1",
+      "logo": "data/job-logos/ce46041005a8.ico",
       "title": "Solutions Consultant (Berlin, Germany)",
       "company": "Figma",
       "companyType": "Public",
@@ -1898,6 +1958,7 @@
     },
     {
       "id": "job_17b622fb53c7883351dc",
+      "logo": "data/job-logos/ce46041005a8.ico",
       "title": "Account Executive, SMB (London, United Kingdom)",
       "company": "Figma",
       "companyType": "Public",
@@ -1926,6 +1987,7 @@
     },
     {
       "id": "job_3ad9f7a193fa4283fd47",
+      "logo": "data/job-logos/ce46041005a8.ico",
       "title": "Solutions Consultant (London, United Kingdom)",
       "company": "Figma",
       "companyType": "Public",
@@ -1955,6 +2017,7 @@
     },
     {
       "id": "job_39190517853443605a4b",
+      "logo": "data/job-logos/ce46041005a8.ico",
       "title": "Senior Account Executive, UK Government (London, United Kingdom)",
       "company": "Figma",
       "companyType": "Public",
@@ -1983,6 +2046,7 @@
     },
     {
       "id": "job_b35a1f10e7c82c32d129",
+      "logo": "data/job-logos/ce46041005a8.ico",
       "title": "Manager, Mid-Market Sales (Berlin, Germany)",
       "company": "Figma",
       "companyType": "Public",
@@ -2011,6 +2075,7 @@
     },
     {
       "id": "job_8de61b3e7cb76947a55b",
+      "logo": "data/job-logos/ce46041005a8.ico",
       "title": "Manager, Inside Sales (London, United Kingdom)",
       "company": "Figma",
       "companyType": "Public",
@@ -2039,6 +2104,7 @@
     },
     {
       "id": "job_09b1f0f80b01783a4dc7",
+      "logo": "data/job-logos/ce46041005a8.ico",
       "title": "Account Executive, Strategic (Paris, France) ",
       "company": "Figma",
       "companyType": "Public",
@@ -2067,6 +2133,7 @@
     },
     {
       "id": "job_2828b7ca583ffd331d7b",
+      "logo": "data/job-logos/ce46041005a8.ico",
       "title": "Account Executive, SMB (Berlin, Germany)",
       "company": "Figma",
       "companyType": "Public",
@@ -2095,6 +2162,7 @@
     },
     {
       "id": "job_388660c0245452204195",
+      "logo": "data/job-logos/ce46041005a8.ico",
       "title": "Account Executive, Mid-Market (Paris, France)",
       "company": "Figma",
       "companyType": "Public",
@@ -2123,6 +2191,7 @@
     },
     {
       "id": "job_5241c71821abfd86cd2c",
+      "logo": "data/job-logos/ce46041005a8.ico",
       "title": "Account Executive, Mid-Market (London, United Kingdom)",
       "company": "Figma",
       "companyType": "Public",
@@ -2151,6 +2220,7 @@
     },
     {
       "id": "job_9add35d2e67e7966dc2c",
+      "logo": "data/job-logos/ce46041005a8.ico",
       "title": "Account Executive, Enterprise (Berlin, Germany)",
       "company": "Figma",
       "companyType": "Public",

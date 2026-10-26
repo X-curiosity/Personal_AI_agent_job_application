@@ -1,14 +1,47 @@
 # Repository context — start here
 
+## Implementation and deployment report — 26 October 2026
+
+### What changed and why
+
+- **Hired public discovery:** the former company-only page is now an orange/yellow Jobs + Map product. It combines a broad public company catalogue with 70 source-linked European vacancies from reviewed employer-board APIs. Greenhouse is only one source; Ashby is also used, and additional official feeds can be registered.
+- **StartupMap-style area discovery, generalized to every city:** `/map/<city>` uses the same route, breadcrumbs (`Europe → country → city`), company counts, real open-role counts, company cards, and company details. Brussels has no special implementation. Country/city cards replace cluttered pins while zooming; cards are decluttered and street-level pins use company logos.
+- **Logos and source honesty:** current vacancy companies and catalogue companies use self-hosted logos with monogram fallbacks. Directory presence is not presented as a vacancy, and company headquarters are not substituted for a vacancy's stated location.
+- **Passwordless hosted foundation:** Supabase email magic links/OTP, server-recorded Privacy Notice acceptance, private multi-CV storage, deterministic CV matching, single-use LinkedIn PKCE state, and fresh-OTP deletion were added. The migration was applied to the configured Supabase project. Hosted registration, LinkedIn, deletion, and Render deployment remain disabled until their live provider checks pass.
+- **Deterministic auto-apply:** `rule_based_apply.py` fills recognized fields without an LLM, attaches the exact CV, supports scanned PDFs, blocks unknown questions/CAPTCHA/consent/restrictions, and requires final approval for each application. URL-encoded, multipart CV, and explicitly enabled JSON submissions are supported; ambiguous forms fail closed. A controlled proxy prevents Chromium DNS rebinding, and one-time approval binds target, query, body, and file hash.
+- **Daily refresh:** `.github/workflows/refresh-jobs.yml` refreshes official boards at 06:00 UTC. GitHub reports the workflow active. Failed or empty refreshes preserve the previous snapshot.
+- **Privacy:** `vercel-site/privacy.html` documents operator contact, providers, CV processing, LinkedIn identity, retention, export, and deletion. It is not represented as legal advice.
+
+### Evidence and live behavior
+
+- Production Hired: https://co-apply-gpt-magbixavier-gmailcoms-projects.vercel.app — the production job list/detail browser check passed.
+- Synthetic ATS: multipart CV and JSON submissions returned confirmed successful responses through the real deterministic runner. No employer received test applications.
+- Brussels and Paris city routes, logos, breadcrumbs, company details, and zoom-card decluttering passed local Chromium checks.
+- Deterministic security and UX re-reviews were approved after fixing duplicate submissions, DNS isolation, CV attachment, query binding, and cancellation/status semantics.
+- Latest checks: **396 Python tests passed; 21 Node tests passed**. Deno deletion-auth checks, build, compile, YAML, and diff checks also passed.
+
+### Not activated or not verified
+
+- No live OpenAI model is used or required; an invalid old key was not used for inference.
+- Live Supabase email delivery, LinkedIn OAuth, deletion Edge Function deployment, and Render hosting still need their provider-specific checks. No hosted public sign-up is enabled.
+- No real employer application was submitted. The user must choose a job and personally approve its completed form.
+- Daily workflow is active, but a future scheduled run is distinct from a manually verified export.
+
+### Deployment history
+
+- `e8a8b53` (`Add Hired jobs, hosted accounts, and reviewed auto-apply`) was pushed to the working branch and `main`; Vercel production became ready and the daily workflow became active.
+- The next update adds generic city/company discovery, self-hosted job logos, the Privacy Notice page, and this report.
+
+
 Updated 15 October 2026 (Europe/Zurich). No Codex.md was present when the role-first portal work began; the README and implementation were the starting context.
 
 ## Product and stack
 
-Local, single-user career preparation prototype. Python 3.12+, Streamlit, Pydantic, SQLite; dependencies in `pyproject.toml` / `uv.lock`. Keep this stack unless a measured limitation justifies replacing it. No public deployment or multi-user authentication is configured.
+Local, single-user career preparation prototype plus a separate public static Hired explorer and an isolated hosted account foundation. Python 3.12+, Streamlit, Pydantic, SQLite; dependencies in `pyproject.toml` / `uv.lock`. Keep this stack unless a measured limitation justifies replacing it. The public explorer is deployed on Vercel; the full local app remains local and hosted multi-user authentication is not publicly enabled.
 
 Primary context: [README.md](README.md). Module context: [src/tau_job_application/codex.md](src/tau_job_application/codex.md). Delivery reports: [role-first portal](docs/ROLE_FIRST_IMPLEMENTATION_REPORT.md) and [company catalogue](docs/COMPANY_CATALOG_IMPLEMENTATION_REPORT.md).
 
-Hosted MVP scaffold: `hosted_ui.py` is separate from the local `ui.py`; `hosted.py` uses per-user Supabase clients and RLS-backed private rows/files, with SQL in `supabase/migrations/`. `render.yaml` defines an unconfigured free preview with public sign-up and account deletion off by default. Password recovery needs the documented OTP template; account deletion uses a separate Supabase Edge Function with its privileged key confined to that function. No hosted provider project is live; local SQLite remains the full app's store of record, and no local records are migrated. Never use a Supabase service-role key in the Streamlit app. See [docs/HOSTED_MVP.md](docs/HOSTED_MVP.md) and [the privacy notice draft](docs/PRIVACY_NOTICE_DRAFT.md) for scope, setup, and limitations.
+Hosted MVP scaffold: `hosted_ui.py` is separate from the local `ui.py`; `hosted.py` uses per-user Supabase clients and RLS-backed private rows/files, with SQL in `supabase/migrations/`. Registration uses passwordless magic links/OTP; account deletion requires fresh OTP verified by the Edge Function. The migration was applied to the configured Supabase project, but hosted email/OAuth/deletion/Render checks are incomplete. `render.yaml` keeps public sign-up, LinkedIn, and deletion off by default. Local SQLite remains the full app's store of record, and no local records are migrated. Never use a Supabase service-role key in the Streamlit app. See [docs/HOSTED_MVP.md](docs/HOSTED_MVP.md) and [the privacy notice draft](docs/PRIVACY_NOTICE_DRAFT.md) for scope, setup, and limitations.
 
 ## Entry points and checks
 
@@ -38,7 +71,7 @@ Interests are many-to-many navigation, not degree/eligibility rules. A role may 
 - LinkedIn links suggest contact roles, not verified people. Email pattern output is an unverified hypothesis, never used for sending or probing.
 - Gmail/Slack connectors are read-only and require externally provisioned server tokens plus conversation-level consent. No one-click OAuth, token refresh, whole-inbox crawler, or always-on worker exists.
 - Gmail auto-updates are optional, exact-conversation/sender bound, future-only, non-regressive, deduplicated, and audited. Literal phrase classification is imperfect; Slack/ambiguous/old replies need review. An offer status never accepts an offer.
-- Computer-use application submission is not implemented. The Apply tab is a manual official-form handoff with an explicit submitted confirmation.
+- `rule_based_apply.py` implements deterministic local form filling without an LLM. It requires explicit per-application approval, exact CV/body/target binding, and confirmed response; unsupported or ambiguous forms fail closed. No real employer submission has been made.
 - No visitor analytics added. Local application history is not visitor analytics. Browser-loaded logos/map assets can still contact their providers.
 
 ## Recent additions
@@ -47,4 +80,4 @@ Product display name is **Co-Apply GPT** (package stays `tau_job_application`). 
 
 ## Next engineering work
 
-Expand official/licensed job coverage, especially finance; add secure OAuth and revocation; evaluate reply classification using consented fixtures; add source-backed named-person discovery; implement a supervised, employer-specific browser runner only with confirmation, screenshot/audit, duplicate-submission controls, and employer-policy review. Do not describe these as shipped.
+Expand official/licensed job coverage, especially finance; complete hosted email/OAuth/deployment checks; evaluate reply classification using consented fixtures; and test rule-based auto-apply against more employer-specific forms. Do not describe unverified provider integrations or universal form compatibility as shipped.

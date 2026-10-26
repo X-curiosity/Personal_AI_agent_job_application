@@ -1,8 +1,5 @@
 .vercel
 .env*
-data/logos/
-data/companies.json
 data/wikidata_hq.json
-map-core.mjs
 vendor/* 2*
 vendor/* 3*

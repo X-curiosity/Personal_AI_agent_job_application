@@ -8,6 +8,7 @@ from __future__ import annotations
 import hashlib
 import json
 import re
+import shutil
 from datetime import UTC, datetime
 from pathlib import Path
 
@@ -35,9 +36,19 @@ def role_area(title: str) -> str:
     return next((name for name, words in groups if any(word in text for word in words)), "Operations")
 
 
+def company_logos() -> dict[str, str]:
+    path = ROOT / "vercel-site/data/companies.json"
+    try:
+        rows = json.loads(path.read_text(encoding="utf-8")).get("companies", [])
+    except (OSError, json.JSONDecodeError):
+        return {}
+    return {str(row.get("name", "")).casefold(): str(row.get("logo") or "") for row in rows if row.get("name")}
+
+
 def export(limit: int = 120) -> dict:
     jobs = []
     errors = []
+    logos = company_logos()
     for board in DEFAULT_VETTED_COMPANY_BOARDS:
         try:
             openings = fetch_public_board_openings(board.source, board.board_identifier, company=board.company.name)
@@ -60,8 +71,21 @@ def export(limit: int = 120) -> dict:
             description = re.sub(r"\b[\w.+-]+@[\w.-]+\.[A-Za-z]{2,}\b", "[email in original advert]", description)[:4000]
             skills = extract_skills(f"{opening['title']} {description}")
             identity = f"{board.company.name}|{opening['source_id']}"
+            logo = logos.get(board.company.name.casefold(), "")
+            if logo:
+                source = ROOT / "vercel-site" / logo
+                suffix = source.suffix.lower()
+                target_relative = f"data/job-logos/{hashlib.sha256(board.company.name.encode()).hexdigest()[:12]}{suffix}"
+                if source.is_file() and suffix in {".png", ".jpg", ".webp", ".gif", ".ico"}:
+                    target = ROOT / "vercel-site" / target_relative
+                    target.parent.mkdir(parents=True, exist_ok=True)
+                    shutil.copyfile(source, target)
+                    logo = target_relative
+                else:
+                    logo = ""
             jobs.append({
                 "id": "job_" + hashlib.sha256(identity.encode()).hexdigest()[:20],
+                "logo": logo,
                 "title": opening["title"], "company": board.company.name, "companyType": board.company.company_type,
                 "url": opening["url"], "source": opening["source"], "boardUrl": board.board_url,
                 "area": role_area(opening["title"]), "skills": skills, "description": description,

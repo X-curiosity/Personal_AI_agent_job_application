@@ -9,6 +9,11 @@ import argparse
 ROOT = Path(__file__).resolve().parents[1] / "vercel-site"
 
 class Handler(SimpleHTTPRequestHandler):
+    def do_GET(self):
+        if self.path.startswith("/map/"):
+            self.path = "/index.html"
+        super().do_GET()
+
     def end_headers(self):
         for rule in json.loads((ROOT / "vercel.json").read_text())["headers"]:
             for header in rule["headers"]:
