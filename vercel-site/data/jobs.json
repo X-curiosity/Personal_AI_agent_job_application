@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "exportedAt": "2026-10-26T00:22:41.716558+00:00",
+  "exportedAt": "2026-10-26T11:56:36.238512+00:00",
   "live": false,
   "jobs": [
     {
@@ -148,12 +148,12 @@
       "description": "ABOUT MISTRAL Mistral provides full-stack AI solutions: from frontier models to developer tools, applications, and compute. We partner with enterprises tackling the hardest problems across high-stakes industries like finance, manufacturing, defense, healthcare, and the public sector, co-creating customized AI systems that they can run on their terms. We are a dynamic, collaborative team passionate about AI and its potential to transform society. Our diverse workforce thrives in competitive environments and is committed to driving innovation. Our teams are distributed between Europe, North America, Asia and the Middle East. We are creative, low-ego and team-spirited. About the Role Mistral is seeking a Data Center Operations Manager to oversee the build, run, and operational excellence of our data centers in the Paris Region. This role is critical to ensuring the reliability, security, and efficiency of our HPC infrastructure as we scale our AI capabilities. Primary Location: Besse-sur-Braye Key Responsibilities • Lead the operational management of Mistral’s data centers ensuring seamless coordination and high availability. • Organise and manage onsite operations, technical support, maintenance, and emergency response to ensure 24/7 reliability. • Coordinate hardware deployment, upgrades, and decommissioning with third-party suppliers, ensuring alignment with project timelines. • Follow industry best practices to ensure high-quality installations and adherence to security protocols, contractual obligations, and regulatory requirements. • Oversee ticketing systems for incident resolution, ensuring timely communication and stakeholder updates. • Manage inventory of spare parts and logistics to minimise downtime and maintain operational continuity. • Problem-solve technical issues and mediate challenges to ensure maximum uptime and performance of data center resources. • Provide regular updates to internal and external stakeholders on operational status, risks, and improvements. • Manage local contracts with DC providers and OEM. • Manage the site’s annual operating budget (OpEx) for utilities, maintenance services, and consumables, driving site cost efficiency. • Establish, implement, and enforce robust Health, Safety, and Environmental (HSE) policies and protocols for all site personnel, contractors, and visitors, ensuring compliance with local regulations. • Identify and implement opportunities for the automation of routine operations tasks (e.g., alert handling, reporting, and asset tracking) to improve team efficiency. Qualifications & Experience • Degree in Computer Science, Electrical/Mechanical Engineering, or related field, or equivalent experience, with a strong understanding of data center technical requirements and operations. • Proven track record in data center operations, hardware management, or infrastructure support, preferably in HPC or cloud environments. • Experience managing large-scale infrastructure projects, including build-outs, migrations, or upgrades. • Strong ability to coordinate and lead vendors, contractors, and internal teams, including review, escalation, and contractual engagement. • Comfortable with contract negotiation and management. • Hands-on troubleshooting skills and ability to work and lead in critical situations and aggressive timelines. • Knowledge of data center security standards (physical and digital) and compliance requirements. • Relevant professional certifications such as CDCP, CDCE, or ITIL v4 are highly desired. • Language Skills: Fluency in English and French. WHAT WE OFFER We offer a comprehensive benefits package designed to support your well-being, growth, and work-life balance. Benefits vary by country and may include healthcare coverage, parental leave, retirement plans, relocation support, wellness programs, meal and transportation allowances, and other location-specific perks. For the most up-to-date details on benefits available in your location, please refer to our Ben",
       "locations": [
         {
-          "label": "Paris, France",
-          "city": "Paris",
+          "label": "Bessé-sur-Braye, Pays de la Loire, France",
+          "city": "France",
           "country": "France",
-          "latitude": 48.8566,
-          "longitude": 2.3522,
-          "precision": "city"
+          "latitude": 46.2276,
+          "longitude": 2.2137,
+          "precision": "country"
         }
       ],
       "workplace": "OnSite",
