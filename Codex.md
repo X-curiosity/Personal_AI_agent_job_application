@@ -1,5 +1,14 @@
 # Repository context — start here
 
+## Public catalogue refresh — current push
+
+- Capital Atlas refreshed locally: 2,429 records. StartupMap public pages imported: 2,844 records. Merged export: 10,247 companies, 8,803 cached local logos, 1,109 Wikidata HQ matches. No private APIs or StartupMap coordinates used.
+- Added public-page importer, snapshot preservation, cached-logo export, country-qualified city groups/routes and global directory copy. Removed breadcrumb arrow characters from 416 imported country labels.
+- Verification: 13 focused Python tests and 21 Node tests passed; git diff whitespace check passed. Independent review agents failed to launch; no completed independent or new browser review is claimed.
+- Remaining: 708 StartupMap entries lacked detail-page websites after rate limiting; some country/location metadata remains unresolved. Worldwide city coverage is NOT exhaustive; vacancy snapshot remains European. City routing/filter integration requires further browser QA. Hosted authentication/LinkedIn/deletion activation remains gated.
+- Push requested explicitly with these limitations. Production deployment and live-route checks for this push are not yet verified.
+
+
 ## Implementation and deployment report — 26 October 2026
 
 ### What changed and why

@@ -24,11 +24,11 @@ export function filterJobs(jobs, filters) {
 }
 export function readState(search) {
   const p = new URLSearchParams(search);
-  return Object.fromEntries(['q', 'area', 'type', 'location', 'job', 'company', 'view'].map(k => [k, clean(p.get(k), 200)]));
+  return Object.fromEntries(['q', 'area', 'type', 'location', 'country', 'job', 'company', 'view'].map(k => [k, clean(p.get(k), 200)]));
 }
 export function stateQuery(state) {
   const p = new URLSearchParams();
-  for (const k of ['q', 'area', 'type', 'location', 'job', 'company', 'view']) if (state[k]) p.set(k, state[k]);
+  for (const k of ['q', 'area', 'type', 'location', 'country', 'job', 'company', 'view']) if (state[k]) p.set(k, state[k]);
   return p.toString();
 }
 export function citySlug(value) {
@@ -53,21 +53,56 @@ export function locationGroups(jobs, level) {
   return [...groups.values()].map(group => ({...group, latitude: group.locations.reduce((sum, p) => sum + p.latitude, 0) / group.locations.length, longitude: group.locations.reduce((sum, p) => sum + p.longitude, 0) / group.locations.length})).sort((a, b) => b.jobs.length - a.jobs.length || a.key.localeCompare(b.key));
 }
 
+export function buildCityCountries(records) {
+  const routes = new Map();
+  for (const record of records) {
+    const city = record.locationLabel || record.city;
+    if (!city || city === record.country || !['city','hq'].includes(record.precision)) continue;
+    const slug = citySlug(city), countries = routes.get(slug) || [];
+    if (record.country && !countries.includes(record.country)) countries.push(record.country);
+    routes.set(slug, countries);
+  }
+  return routes;
+}
+
+export function continentForCountry(country) {
+  const value = String(country || '').toLocaleLowerCase('en');
+  if (['united states','usa','canada','mexico'].includes(value)) return 'North America';
+  if (['brazil','argentina','chile','colombia','peru','uruguay'].includes(value)) return 'South America';
+  if (['nigeria','south africa','egypt','kenya','ghana','morocco','senegal'].includes(value)) return 'Africa';
+  if (['india','china','japan','singapore','south korea','indonesia','vietnam','thailand','united arab emirates','israel','saudi arabia','qatar','taiwan','hong kong'].includes(value)) return 'Asia';
+  if (['australia','new zealand'].includes(value)) return 'Oceania';
+  if (['united kingdom','uk','england','france','germany','netherlands','belgium','switzerland','spain','portugal','italy','ireland','sweden','norway','denmark','finland','austria','poland','czech republic','czechia','romania','greece','estonia','latvia','lithuania','croatia','slovenia','hungary','bulgaria','iceland','luxembourg'].includes(value)) return 'Europe';
+  return 'World';
+}
+
+export function buildCityRoutes(records) {
+  const routes = new Map();
+  for (const record of records) {
+    const city = record.locationLabel || record.city;
+    if (!city || city === record.country || !['city','hq'].includes(record.precision)) continue;
+    const slug = citySlug(city), labels = routes.get(slug) || [];
+    if (!labels.includes(city)) labels.push(city);
+    routes.set(slug, labels);
+  }
+  return routes;
+}
+
 export function directoryGroups(companies, jobs, level) {
   const groups = new Map();
   for (const company of companies) {
     if (!Number.isFinite(company.latitude) || !Number.isFinite(company.longitude)) continue;
     const companyName = company.name.toLocaleLowerCase('en');
-    const directoryKey = level === 'country' ? (company.country === 'England' ? 'United Kingdom' : company.country) : company.locationLabel;
+    const directoryKey = level === 'country' ? (company.country === 'England' ? 'United Kingdom' : company.country) : `${company.locationLabel}::${company.country}`;
     const companyJobs = jobs.filter(job => job.company.toLocaleLowerCase('en') === companyName);
-    const jobKeys = companyJobs.flatMap(job => job.locations || []).map(place => level === 'country' ? (place.country === 'England' ? 'United Kingdom' : place.country) : place.city).filter(Boolean);
+    const jobKeys = companyJobs.flatMap(job => job.locations || []).map(place => level === 'country' ? (place.country === 'England' ? 'United Kingdom' : place.country) : `${place.city}::${place.country}`).filter(Boolean);
     const keys = new Set([directoryKey, ...jobKeys].filter(Boolean));
     for (const key of keys) {
-      if (!groups.has(key)) groups.set(key,{key,companies:[],jobs:0,latitude:0,longitude:0,coordinateCount:0,logo:null});
+      if (!groups.has(key)) groups.set(key,{key,label:level === 'city' ? key.split('::')[0] : key,country:level === 'city' ? key.split('::')[1] : key,companies:[],jobs:0,latitude:0,longitude:0,coordinateCount:0,logo:null});
       const group = groups.get(key); group.companies.push(company);
-      const matchingJobs = companyJobs.filter(job => (job.locations || []).some(place => (level === 'country' ? (place.country === 'England' ? 'United Kingdom' : place.country) : place.city) === key));
+      const matchingJobs = companyJobs.filter(job => (job.locations || []).some(place => (level === 'country' ? (place.country === 'England' ? 'United Kingdom' : place.country) : `${place.city}::${place.country}`) === key));
       group.jobs += matchingJobs.length;
-      const jobPoints = matchingJobs.flatMap(job => job.locations || []).filter(place => (level === 'country' ? (place.country === 'England' ? 'United Kingdom' : place.country) : place.city) === key && Number.isFinite(place.latitude) && Number.isFinite(place.longitude));
+      const jobPoints = matchingJobs.flatMap(job => job.locations || []).filter(place => (level === 'country' ? (place.country === 'England' ? 'United Kingdom' : place.country) : `${place.city}::${place.country}`) === key && Number.isFinite(place.latitude) && Number.isFinite(place.longitude));
       const points = jobPoints.length ? jobPoints : [company];
       for (const point of points) { group.latitude += point.latitude; group.longitude += point.longitude; group.coordinateCount += 1; }
       if (!group.logo && company.logo) group.logo = company.logo;

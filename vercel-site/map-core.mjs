@@ -47,7 +47,7 @@ export function hasPoint(company) {
 }
 
 export function readCatalogue(payload) {
-  if (payload?.schemaVersion !== 1 || !Array.isArray(payload.companies) || payload.companies.length > 10000) throw new Error('Unsupported company catalogue.');
+  if (payload?.schemaVersion !== 1 || !Array.isArray(payload.companies) || payload.companies.length > 20000) throw new Error('Unsupported company catalogue.');
   const ids = new Set();
   const companies = payload.companies.map(raw => {
     if (!raw || typeof raw.id !== 'string' || !/^[a-zA-Z0-9_-]{1,100}$/.test(raw.id) || ids.has(raw.id) || typeof raw.name !== 'string' || !raw.name.trim()) throw new Error('Invalid company record.');

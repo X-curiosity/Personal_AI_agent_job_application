@@ -289,6 +289,21 @@ def attach_logos(companies: list[dict[str, Any]], logos_dir: Path, *, workers: i
     return count
 
 
+def attach_cached_logos(companies: list[dict[str, Any]], logos_dir: Path) -> int:
+    """Reuse only existing local logo files; make no network requests."""
+    count = 0
+    for company in companies:
+        company.pop("_logo_payload", None)
+        if not logos_dir.exists():
+            continue
+        for existing in logos_dir.glob(f"{company['id']}.*"):
+            if existing.suffix in {".png", ".jpg", ".webp", ".gif", ".ico"}:
+                company["logo"] = f"data/logos/{existing.name}"
+                count += 1
+                break
+    return count
+
+
 def apply_hq(record: dict[str, Any], hq: dict[str, dict]) -> dict[str, Any]:
     """Exact headquarters coordinate wins over the city/country estimate, but
     only from the Wikidata domain-verified map — never guessed."""
@@ -430,7 +445,49 @@ def atlas_record(row: sqlite3.Row) -> dict[str, Any] | None:
     }
 
 
-def export_catalog(db_path: Path, output_path: Path, *, exported_at: str | None = None, logos: bool = True) -> dict[str, Any]:
+def startupmap_record(row: sqlite3.Row) -> dict[str, Any] | None:
+    """One company from StartupMap's public city/company page snapshot."""
+    try:
+        payload = json.loads(row["payload_json"])
+    except (TypeError, json.JSONDecodeError):
+        return None
+    if not isinstance(payload, dict) or not payload.get("name"):
+        return None
+    city = str(payload.get("city") or "").strip()
+    country = normalize_country(payload.get("country"))
+    location = ", ".join(part for part in (city, country) if part) or None
+    geocode = _safe_geocode(location)
+    raw_stage = str(payload.get("stage") or "").strip()
+    stage, stage_basis = classify_stage({"funding_stage": raw_stage})
+    return {
+        "id": public_id("StartupMap", row["slug"]),
+        "name": str(payload["name"]).strip(),
+        "summary": str(payload.get("description") or "").strip()[:500] or None,
+        "industry": None,
+        "stage": stage,
+        "stageBasis": f"StartupMap public city page: {raw_stage}" if raw_stage else "StartupMap stage unavailable",
+        "location": location,
+        "latitude": geocode.latitude if geocode else None,
+        "longitude": geocode.longitude if geocode else None,
+        "precision": geocode.precision if geocode else "unmapped",
+        "locationLabel": geocode.label if geocode else (location or "Unmapped"),
+        "source": "StartupMap public pages",
+        "sourceUrl": safe_https(payload.get("source_url")),
+        "website": safe_https(payload.get("website")),
+        "hiringSignal": "directory_flag" if payload.get("hiring") is True else "unknown",
+        "observedAt": row["imported_at"],
+        "country": country,
+        "countryCode": COUNTRY_ISO.get(country or ""),
+        "region": None,
+        "logo": None,
+        "type": "startup",
+        "fundingStage": raw_stage or None,
+        "tags": [],
+        "_logo_payload": {"logo_url": payload.get("logo_url")},
+    }
+
+
+def export_catalog(db_path: Path, output_path: Path, *, exported_at: str | None = None, logos: bool = True, cached_logos: bool = False) -> dict[str, Any]:
     uri = db_path.resolve().as_uri() + "?mode=ro"
     with sqlite3.connect(uri, uri=True) as db:
         db.row_factory = sqlite3.Row
@@ -443,9 +500,10 @@ def export_catalog(db_path: Path, output_path: Path, *, exported_at: str | None 
         # The richer directory snapshots replace the smaller reviewed imports
         # of the same sources (they were the same public data, capped at 100).
         seen_names = {company["name"].casefold() for company in companies}
-        for table, builder in (("yc_directory", yc_record), ("atlas_companies", atlas_record)):
+        for table, builder in (("yc_directory", yc_record), ("atlas_companies", atlas_record), ("startupmap_companies", startupmap_record)):
             try:
-                snapshot_rows = db.execute(f"SELECT slug, name, payload_json FROM {table}").fetchall()
+                columns = "slug, name, payload_json, imported_at" if table == "startupmap_companies" else "slug, name, payload_json"
+                snapshot_rows = db.execute(f"SELECT {columns} FROM {table}").fetchall()
             except sqlite3.OperationalError:
                 continue  # snapshot not present on this machine
             for row in snapshot_rows:
@@ -464,7 +522,10 @@ def export_catalog(db_path: Path, output_path: Path, *, exported_at: str | None 
             "companies": companies,
         }
         db.rollback()
-    if logos:
+    if cached_logos:
+        count = attach_cached_logos(data["companies"], output_path.parent / "logos")
+        print(f"Reused {count} cached company logos")
+    elif logos:
         count = attach_logos(data["companies"], output_path.parent / "logos")
         print(f"Downloaded {count} company logos")
     for company in data["companies"]:
@@ -479,8 +540,9 @@ def main() -> None:
     parser.add_argument("--database", type=Path, default=ROOT / ".job_assistant/assistant.sqlite")
     parser.add_argument("--output", type=Path, default=ROOT / "vercel-site/data/companies.json")
     parser.add_argument("--no-logos", action="store_true", help="Skip logo downloads (offline/tests)")
+    parser.add_argument("--cached-logos", action="store_true", help="Reuse cached logos without any network requests")
     args = parser.parse_args()
-    data = export_catalog(args.database, args.output, logos=not args.no_logos)
+    data = export_catalog(args.database, args.output, logos=not args.no_logos, cached_logos=args.cached_logos)
     print(f"Exported {len(data['companies'])} public companies to {args.output}")
 
 

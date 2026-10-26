@@ -1,4 +1,4 @@
-import {PAGE_SIZE, citySlug, declutterDirectoryGroups, directoryGroups, filterJobs, matchSkills, readJobs, readState, stateQuery} from './jobs-core.mjs';
+import {PAGE_SIZE, buildCityCountries, buildCityRoutes, citySlug, continentForCountry, declutterDirectoryGroups, directoryGroups, filterJobs, matchSkills, readJobs, readState, stateQuery} from './jobs-core.mjs';
 import {readCatalogue} from './map-core.mjs';
 const $ = id => document.getElementById(id);
 const el = (tag, className, text) => { const node = document.createElement(tag); if (className) node.className = className; if (text != null) node.textContent = text; return node; };
@@ -13,15 +13,16 @@ function companyMark(job) {
 }
 const dateLabel = value => { const date = new Date(value); return Number.isNaN(date.valueOf()) ? 'Date unavailable' : date.toLocaleDateString('en', {year:'numeric',month:'short',day:'numeric',timeZone:'UTC'}); };
 let jobs = [], filtered = [], companies = [], filteredCompanies = [], state = readState(location.search), page = 0, loading = false, map, mapReady = false, pendingFit = false;
-let knownCities = new Map();
+let knownCities = new Map(), knownCityCountries = new Map();
 const pathCity = () => { try { return location.pathname.startsWith('/map/') ? citySlug(decodeURIComponent(location.pathname.split('/')[2] || '')) : ''; } catch { return ''; } };
 const markers = [], controls = {q:$('search'), area:$('area'), type:$('type'), location:$('location')};
 function samePlace(value) { return state.cityRoute ? citySlug(value) === state.cityRoute : value === state.location; }
+function sameCountry(value) { return !state.country || value === state.country; }
 function updateURL(replace = false) {
   const route = state.cityRoute || citySlug(state.location);
   const slug = knownCities.has(route) ? route : '';
   const path = slug ? `/map/${slug}` : (location.pathname.startsWith('/map/') ? '/' : location.pathname);
-  const query = stateQuery({...state, location: slug ? '' : state.location});
+  const query = stateQuery({...state, location: slug ? '' : state.location, country: slug && (knownCityCountries.get(route) || []).length <= 1 ? '' : state.country});
   const url = `${path}${query ? '?' + query : ''}`;
   if (url !== location.pathname + location.search) history[replace ? 'replaceState' : 'pushState'](null, '', url);
 }
@@ -32,7 +33,7 @@ function setView(view) { state.view = view; document.querySelector('.explorer-bo
 $('nav-jobs').addEventListener('click', () => setView('jobs'));
 $('nav-map').addEventListener('click', () => setView('map'));
 let searchTimer;
-function applyFilters(fit = false, replace = false) { readControls(); state.cityRoute = knownCities.has(citySlug(state.location)) ? citySlug(state.location) : ''; state.job = ''; state.company = ''; page = 0; updateURL(replace); render(); if (fit) fitResults(); }
+function applyFilters(fit = false, replace = false) { readControls(); state.cityRoute = knownCities.has(citySlug(state.location)) ? citySlug(state.location) : ''; const countries = knownCityCountries.get(state.cityRoute) || []; if (!state.cityRoute) state.country = ''; else if (!countries.includes(state.country)) state.country = countries[0] || ''; state.job = ''; state.company = ''; page = 0; updateURL(replace); render(); if (fit) fitResults(); }
 $('filters').addEventListener('submit', e => { e.preventDefault(); applyFilters(true); });
 controls.q.addEventListener('input', () => { clearTimeout(searchTimer); searchTimer = setTimeout(() => applyFilters(true,true),180); });
 for (const key of ['area','type','location']) controls[key].addEventListener('change', () => applyFilters(true));
@@ -42,12 +43,12 @@ $('previous').addEventListener('click', () => { page--; renderList(); $('jobs-he
 $('next').addEventListener('click', () => { page++; renderList(); $('jobs-heading').focus(); });
 $('fit-map').addEventListener('click', fitResults);
 function areaCitySelected() { return state.view === 'map' && knownCities.has(citySlug(state.location)); }
-function companyJobs(company) { return filtered.filter(job => job.company.toLocaleLowerCase('en') === company.name.toLocaleLowerCase('en') && (!state.location || job.locations.some(place => samePlace(place.city) || place.country === state.location))); }
+function companyJobs(company) { return filtered.filter(job => job.company.toLocaleLowerCase('en') === company.name.toLocaleLowerCase('en') && (!state.location || job.locations.some(place => samePlace(place.city) && sameCountry(place.country)))); }
 function filterDirectory() {
   if (!areaCitySelected()) { filteredCompanies = []; return; }
   const query = state.q.toLocaleLowerCase('en');
   filteredCompanies = companies.filter(company => {
-    const cityMatch = samePlace(company.locationLabel) || company.country === state.location || companyJobs(company).length > 0;
+    const cityMatch = (samePlace(company.locationLabel) && sameCountry(company.country)) || company.country === state.location || companyJobs(company).length > 0;
     const queryMatch = !query || [company.name,company.summary,company.industry,company.location].join(' ').toLocaleLowerCase('en').includes(query);
     const typeMatch = !state.type || (state.type === 'Startup' ? company.type === 'startup' : state.type === 'Public' ? company.type === 'public' : company.type === 'private');
     const roleMatch = !state.area || companyJobs(company).some(job => job.area === state.area);
@@ -56,13 +57,14 @@ function filterDirectory() {
 }
 function applyPathCity() {
   const slug = pathCity();
-  if (slug) { state.cityRoute = slug; state.location = knownCities.get(slug)?.[0] || slug; if (!state.view) state.view = 'map'; }
+  if (slug) { state.cityRoute = slug; const countries = knownCityCountries.get(slug) || []; if (!countries.includes(state.country)) state.country = countries[0] || ''; state.location = knownCities.get(slug)?.[0] || slug; if (!state.view) state.view = 'map'; }
 }
 function renderArea() {
   const area = $('area-context'), selected = state.location;
   const city = knownCities.has(citySlug(selected));
   const place = city ? filtered.flatMap(job => job.locations).find(item => item.city === selected) : null;
-  const country = place?.country || filteredCompanies[0]?.country || (!city && selected ? selected : '');
+  const country = state.country || place?.country || filteredCompanies[0]?.country || (!city && selected ? selected : '');
+  const continent = continentForCountry(country);
   area.hidden = !selected;
   area.replaceChildren();
   $('jobs-heading').textContent = selected || 'Jobs for you to explore';
@@ -70,7 +72,7 @@ function renderArea() {
   document.title = selected ? `${selected} jobs · Hired` : 'Hired · European jobs, mapped to you';
   if (!selected) return;
   const crumbs = el('nav','area-breadcrumbs'); crumbs.setAttribute('aria-label','Area breadcrumb');
-  const europe = el('button','area-crumb','Europe'); europe.type = 'button'; europe.addEventListener('click',() => { controls.location.value = ''; applyFilters(true); }); crumbs.append(europe);
+  const continentButton = el('button','area-crumb',continent); continentButton.type = 'button'; continentButton.addEventListener('click',() => { controls.location.value = ''; state.country = ''; applyFilters(true); }); crumbs.append(continentButton);
   if (city && country) {
     crumbs.append(el('span','area-separator','›'));
     const countryButton = el('button','area-crumb',country); countryButton.type = 'button'; countryButton.addEventListener('click',() => { controls.location.value = country; applyFilters(true); }); crumbs.append(countryButton);
@@ -94,7 +96,7 @@ function directoryForMap() {
     const queryMatch = !query || [company.name,company.summary,company.industry,company.location].join(' ').toLocaleLowerCase('en').includes(query);
     const typeMatch = !state.type || (state.type === 'Startup' ? company.type === 'startup' : state.type === 'Public' ? company.type === 'public' : company.type === 'private');
     const roleMatch = !state.area || companyJobs(company).some(job => job.area === state.area);
-    const locationMatch = !state.location || samePlace(company.locationLabel) || company.country === state.location;
+    const locationMatch = !state.location || (samePlace(company.locationLabel) && sameCountry(company.country)) || company.country === state.location;
     return queryMatch && typeMatch && roleMatch && locationMatch;
   });
 }
@@ -153,15 +155,18 @@ function renderDetail(job) {
   const about = el('section','detail-section'); about.append(el('h3','','About the role'),el('p','',job.description || 'Open the official advert for the complete description.')); if (job.skills.length) { const skills = el('div','company-tags'); for (const skill of job.skills) skills.append(el('span','tag',skill)); about.append(el('h3','','Terms detected in the advert'),skills); } detail.append(about,el('p','field-note',`Source: ${job.source} employer board. Verify the current advert and submit it yourself. Hired never applies on your behalf.`));
 }
 function clearMarkers() { for (const marker of markers.splice(0)) marker.remove(); }
+function selectArea(city, country) {
+  controls.location.value = city; state.country = country; state.cityRoute = citySlug(city); applyFilters();
+}
 function addAreaMarker(group, level) {
   const card = el('div','area-map-card');
   const thumb = el('span','area-map-thumb');
   if (group.logo) { const image = el('img','company-logo'); image.src = '/' + group.logo; image.alt = ''; thumb.append(image); } else thumb.textContent = initials(group.key);
-  card.append(thumb,el('span','area-map-title',group.key),el('span','area-map-count',`${group.companies.length} companies · ${group.jobs} roles`));
+  card.append(thumb,el('span','area-map-title',group.label || group.key),el('span','area-map-count',`${group.companies.length} companies · ${group.jobs} roles`));
   card.tabIndex = 0; card.setAttribute('role','button'); card.setAttribute('aria-label',`${group.key}, ${group.companies.length} companies and ${group.jobs} roles`);
   const choose = () => {
     if (level === 'country') map.jumpTo({center:[group.longitude,group.latitude],zoom:5});
-    else { controls.location.value = group.key; applyFilters(); map.jumpTo({center:[group.longitude,group.latitude],zoom:8}); }
+    else { selectArea(group.label || group.key,group.country); map.jumpTo({center:[group.longitude,group.latitude],zoom:8}); }
   };
   card.addEventListener('click',choose);
   card.addEventListener('keydown',event => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); choose(); } });
@@ -207,15 +212,8 @@ async function initializeMap() {
 }
 let companiesLoading = false, companiesLoaded = false;
 function registerCities(records) {
-  const routes = new Map();
-  for (const record of records) {
-    const city = record.locationLabel || record.city;
-    if (!city || city === record.country || !['city','hq'].includes(record.precision)) continue;
-    const slug = citySlug(city), labels = routes.get(slug) || [];
-    if (!labels.includes(city)) labels.push(city);
-    routes.set(slug, labels);
-  }
-  knownCities = routes;
+  knownCities = buildCityRoutes(records);
+  knownCityCountries = buildCityCountries(records);
 }
 async function loadCompanies() {
   if (companiesLoaded || companiesLoading) return;
