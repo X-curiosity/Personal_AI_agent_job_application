@@ -1,8 +1,37 @@
 {
   "schemaVersion": 1,
-  "exportedAt": "2026-10-26T11:56:36.238512+00:00",
+  "exportedAt": "2026-10-27T11:19:02.650986+00:00",
   "live": false,
   "jobs": [
+    {
+      "id": "job_eb445b0bd54071017dd3",
+      "logo": "data/job-logos/ce46041005a8.ico",
+      "title": "Customer Enablement Manager - Figma Weave  (London, United Kingdom)",
+      "company": "Figma",
+      "companyType": "Public",
+      "url": "https://boards.greenhouse.io/figma/jobs/6232584004?gh_jid=6232584004",
+      "source": "Greenhouse",
+      "boardUrl": "https://boards.greenhouse.io/figma",
+      "area": "Operations",
+      "skills": [
+        "Figma"
+      ],
+      "description": "Figma is growing our team of passionate creatives and builders on a mission to make design accessible to all. Figma’s platform helps teams bring ideas to life—whether you're brainstorming, creating a prototype, translating designs into code, or iterating with AI. From idea to product, Figma empowers teams to streamline workflows, move faster, and work together in real time from anywhere in the world. If you're excited to shape the future of design and collaboration, join us! As a Customer Enablement Manager, you’ll work directly with our larger customers to help them get the most value from the Figma Weave platform. You’ll design and deliver tailored enablement strategies that drive product adoption, help uncover new use cases, and support long-term success. In this role, you’ll partner with various internal teams to deliver a seamless, impactful, and engaging customer experience. Your ability to build strong relationships, connect the dots between product features and customer goals, and communicate with clarity will make you a trusted advisor and strategic partner. If you’re energized by helping customers thrive, enjoy solving complex problems, and love working at the intersection of product and customer success, we’d love to meet you. We’re building the next chapter of AI-native craft and creativity - where craft and technology meet. Our unified platform bridges the gap between AI capabilities and human creativity, and lets professional creatives and designers harness the power of the world’s leading AI models without losing precision, expression, or soul. Together, we’re building tools that help people move faster without sacrificing quality, precision, or craft — a platform where AI supports creativity instead of flattening it. This is a full time hybrid role based out of our London hub. What you’ll do at Figma Weave: Manage the adoption journey for a portfolio of large, commercial and enterprise customers Understand customer goals and success metrics, and use product data to inform proactive engagement strategies Share best practices, use cases, and product expertise to help teams unlock the full value of Figma Weave Build trusted relationships with stakeholders across roles and departments; from individual contributors to senior leaders Identify and empower internal champions who can advocate for Figma Weave within their organizations Collaborate with Account Executives on account reviews, expansion opportunities, and renewal risk mitigation Deliver live and scalable training sessions customized to customer maturity and needs Partner cross-functionally with Onboarding Managers, Technical Account Managers, Solutions Consultants, and Industry Advocates to ensure customer success We'd love to hear from you if you have: 4+ years of experience in Customer Success, Customer Enablement, Account Management or a relevant customer-facing role in SaaS Excellent communication skills, with the ability to connect with a wide range of customer personas Strong product knowledge and a customer-first, consultative approach to solving challenges and driving adoption A track record of driving impactful outcomes, adapting to evolving customer needs, and collaborating effectively with cross-functional teams While it’s not required, it’s an added plus if you also have: Experience using node-based design products or working with design and collaboration tools Background in Post-Production, VFX, Creative work, UX/UI, Design Ops, or Frontend Development At Figma, one of our values is Grow as you go. We believe in hiring smart, curious people who are excited to learn and develop their skills. If you’re excited about this role but your past experience doesn’t align perfectly with the points outlined in the job description, we encourage you to apply anyways. You may be just the right candidate for this or other roles. At Figma we celebrate and support our differences. We know employing a team rich in diverse thoughts, experiences, and opinions allo",
+      "locations": [
+        {
+          "label": "London, England",
+          "city": "London",
+          "country": "England",
+          "latitude": 51.5072,
+          "longitude": -0.1276,
+          "precision": "city"
+        }
+      ],
+      "workplace": null,
+      "employment": null,
+      "sourceTimestamp": "2026-10-26T16:02:50-04:00",
+      "sourceTimestampKind": "updated"
+    },
     {
       "id": "job_5258a172b6a726d8c361",
       "logo": "data/job-logos/f1fff94a8e80.ico",
@@ -1505,35 +1534,6 @@
       "workplace": null,
       "employment": null,
       "sourceTimestamp": "2026-10-05T16:36:07-04:00",
-      "sourceTimestampKind": "updated"
-    },
-    {
-      "id": "job_04c79f2465b1cfba0e49",
-      "logo": "data/job-logos/ce46041005a8.ico",
-      "title": "Senior Customer Enablement Manager (London, United Kingdom)",
-      "company": "Figma",
-      "companyType": "Public",
-      "url": "https://boards.greenhouse.io/figma/jobs/6130557004?gh_jid=6130557004",
-      "source": "Greenhouse",
-      "boardUrl": "https://boards.greenhouse.io/figma",
-      "area": "Operations",
-      "skills": [
-        "Figma"
-      ],
-      "description": "Figma is growing our team of passionate creatives and builders on a mission to make design accessible to all. Figma’s platform helps teams bring ideas to life—whether you're brainstorming, creating a prototype, translating designs into code, or iterating with AI. From idea to product, Figma empowers teams to streamline workflows, move faster, and work together in real time from anywhere in the world. If you're excited to shape the future of design and collaboration, join us! As a Senior Customer Enablement Manager, you'll work directly with some of our largest customers to help them get the most value from the Figma platform. You'll design and deliver tailored enablement strategies that drive product adoption, help uncover new use cases, and support long-term success. In this highly collaborative role, you'll partner with various internal teams such as Account Executives, Onboarding Managers, Technical Account Managers, and Industry Advocates to deliver a seamless and impactful customer experience. Your ability to build strong relationships, connect the dots between product features and customer goals, and communicate with clarity will make you a trusted advisor and strategic partner. If you're passionate about helping customers thrive, enjoy solving complex problems, and love working at the intersection of product and customer success, we'd love to meet you. This is a full time role that can be held from our London hub. What you'll do at Figma: Manage the adoption journey for a portfolio of large, strategic customers Understand customer goals and success metrics, and use product data to inform proactive engagement strategies that lead to measurable value delivery Document proactive engagement strategies as part of high quality, bespoke enablement plans Share best practices, use cases, and product expertise to help teams unlock the full value of Figma Build trusted relationships with stakeholders across roles and departments - from individual contributors to senior leaders Collaborate with Account Executives on account reviews, expansion opportunities, and renewal risk mitigation Deliver live and scalable training sessions customized to customer maturity and needs Partner cross-functionally with Onboarding Managers, Technical Account Managers, Solutions Consultants, and Industry Advocates to ensure customer success We'd love to hear from you if you have: 4+ years of experience in Technical Account Management, Technical Customer Success, Customer Success, Customer Enablement, Account Management or a relevant customer-facing role in SaaS Excellent communication skills, with the ability to connect with a wide range of customer personas Strong product knowledge and a customer-first, consultative approach to solving challenges and driving adoption A track record of driving impactful outcomes, adapting to evolving customer needs, and collaborating effectively with cross-functional teams While it's not required, it's an added plus if you also have: Experience using Figma or working with design and collaboration tools Background in UX/UI, Design Ops, or Frontend Development Proficiency in additional languages such as French, Spanish, German At Figma, one of our values is Grow as you go. We believe in hiring smart, curious people who are excited to learn and develop their skills. If you're excited about this role but your past experience doesn't align perfectly with the points outlined in the job description, we encourage you to apply anyways. You may be just the right candidate for this or other roles. At Figma we celebrate and support our differences. We know employing a team rich in diverse thoughts, experiences, and opinions allows our employees, our product and our community to flourish. Figma is an equal opportunity workplace - we are dedicated to equal employment opportunities regardless of race, color, ancestry, religion, sex, national origin, sexual orientation, age, citizenship, marital status, disability, gender identity/exp",
-      "locations": [
-        {
-          "label": "London, England",
-          "city": "London",
-          "country": "England",
-          "latitude": 51.5072,
-          "longitude": -0.1276,
-          "precision": "city"
-        }
-      ],
-      "workplace": null,
-      "employment": null,
-      "sourceTimestamp": "2026-09-30T11:45:47-04:00",
       "sourceTimestampKind": "updated"
     },
     {
