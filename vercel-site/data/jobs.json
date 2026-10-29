@@ -1,8 +1,456 @@
 {
   "schemaVersion": 1,
-  "exportedAt": "2026-10-28T11:53:06.616888+00:00",
+  "exportedAt": "2026-10-29T12:00:22.228234+00:00",
   "live": false,
   "jobs": [
+    {
+      "id": "job_01a82330046839304840",
+      "logo": "data/job-logos/f1fff94a8e80.ico",
+      "title": "Account Executive, Enterprise, Swiss Romande ",
+      "company": "Mistral AI",
+      "companyType": "Startup",
+      "url": "https://jobs.ashbyhq.com/mistral.ai/19026237-fb3d-480d-a1a3-27204bcb154a",
+      "source": "Ashby",
+      "boardUrl": "https://jobs.ashbyhq.com/mistral.ai",
+      "area": "Sales",
+      "skills": [],
+      "description": "ABOUT MISTRAL Mistral provides full-stack AI solutions: from frontier models to developer tools, applications, and compute. We partner with enterprises tackling the hardest problems across high-stakes industries like finance, manufacturing, defense, healthcare, and the public sector, co-creating customized AI systems that they can run on their terms. We are a dynamic, collaborative team passionate about AI and its potential to transform society. Our diverse workforce thrives in competitive environments and is committed to driving innovation. Our teams are distributed between Europe, North America, Asia and the Middle East. We are creative, low-ego and team-spirited. Role Summary: As our Enterprise Sales Executive, you will be instrumental in shaping Mistral’s adoption with our largest customers across a variety of industries. You will be driving deals end2end: from prospective, first intro call until closing and beyond — together with our dedicated implementation specialist, tech and legal teams. What you will do: Lead development (strategic outbound and qualified inbound): - Handle strategic outreach as well as warm introductions to promising enterprise customers - Converting inbound deals where upselling / more bespoke agreements can be achieved Value prop validation for customer: - Provide hands-on support and guidance to clients during a potential Proof of Concept (POC) phase, ensuring a smooth and successful evaluation process - Leverage successful POC outcomes to facilitate the conversion of POCs into long-term, revenue-generating contracts Deal management & closing: - Develop and execute strategic sales plans to convert leads into valued customers — you are the first point of contact for all external stakeholders and are responsible for properly managing deals and aligning all stakeholders (heavy involvement of customer engineering, product, and commercial teams, both on operational and C-level) - Handle customer negotiation end2end, together with our legal and implementation specialist team Executive Engagement: - Cultivate and maintain strong relationships with C-level executives, heads of innovation/AI, and other key decision-makers within target organisations - Comprehend their specific challenges and needs, positioning our solution as an integral part of their strategic initiatives Technical Aptitude: - Demonstrate a deep understanding of the technical intricacies of our product and articulate its value proposition effectively to potential clients - Work side-by-side with our implementation team to ensure that customer’s questions, concerns and challenges are taken care of during pre-sales, deployment and post-deployment phase - Collaborate with our technical team to address any customer inquiries or concerns Training and enablement: -Empower internal teams with the knowledge and resources that you collect in customer conversations to drive product roadmap and align on priorities Who you are: - 7-10 years experience in Sales (enterprise sales/consultative selling, ideally selling a highly complex, technical product) - Excellent academics: Bachelor and/or Master Degree in Business, Computer Science, or a related field - Significant work experience within AI ecosystem or related data/infrastructure field - Experience at successful fast growing startup, ideally in deep-tech - Strong technical skills to navigate quickly evolving products and steer technical discussions - Excellent French, German and English - Outstanding negotiation and communication skills WHAT WE OFFER We offer a comprehensive benefits package designed to support your well-being, growth, and work-life balance. Benefits vary by country and may include healthcare coverage, parental leave, retirement plans, relocation support, wellness programs, meal and transportation allowances, and other location-specific perks. For the most up-to-date details on benefits available in your location, please refer to our Benefits page https://app.notion.com/p/mistralai",
+      "locations": [
+        {
+          "label": "Zurich, Switzerland",
+          "city": "Zurich",
+          "country": "Switzerland",
+          "latitude": 47.3769,
+          "longitude": 8.5417,
+          "precision": "city"
+        }
+      ],
+      "workplace": null,
+      "employment": "FullTime",
+      "sourceTimestamp": "2026-10-29T09:59:03.266+00:00",
+      "sourceTimestampKind": "published"
+    },
+    {
+      "id": "job_a8e6958968dff8672686",
+      "logo": "data/job-logos/f1fff94a8e80.ico",
+      "title": "Engineering Manager, Sandbox",
+      "company": "Mistral AI",
+      "companyType": "Startup",
+      "url": "https://jobs.ashbyhq.com/mistral.ai/994971b0-a0bb-431f-81de-c8c7568ff681",
+      "source": "Ashby",
+      "boardUrl": "https://jobs.ashbyhq.com/mistral.ai",
+      "area": "Engineering",
+      "skills": [
+        "Go",
+        "Kubernetes",
+        "Linux",
+        "Security"
+      ],
+      "description": "ABOUT MISTRAL Mistral provides full-stack AI solutions: from frontier models to developer tools, applications, and compute. We partner with enterprises tackling the hardest problems across high-stakes industries like finance, manufacturing, defense, healthcare, and the public sector, co-creating customized AI systems that they can run on their terms. We are a dynamic, collaborative team passionate about AI and its potential to transform society. Our diverse workforce thrives in competitive environments and is committed to driving innovation. Our teams are distributed between Europe, North America, Asia and the Middle East. We are creative, low-ego and team-spirited. THE TEAM Mistral is building a sovereign AI cloud for Europe. Our customers in finance, healthcare, and the public sector run frontier models on European-jurisdiction infrastructure, and the Cloud Platform team builds the systems that make that possible — compute orchestration, Kubernetes, bare metal, storage, networking, and the datacenter fleet that runs it all. We run it all on our own metal, our own network, our own datacenters — which means when something breaks, the fix is ours to write. European Compute Units let enterprises commit to multi-year capacity on that infrastructure, and we are scaling toward a gigawatt of compute across Europe by 2030. You will design and ship the layer every sovereign AI deployment depends on and shape the team building it. THE ROLE Agents don't run in browsers. They run in sandboxes — and you will lead the team building ours. You will manage the team — hiring, coaching, performance, growth paths, honest feedback — while staying close to the code: roughly half your time in architecture decisions and the hardest technical problems the team faces, the other half leading your squad. We build secure, isolated, network-controlled environments with snapshotting primitives, designed for AI agents and reinforcement-learning workloads. An RL training run doesn't need one environment; it needs thousands, created and destroyed every second. An agent needs to be sandboxed from the world while still feeling fast enough to be useful. That tension — airtight isolation, at fleet scale, at low latency — is the product. Your customers are the people building the next generation of AI software on our infrastructure; the primitives you ship become the runtime their agents live in. WHAT YOU WILL DO - Build the isolation layer: microVMs or containers, namespaces, cgroups, seccomp, snapshot and restore. - Own the security boundary. Customers run code they didn't write and can't fully trust — your systems make that safe. - Scale to fleets: creation latency, density, and lifecycle management for thousands of concurrent environments. - Design and build alongside your team, owning the architecture and the hardest implementation decisions. - Grow the engineers, not just the software — set the standard for ownership and coach people past their comfort zone. - Own people management for the team: hiring, performance, growth paths, and honest feedback. - Partner with Product Managers to turn frontier research needs into shippable primitives. WHAT WE'RE LOOKING FOR - 3+ years of real people leadership. You have managed engineers — hired, coached, given honest feedback, and grown them. Hands-on contribution matters here, but this role is judged on the team you build and lead, not just the code you write. - Deep Linux internals: namespaces, cgroups, seccomp, virtualization — ideally microVMs of the Firecracker class. - You have shipped production systems in Go. Not dabbled. Shipped. - You understand network isolation at the packet level — not just firewall rules. - Performance instincts: you know what a syscall costs, and you have the profiles to prove you've cared. - 8+ years building backend or infrastructure systems. - You have partnered with product, design, and business teams to ship software that reached real users. - A low-ego, team-first mindset. We care ",
+      "locations": [
+        {
+          "label": "Paris, France",
+          "city": "Paris",
+          "country": "France",
+          "latitude": 48.8566,
+          "longitude": 2.3522,
+          "precision": "city"
+        },
+        {
+          "label": "Switzerland",
+          "city": "Switzerland",
+          "country": "Switzerland",
+          "latitude": 46.8182,
+          "longitude": 8.2275,
+          "precision": "country"
+        },
+        {
+          "label": "Spain",
+          "city": "Spain",
+          "country": "Spain",
+          "latitude": 40.4637,
+          "longitude": -3.7492,
+          "precision": "country"
+        },
+        {
+          "label": "Amsterdam, Netherlands",
+          "city": "Amsterdam",
+          "country": "Netherlands",
+          "latitude": 52.3676,
+          "longitude": 4.9041,
+          "precision": "city"
+        },
+        {
+          "label": "Warsaw, Poland",
+          "city": "Warsaw",
+          "country": "Poland",
+          "latitude": 52.2297,
+          "longitude": 21.0122,
+          "precision": "city"
+        },
+        {
+          "label": "Linz, Austria",
+          "city": "Austria",
+          "country": "Austria",
+          "latitude": 47.5162,
+          "longitude": 14.5501,
+          "precision": "country"
+        },
+        {
+          "label": "Munich, Germany",
+          "city": "Munich",
+          "country": "Germany",
+          "latitude": 48.1351,
+          "longitude": 11.582,
+          "precision": "city"
+        },
+        {
+          "label": "London, United Kingdom",
+          "city": "London",
+          "country": "United Kingdom",
+          "latitude": 51.5072,
+          "longitude": -0.1276,
+          "precision": "city"
+        },
+        {
+          "label": "Berlin, Germany",
+          "city": "Berlin",
+          "country": "Germany",
+          "latitude": 52.52,
+          "longitude": 13.405,
+          "precision": "city"
+        }
+      ],
+      "workplace": "Remote",
+      "employment": "FullTime",
+      "sourceTimestamp": "2026-10-28T22:38:33.563+00:00",
+      "sourceTimestampKind": "published"
+    },
+    {
+      "id": "job_fd18f50b2f64cb8784c8",
+      "logo": "data/job-logos/f1fff94a8e80.ico",
+      "title": "Engineering Manager, Storage",
+      "company": "Mistral AI",
+      "companyType": "Startup",
+      "url": "https://jobs.ashbyhq.com/mistral.ai/81611d9e-112e-4512-a793-8f0b64f6a99c",
+      "source": "Ashby",
+      "boardUrl": "https://jobs.ashbyhq.com/mistral.ai",
+      "area": "Engineering",
+      "skills": [
+        "Go",
+        "Kubernetes"
+      ],
+      "description": "ABOUT MISTRAL Mistral provides full-stack AI solutions: from frontier models to developer tools, applications, and compute. We partner with enterprises tackling the hardest problems across high-stakes industries like finance, manufacturing, defense, healthcare, and the public sector, co-creating customized AI systems that they can run on their terms. We are a dynamic, collaborative team passionate about AI and its potential to transform society. Our diverse workforce thrives in competitive environments and is committed to driving innovation. Our teams are distributed between Europe, North America, Asia and the Middle East. We are creative, low-ego and team-spirited. THE TEAM Mistral is building a sovereign AI cloud for Europe. Our customers in finance, healthcare, and the public sector run frontier models on European-jurisdiction infrastructure, and the Cloud Platform team builds the systems that make that possible — compute orchestration, Kubernetes, bare metal, storage, networking, and the datacenter fleet that runs it all. We run it all on our own metal, our own network, our own datacenters — which means when something breaks, the fix is ours to write. European Compute Units let enterprises commit to multi-year capacity on that infrastructure, and we are scaling toward a gigawatt of compute across Europe by 2030. You will design and ship the layer every sovereign AI deployment depends on and shape the team building it. THE ROLE This is a founding people-leadership role. There is no team to inherit and no legacy to maintain — you build the team as well as the stack, and you are accountable for both from day one. Early on you will be deliberately hands-on, because there is no one else to solve the hardest problems — but hiring your first engineers, coaching them, and setting their growth paths starts immediately, not later. You will be the founding EM for storage on our Sovereign AI cloud. Block, filesystem, and object storage for training runs, sandboxed workloads, and general compute: you decide what we build, what we buy, and how it adds up to storage our customers can bet a business on. Some layers we deploy and harden from best-in-class vendors. The ones that matter most we write ourselves in Go — S3-compatible object storage, tiering, backup and recovery, caching layers that put cold data on cheap spinning disks. As the team grows, the balance shifts toward people leadership, and you decide how fast. You will own capacity planning across datacenters and the architecture that keeps data durable when disks, networks, and entire sites fail. Storage is a strategic bet for this org: the team you build and the calls you make will define how a gigawatt of European compute stores its data. WHAT YOU WILL DO - Stand up the storage stack — block, file, object — for training, sandbox, and general compute workloads. - Make the build-vs-buy calls: deploy and harden vendor platforms where they win; design and write our own services in Go where they don't. - Own the data plane: allocation, duplication, tiering, backup and recovery, S3-compatible APIs. - Plan capacity across datacenters and across failure domains — petabytes, not terabytes. - Build the team from zero: make the first hires, onboard and coach them, own performance and growth paths, and set the standard for ownership. - Partner with Product Managers to shape the storage roadmap and make the technical and business tradeoffs. WHAT WE'RE LOOKING FOR - 2+ years of real people leadership. You have managed engineers — hired, coached, given honest feedback, and grown them. Hands-on contribution matters here, but this role is judged on the team you build and lead, not just the code you write. - You have built storage systems — object, block, or distributed filesystems — not just operated them. You know what happens when a disk dies mid-write and when a rebalance collides with a backup window. - Deep distributed-systems fundamentals: durability, consistency, replication, erasure co",
+      "locations": [
+        {
+          "label": "Paris, France",
+          "city": "Paris",
+          "country": "France",
+          "latitude": 48.8566,
+          "longitude": 2.3522,
+          "precision": "city"
+        },
+        {
+          "label": "Switzerland",
+          "city": "Switzerland",
+          "country": "Switzerland",
+          "latitude": 46.8182,
+          "longitude": 8.2275,
+          "precision": "country"
+        },
+        {
+          "label": "Spain",
+          "city": "Spain",
+          "country": "Spain",
+          "latitude": 40.4637,
+          "longitude": -3.7492,
+          "precision": "country"
+        },
+        {
+          "label": "Amsterdam, Netherlands",
+          "city": "Amsterdam",
+          "country": "Netherlands",
+          "latitude": 52.3676,
+          "longitude": 4.9041,
+          "precision": "city"
+        },
+        {
+          "label": "Warsaw, Poland",
+          "city": "Warsaw",
+          "country": "Poland",
+          "latitude": 52.2297,
+          "longitude": 21.0122,
+          "precision": "city"
+        },
+        {
+          "label": "Linz, Austria",
+          "city": "Austria",
+          "country": "Austria",
+          "latitude": 47.5162,
+          "longitude": 14.5501,
+          "precision": "country"
+        },
+        {
+          "label": "Munich, Germany",
+          "city": "Munich",
+          "country": "Germany",
+          "latitude": 48.1351,
+          "longitude": 11.582,
+          "precision": "city"
+        },
+        {
+          "label": "London, United Kingdom",
+          "city": "London",
+          "country": "United Kingdom",
+          "latitude": 51.5072,
+          "longitude": -0.1276,
+          "precision": "city"
+        },
+        {
+          "label": "Berlin, Germany",
+          "city": "Berlin",
+          "country": "Germany",
+          "latitude": 52.52,
+          "longitude": 13.405,
+          "precision": "city"
+        }
+      ],
+      "workplace": null,
+      "employment": "FullTime",
+      "sourceTimestamp": "2026-10-28T22:36:18.018+00:00",
+      "sourceTimestampKind": "published"
+    },
+    {
+      "id": "job_f2d6c19347f24c45170e",
+      "logo": "data/job-logos/f1fff94a8e80.ico",
+      "title": "Engineering Manager, Fleet Delivery",
+      "company": "Mistral AI",
+      "companyType": "Startup",
+      "url": "https://jobs.ashbyhq.com/mistral.ai/647826f5-37f4-48b7-b5b8-5b7bee6d8e23",
+      "source": "Ashby",
+      "boardUrl": "https://jobs.ashbyhq.com/mistral.ai",
+      "area": "Engineering",
+      "skills": [
+        "Go",
+        "Kubernetes",
+        "Linux"
+      ],
+      "description": "ABOUT MISTRAL Mistral provides full-stack AI solutions: from frontier models to developer tools, applications, and compute. We partner with enterprises tackling the hardest problems across high-stakes industries like finance, manufacturing, defense, healthcare, and the public sector, co-creating customized AI systems that they can run on their terms. We are a dynamic, collaborative team passionate about AI and its potential to transform society. Our diverse workforce thrives in competitive environments and is committed to driving innovation. Our teams are distributed between Europe, North America, Asia and the Middle East. We are creative, low-ego and team-spirited. THE TEAM Mistral is building a sovereign AI cloud for Europe. Our customers in finance, healthcare, and the public sector run frontier models on European-jurisdiction infrastructure, and the Cloud Platform team builds the systems that make that possible — compute orchestration, Kubernetes, bare metal, storage, networking, and the datacenter fleet that runs it all. European Compute Units let enterprises commit to multi-year capacity on that infrastructure, and we are scaling toward a gigawatt of compute across Europe by 2030. You will design and ship the layer every sovereign AI deployment depends on and shape the team building it. THE ROLE A datacenter is not a cloud until software makes it one. You will lead the team that turns arriving hardware into accepted clusters. Cabling validation, burn-in, firmware, deployment validation, software stack install — all of it automated, none of it click-ops. Your KPI is time to acceptance: the hours between a rack being physically installed and it serving customer workloads. Across the industry that number is measured in weeks. You will drive it toward days, then hours, as we scale toward a gigawatt of compute across Europe. This is a founding leadership role at the intersection of hardware and software. Early on it is deliberately hands-on: most of your time in the code and the architecture, some of it on datacenter floors, because the automation has to survive contact with the machines it runs on. But the job is building and leading a team from day one — hiring your first engineers, coaching them, setting their growth paths, and running the rituals that keep quality high. As the team grows, the balance shifts toward people leadership, and you decide how fast. You shape this new team's charter and set the standard for how every future Mistral datacenter comes online. WHAT YOU WILL DO - Build the delivery pipeline in Go: provisioning, configuration, validation, burn-in, network bring-up, software stack install. - Build the team from scratch: make the first hires, onboard and coach them, own their performance and growth paths — and set the tooling standards and the playbook every future site reuses. - Own time-to-acceptance and drive it down relentlessly — measure it, break it down, kill the slowest step first. - Work shoulder-to-shoulder with Hardware Design and Fleet Health — reliability starts at delivery. - Handle GPU fleets at scale: H100 and GB200-class nodes, InfiniBand and RoCE fabrics, and the failure modes they bring. - Partner with Product Managers and the datacenter org to plan delivery waves against capacity commitments. WHAT WE'RE LOOKING FOR - You have automated bare-metal fleets — you have written the software that turns racks into clusters. If you have done it by hand, you resented it and scripted it. - Hardware fluency: servers, GPUs, NICs, switches, firmware — you can read a parts list and a topology diagram. - 8+ years building backend or infrastructure systems, with at least 2 years leading engineers — real people leadership: you have hired, coached, and grown engineers, not just set technical direction. - Deep Linux: you are comfortable well below the application layer. - You have shipped production systems in Go. Not dabbled. Shipped. - Willing to travel to datacenter sites when the work demands it. - A ",
+      "locations": [
+        {
+          "label": "Paris, France",
+          "city": "Paris",
+          "country": "France",
+          "latitude": 48.8566,
+          "longitude": 2.3522,
+          "precision": "city"
+        },
+        {
+          "label": "Switzerland",
+          "city": "Switzerland",
+          "country": "Switzerland",
+          "latitude": 46.8182,
+          "longitude": 8.2275,
+          "precision": "country"
+        },
+        {
+          "label": "Spain",
+          "city": "Spain",
+          "country": "Spain",
+          "latitude": 40.4637,
+          "longitude": -3.7492,
+          "precision": "country"
+        },
+        {
+          "label": "Amsterdam, Netherlands",
+          "city": "Amsterdam",
+          "country": "Netherlands",
+          "latitude": 52.3676,
+          "longitude": 4.9041,
+          "precision": "city"
+        },
+        {
+          "label": "Warsaw, Poland",
+          "city": "Warsaw",
+          "country": "Poland",
+          "latitude": 52.2297,
+          "longitude": 21.0122,
+          "precision": "city"
+        },
+        {
+          "label": "Linz, Austria",
+          "city": "Austria",
+          "country": "Austria",
+          "latitude": 47.5162,
+          "longitude": 14.5501,
+          "precision": "country"
+        },
+        {
+          "label": "Munich, Germany",
+          "city": "Munich",
+          "country": "Germany",
+          "latitude": 48.1351,
+          "longitude": 11.582,
+          "precision": "city"
+        },
+        {
+          "label": "London, United Kingdom",
+          "city": "London",
+          "country": "United Kingdom",
+          "latitude": 51.5072,
+          "longitude": -0.1276,
+          "precision": "city"
+        },
+        {
+          "label": "Berlin, Germany",
+          "city": "Berlin",
+          "country": "Germany",
+          "latitude": 52.52,
+          "longitude": 13.405,
+          "precision": "city"
+        }
+      ],
+      "workplace": "Remote",
+      "employment": "FullTime",
+      "sourceTimestamp": "2026-10-28T22:35:02.299+00:00",
+      "sourceTimestampKind": "published"
+    },
+    {
+      "id": "job_fb0428e810e16bc20139",
+      "logo": "data/job-logos/f1fff94a8e80.ico",
+      "title": "Engineering Manager, Serverless Containers",
+      "company": "Mistral AI",
+      "companyType": "Startup",
+      "url": "https://jobs.ashbyhq.com/mistral.ai/6eba8817-79a2-4b3b-b1f4-e4a15d445834",
+      "source": "Ashby",
+      "boardUrl": "https://jobs.ashbyhq.com/mistral.ai",
+      "area": "Engineering",
+      "skills": [
+        "Go",
+        "Kubernetes"
+      ],
+      "description": "ABOUT MISTRAL Mistral provides full-stack AI solutions: from frontier models to developer tools, applications, and compute. We partner with enterprises tackling the hardest problems across high-stakes industries like finance, manufacturing, defense, healthcare, and the public sector, co-creating customized AI systems that they can run on their terms. We are a dynamic, collaborative team passionate about AI and its potential to transform society. Our diverse workforce thrives in competitive environments and is committed to driving innovation. Our teams are distributed between Europe, North America, Asia and the Middle East. We are creative, low-ego and team-spirited. THE TEAM Mistral is building a sovereign AI cloud for Europe. Our customers in finance, healthcare, and the public sector run frontier models on European-jurisdiction infrastructure, and the Cloud Platform team builds the systems that make that possible — compute orchestration, Kubernetes, bare metal, storage, networking, and the datacenter fleet that runs it all. We run it all on our own metal, our own network, our own datacenters — which means when something breaks, the fix is ours to write. European Compute Units let enterprises commit to multi-year capacity on that infrastructure, and we are scaling toward a gigawatt of compute across Europe by 2030. You will design and ship the layer every sovereign AI deployment depends on and shape the team building it. THE ROLE This is a people-leadership role from day one. You will manage the team — hiring, coaching, performance, growth paths, honest feedback — while staying close to the code: roughly half your time in architecture decisions and the hardest technical problems the team faces, the other half leading your squad. If you are looking for a senior IC role, this is not it. You will lead the team building our serverless containers product: the way developers run AI apps, MCP servers, APIs, and managed workers on our cloud without thinking about servers. Push a container, get an endpoint, scale from zero to thousands of instances and back down — across CPU and GPU. On a hyperscaler, the serverless layer is a product someone else built. Here you own it end to end: the scheduler that decides where a container lands, the routing path a request takes, the machinery that turns a scaled-to-zero service into a warm instance before a customer notices. All of it runs on metal, network, and datacenters we own. That tension is the product: scale-to-zero economics with cold starts in milliseconds, autoscaling that absorbs a launch spike without a config change, GPUs scheduled onto containers the way other platforms schedule CPU. The customers betting on this layer are the developers building the next generation of AI software on European infrastructure. WHAT YOU WILL DO - Own the container platform end to end: image delivery, placement, request routing, scale-up, scale-to-zero — across CPU and GPU. - Make cold starts a solved problem: snapshotting, prewarming, image-layer caching, whatever it takes for scale-from-zero to feel instant. - Treat AI workloads as the normal case: GPU-backed containers, streaming responses, long-lived connections, MCP servers that cost almost nothing while idle. - Write Go alongside your team and own the architecture and the hardest implementation decisions. - Grow the engineers, not just the software — set the standard for ownership and coach people past their comfort zone. - Own people management for the team: hiring, performance, growth paths, and honest feedback. - Partner with Product Managers to turn platform decisions into a product developers want to deploy on. WHAT WE'RE LOOKING FOR - 3+ years of real people leadership. You have managed engineers — hired, coached, given honest feedback, and grown them. Hands-on contribution matters here, but this role is judged on the team you build and lead, not just the code you write. - You have shipped production systems in Go. Not dabbled. Shipped. - Yo",
+      "locations": [
+        {
+          "label": "Paris, France",
+          "city": "Paris",
+          "country": "France",
+          "latitude": 48.8566,
+          "longitude": 2.3522,
+          "precision": "city"
+        },
+        {
+          "label": "Amsterdam, Netherlands",
+          "city": "Amsterdam",
+          "country": "Netherlands",
+          "latitude": 52.3676,
+          "longitude": 4.9041,
+          "precision": "city"
+        },
+        {
+          "label": "Munich, Germany",
+          "city": "Munich",
+          "country": "Germany",
+          "latitude": 48.1351,
+          "longitude": 11.582,
+          "precision": "city"
+        },
+        {
+          "label": "London, United Kingdom",
+          "city": "London",
+          "country": "United Kingdom",
+          "latitude": 51.5072,
+          "longitude": -0.1276,
+          "precision": "city"
+        },
+        {
+          "label": "Berlin, Germany",
+          "city": "Berlin",
+          "country": "Germany",
+          "latitude": 52.52,
+          "longitude": 13.405,
+          "precision": "city"
+        }
+      ],
+      "workplace": "Remote",
+      "employment": "FullTime",
+      "sourceTimestamp": "2026-10-28T22:34:32.424+00:00",
+      "sourceTimestampKind": "published"
+    },
+    {
+      "id": "job_4b45ec3a132b62406a92",
+      "logo": "data/job-logos/f1fff94a8e80.ico",
+      "title": "People Tech & Analytics Engineer",
+      "company": "Mistral AI",
+      "companyType": "Startup",
+      "url": "https://jobs.ashbyhq.com/mistral.ai/38140494-a26d-4b24-a777-3dd944215732",
+      "source": "Ashby",
+      "boardUrl": "https://jobs.ashbyhq.com/mistral.ai",
+      "area": "Engineering",
+      "skills": [
+        "Python",
+        "SQL",
+        "Data Engineering"
+      ],
+      "description": "ABOUT MISTRAL Mistral provides full-stack AI solutions: from frontier models to developer tools, applications, and compute. We partner with enterprises tackling the hardest problems across high-stakes industries like finance, manufacturing, defense, healthcare, and the public sector, co-creating customized AI systems that they can run on their terms. We are a dynamic, collaborative team passionate about AI and its potential to transform society. Our diverse workforce thrives in competitive environments and is committed to driving innovation. Our teams are distributed between Europe, North America, Asia and the Middle East. We are creative, low-ego and team-spirited. THE ROLE As a People Tech & Analytics Engineer on the People team, you will build the systems, data pipelines, and automations behind how Mistral runs People Operations. Reporting to the People Tech & Analytics Lead, you will turn the roadmap into reality: wiring our HR tech stack together, making data flow reliably between systems, and automating people processes with third-party tools as well as Mistral's own models, agents, and APIs. This is an individual contributor role for someone who loves building. You will spend most of your time in the systems and the data, deep-diving into problems: connecting HRIS, ATS, payroll, identity, and finance tools, standing up the data layer behind our people metrics, and shipping automations that remove manual work from the People team. If you are a data engineer or people technology specialist who wants to deliver meaningful automation outcomes at Europe's largest AI company, this is the role for you. WHAT YOU WILL DO - Build, maintain, and troubleshoot integrations and data pipelines across our HR systems (HRIS, ATS, payroll, identity and finance), run data quality checks, and fix inconsistencies at the source. - Implement and evolve the Metabase visualisation layer of our people data lake, build the dashboards and self-serve reporting managers and People partners rely on, and run hands-on analyses of workforce trends, retention and organisational health, supporting the move to conversational insights for leadership. - Design, build, test and document automated workflows, mainly with Mistral's own models, agents and APIs, with human review wherever decisions affect people, monitor live automations with alerting, error handling, logging and runbooks, and prototype AI use cases on people processes, productionising the ones that prove their worth. - Implement configuration changes across the HR tech stack (workflows, fields, roles and permissions, new countries and entities), support testing and rollout of system changes and integrations, and act as first-line troubleshooter for the People team, leading issue resolution through to production with a clear audit trail. - Architect end-to-end HR workflows with key stakeholders in HR Operations, Business Partnering and Reward, and implement data governance in practice: quality standards, access controls, retention rules and audit trails for employee data. - Provide clear enablement materials in Notion so the People team and managers can use our systems confidently, with strong tier-1 support via a bot. WHAT WE'RE LOOKING FOR - Experience in data engineering, analytics engineering or HR technology, ideally within an HR or People function or working closely with one as a stakeholder. - Strong practical SQL and Python skills: you are comfortable building pipelines and transformations yourself. - Hands-on experience with HR systems such as Ashby, and integrating them with ATS, payroll, identity and finance tools via APIs, middleware and data pipelines. - Real automation experience: you have built and maintained workflows in n8n or similar tools such as Make, Zapier, Workato or Langdock, and you are excited to do the same with Mistral's own models and tooling. - Working experience with data warehousing (Snowflake, BigQuery) and the modern data stack (dbt or similar), and with visualisat",
+      "locations": [
+        {
+          "label": "Paris, France",
+          "city": "Paris",
+          "country": "France",
+          "latitude": 48.8566,
+          "longitude": 2.3522,
+          "precision": "city"
+        },
+        {
+          "label": "London, United Kingdom",
+          "city": "London",
+          "country": "United Kingdom",
+          "latitude": 51.5072,
+          "longitude": -0.1276,
+          "precision": "city"
+        }
+      ],
+      "workplace": null,
+      "employment": "FullTime",
+      "sourceTimestamp": "2026-10-28T15:56:06.712+00:00",
+      "sourceTimestampKind": "published"
+    },
+    {
+      "id": "job_e21844c154dd4111a960",
+      "logo": "data/job-logos/f1fff94a8e80.ico",
+      "title": "People Tech & Analytics Lead",
+      "company": "Mistral AI",
+      "companyType": "Startup",
+      "url": "https://jobs.ashbyhq.com/mistral.ai/90032a01-19af-4a22-9ad0-b3702477b692",
+      "source": "Ashby",
+      "boardUrl": "https://jobs.ashbyhq.com/mistral.ai",
+      "area": "People & HR",
+      "skills": [],
+      "description": "ABOUT MISTRAL Mistral provides full-stack AI solutions: from frontier models to developer tools, applications, and compute. We partner with enterprises tackling the hardest problems across high-stakes industries like finance, manufacturing, defense, healthcare, and the public sector, co-creating customized AI systems that they can run on their terms. We are a dynamic, collaborative team passionate about AI and its potential to transform society. Our diverse workforce thrives in competitive environments and is committed to driving innovation. Our teams are distributed between Europe, North America, Asia and the Middle East. We are creative, low-ego and team-spirited. THE ROLE As a People Tech & Analytics Lead on the People team, you will turn people data into better decisions at Mistral. You will own the roadmap for our HR technology stack, from the HRIS transformation to integrations and data architecture, and build the analytics, dashboards and models that help our leaders understand how we hire, grow, retain and reward our people, and act on what they learn. You will do it the Mistral way: automating people processes with our own models, workflows and agents, and partnering with HR Operations, Business Partnering, Legal, Finance and IT to turn business needs into well-designed systems. You will lead a small team, starting with a People Tech & Analytics Engineer, alongside a large team of agents running our back-end HR processes, giving a fast-growing global company the clarity to make great people decisions at speed, with a seamless employee experience from hire to retire. What You Will Do - Own the people-tech roadmap and the HR tech stack end to end: what we build, buy, integrate or retire, the configuration standards, workflows, roles and permissions that govern it, vendor relationships, and the data pipelines across HRIS, ATS, payroll, identity and finance so data flows reliably between systems. - Define the people metrics that matter and lead analysis on workforce trends, retention and organisational health, turning insight into clear recommendations and workforce planning. - Oversee dashboards, self-serve reporting and conversational insights, so managers get answers without waiting on a spreadsheet. - Drive people-data governance, partnering with Legal and Privacy to keep people data compliant and AI use on it lawful, transparent and proportionate. - Own the automation and AI roadmap for people processes: build agents and workflows with Mistral's own models and APIs, set the standards for how they're designed, tested and monitored, and lead cross-functional projects from scoping to rollout. - Manage and mentor the People Tech & Analytics Engineer, set priorities, and grow the team as needs evolve. WHAT WE'RE LOOKING FOR - Deep experience in HR technology and people analytics, ideally in a high-growth tech company: expert in at least one, broad in both, and comfortable building from scratch. - A strong product mindset: you turn complex business and employee needs into intuitive, practical solutions, starting from the HR need, not the technology. - Experience with global HR tech platforms such as HiBob, Deel or Rippling, and the integrations, data architecture and governance connecting them to ATS, payroll, identity and finance. - Strong workflow-automation experience (n8n or similar) and a real appetite to build with our own LLMs, agents and APIs, with the judgement to know where AI helps and where it doesn't. - Solid analytics foundations (forecasting, visualisation, modern data stack such as Snowflake or BigQuery), experience building people analytics and data governance on workforce data, and working knowledge of GDPR as it applies to employee data. - Experience presenting to senior leaders, turning data into clear, decision-ready recommendations, and managing or mentoring technical or analytical team members, with the hands-on pragmatism to prototype and review technical work yourself. WHAT WE OFFER We offer a comp",
+      "locations": [
+        {
+          "label": "Paris, France",
+          "city": "Paris",
+          "country": "France",
+          "latitude": 48.8566,
+          "longitude": 2.3522,
+          "precision": "city"
+        },
+        {
+          "label": "London, United Kingdom",
+          "city": "London",
+          "country": "United Kingdom",
+          "latitude": 51.5072,
+          "longitude": -0.1276,
+          "precision": "city"
+        }
+      ],
+      "workplace": "Hybrid",
+      "employment": "FullTime",
+      "sourceTimestamp": "2026-10-28T15:28:26.121+00:00",
+      "sourceTimestampKind": "published"
+    },
     {
       "id": "job_ab3cdca3f4b9456539c8",
       "logo": "data/job-logos/f1fff94a8e80.ico",
@@ -1938,255 +2386,6 @@
       "workplace": "OnSite",
       "employment": "FullTime",
       "sourceTimestamp": "2026-10-13T13:58:49.343+00:00",
-      "sourceTimestampKind": "published"
-    },
-    {
-      "id": "job_fb0428e810e16bc20139",
-      "logo": "data/job-logos/f1fff94a8e80.ico",
-      "title": "Engineering Team Lead, Serverless Containers",
-      "company": "Mistral AI",
-      "companyType": "Startup",
-      "url": "https://jobs.ashbyhq.com/mistral.ai/6eba8817-79a2-4b3b-b1f4-e4a15d445834",
-      "source": "Ashby",
-      "boardUrl": "https://jobs.ashbyhq.com/mistral.ai",
-      "area": "Engineering",
-      "skills": [
-        "Go",
-        "Kubernetes"
-      ],
-      "description": "ABOUT MISTRAL Mistral provides full-stack AI solutions: from frontier models to developer tools, applications, and compute. We partner with enterprises tackling the hardest problems across high-stakes industries like finance, manufacturing, defense, healthcare, and the public sector, co-creating customized AI systems that they can run on their terms. We are a dynamic, collaborative team passionate about AI and its potential to transform society. Our diverse workforce thrives in competitive environments and is committed to driving innovation. Our teams are distributed between Europe, North America, Asia and the Middle East. We are creative, low-ego and team-spirited. THE TEAM Mistral is building a sovereign AI cloud for Europe. Our customers in finance, healthcare, and the public sector run frontier models on European-jurisdiction infrastructure, and the Cloud Platform team builds the systems that make that possible — compute orchestration, Kubernetes, bare metal, storage, networking, and the datacenter fleet that runs it all. We run it all on our own metal, our own network, our own datacenters — which means when something breaks, the fix is ours to write. European Compute Units let enterprises commit to multi-year capacity on that infrastructure, and we are scaling toward a gigawatt of compute across Europe by 2030. You will design and ship the layer every sovereign AI deployment depends on and shape the team building it. THE ROLE This is a people-leadership role from day one. You will manage the team — hiring, coaching, performance, growth paths, honest feedback — while staying close to the code: roughly half your time in architecture decisions and the hardest technical problems the team faces, the other half leading your squad. If you are looking for a senior IC role, this is not it. You will lead the team building our serverless containers product: the way developers run AI apps, MCP servers, APIs, and managed workers on our cloud without thinking about servers. Push a container, get an endpoint, scale from zero to thousands of instances and back down — across CPU and GPU. On a hyperscaler, the serverless layer is a product someone else built. Here you own it end to end: the scheduler that decides where a container lands, the routing path a request takes, the machinery that turns a scaled-to-zero service into a warm instance before a customer notices. All of it runs on metal, network, and datacenters we own. That tension is the product: scale-to-zero economics with cold starts in milliseconds, autoscaling that absorbs a launch spike without a config change, GPUs scheduled onto containers the way other platforms schedule CPU. The customers betting on this layer are the developers building the next generation of AI software on European infrastructure. WHAT YOU WILL DO - Own the container platform end to end: image delivery, placement, request routing, scale-up, scale-to-zero — across CPU and GPU. - Make cold starts a solved problem: snapshotting, prewarming, image-layer caching, whatever it takes for scale-from-zero to feel instant. - Treat AI workloads as the normal case: GPU-backed containers, streaming responses, long-lived connections, MCP servers that cost almost nothing while idle. - Write Go alongside your team and own the architecture and the hardest implementation decisions. - Grow the engineers, not just the software — set the standard for ownership and coach people past their comfort zone. - Own people management for the team: hiring, performance, growth paths, and honest feedback. - Partner with Product Managers to turn platform decisions into a product developers want to deploy on. WHAT WE'RE LOOKING FOR - 2+ years of real people leadership. You have managed engineers — hired, coached, given honest feedback, and grown them. Hands-on contribution matters here, but this role is judged on the team you build and lead, not just the code you write. - You have shipped production systems in Go. Not dabbled. Shipped. - Yo",
-      "locations": [
-        {
-          "label": "Paris, France",
-          "city": "Paris",
-          "country": "France",
-          "latitude": 48.8566,
-          "longitude": 2.3522,
-          "precision": "city"
-        },
-        {
-          "label": "Amsterdam, Netherlands",
-          "city": "Amsterdam",
-          "country": "Netherlands",
-          "latitude": 52.3676,
-          "longitude": 4.9041,
-          "precision": "city"
-        },
-        {
-          "label": "Munich, Germany",
-          "city": "Munich",
-          "country": "Germany",
-          "latitude": 48.1351,
-          "longitude": 11.582,
-          "precision": "city"
-        },
-        {
-          "label": "London, United Kingdom",
-          "city": "London",
-          "country": "United Kingdom",
-          "latitude": 51.5072,
-          "longitude": -0.1276,
-          "precision": "city"
-        },
-        {
-          "label": "Berlin, Germany",
-          "city": "Berlin",
-          "country": "Germany",
-          "latitude": 52.52,
-          "longitude": 13.405,
-          "precision": "city"
-        }
-      ],
-      "workplace": null,
-      "employment": "FullTime",
-      "sourceTimestamp": "2026-10-12T08:53:54.708+00:00",
-      "sourceTimestampKind": "published"
-    },
-    {
-      "id": "job_2f04eb1999a8f8440548",
-      "logo": "data/job-logos/f1fff94a8e80.ico",
-      "title": "Applied AI, Technical Lead, Forward Deployed AI Engineer - London",
-      "company": "Mistral AI",
-      "companyType": "Startup",
-      "url": "https://jobs.ashbyhq.com/mistral.ai/dacccac8-1603-4d10-85d4-cde19389807e",
-      "source": "Ashby",
-      "boardUrl": "https://jobs.ashbyhq.com/mistral.ai",
-      "area": "Data & AI",
-      "skills": [
-        "Python",
-        "PyTorch",
-        "Machine Learning",
-        "LLM"
-      ],
-      "description": "ABOUT MISTRAL Mistral provides full-stack AI solutions: from frontier models to developer tools, applications, and compute. We partner with enterprises tackling the hardest problems across high-stakes industries like finance, manufacturing, defense, healthcare, and the public sector, co-creating customized AI systems that they can run on their terms. We are a dynamic, collaborative team passionate about AI and its potential to transform society. Our diverse workforce thrives in competitive environments and is committed to driving innovation. Our teams are distributed between Europe, North America, Asia and the Middle East. We are creative, low-ego and team-spirited. About The Job: Mistral AI is seeking a Technical Lead, Applied AI to drive the technical strategy, execution, and delivery of complex AI solutions for our enterprise customers. In this role, you will lead a project teams of Applied AI Engineers, ensuring the successful deployment of Mistral AI products and the development of high-impact, scalable AI use cases. You will act as the primary technical point of contact for our most strategic customers, guiding them through the entire lifecycle—from pre-sales to post-implementation—while collaborating closely with research, product, and engineering teams to shape the future of our offerings. As a Technical Lead, you will bridge the gap between cutting-edge AI research and real-world enterprise applications, ensuring our solutions are robust, scalable, and aligned with both customer needs and Mistral’s technological vision. What you will do - Deliver as an IC the critical lines of codes of our complex projects, you’ll be hands-on and de-risk the critical parts of our complex projects. You’ll stay deeply involved in coding, reviewing, and optimizing AI solutions. - Lead technical teams of Applied AI Engineers, providing mentorship, technical guidance, and best practices for deploying state-of-the-art GenAI applications across industries. - Lead technical discussions during pre-sales, translating customer requirements into actionable solutions and communicating Mistral’s technological advantages to diverse stakeholders. - Design and oversee the implementation of complex AI systems, including fine-tuning, RAG, agentic workflows, and custom LLM applications, ensuring alignment with Mistral’s product roadmap and open-source initiatives. - Drive innovation by identifying emerging trends in AI, evaluating new tools and methodologies, and championing best practices for fine-tuning, inference, and deployment. - Work closely with product managers, researchers, and engineers to ensure seamless integration of customer feedback into Mistral’s product development cycle. How We Work in Applied AI - We care about people and outputs. - What matters is what you ship, not the time you spend on it - Bureaucracy is where urgency goes to vanish. You talk to whoever you need to talk to. The best idea wins, whether it comes from a principal engineer or someone in their first week. - Always ask why. The best solutions come from deep understanding, not from copying what worked before - We say what we mean. Feedback is direct, timely, and given because we care. - No politics. Low ego, high standards. - We embrace an unstructured environment and find joy in it. About you - You are fluent in English. - You hold a PhD or Master’s degree in AI, Machine Learning, Computer Science, or a related field. - You have 7/8+ years of experience in AI/ML, with at least 2+ years in a technical leadership role (e.g., Tech Lead, Engineering Manager, or Solutions Architect) focused on AI products or enterprise solutions. - You have a proven track record of leading teams to deliver complex AI projects, from prototyping to production, in industries such as tech, finance, healthcare, or industrial automation. - You possess deep expertise in fine-tuning LLMs, advanced RAG, agentic systems, and deploying NLP applications at scale. - You are proficient in Python, PyTorch, ",
-      "locations": [
-        {
-          "label": "London, United Kingdom",
-          "city": "London",
-          "country": "United Kingdom",
-          "latitude": 51.5072,
-          "longitude": -0.1276,
-          "precision": "city"
-        }
-      ],
-      "workplace": "OnSite",
-      "employment": "FullTime",
-      "sourceTimestamp": "2026-10-09T14:36:04.645+00:00",
-      "sourceTimestampKind": "published"
-    },
-    {
-      "id": "job_02803f79790334959281",
-      "logo": "data/job-logos/f1fff94a8e80.ico",
-      "title": "Applied AI, Forward Deployed Machine Learning Engineer - Amsterdam",
-      "company": "Mistral AI",
-      "companyType": "Startup",
-      "url": "https://jobs.ashbyhq.com/mistral.ai/9d6b3153-3162-4a89-bef8-bc24e18dabc6",
-      "source": "Ashby",
-      "boardUrl": "https://jobs.ashbyhq.com/mistral.ai",
-      "area": "Data & AI",
-      "skills": [
-        "Python",
-        "PyTorch",
-        "Machine Learning",
-        "LLM"
-      ],
-      "description": "ABOUT MISTRAL Mistral provides full-stack AI solutions: from frontier models to developer tools, applications, and compute. We partner with enterprises tackling the hardest problems across high-stakes industries like finance, manufacturing, defense, healthcare, and the public sector, co-creating customized AI systems that they can run on their terms. We are a dynamic, collaborative team passionate about AI and its potential to transform society. Our diverse workforce thrives in competitive environments and is committed to driving innovation. Our teams are distributed between Europe, North America, Asia and the Middle East. We are creative, low-ego and team-spirited. About The Job Mistral AI is seeking a Applied AI Engineer to facilitate the adoption of its products among customers and collaborate with them to address complex technical challenges. The Applied AI team is Mistral's customer-facing technical organization. We work directly with enterprise clients from pre-sales through implementation to deploy cutting-edge AI solutions that deliver measurable business impact. Our team combines deep ML expertise with strong customer engagement skills, operating like startup CTOs who own end-to-end project execution. By joining the team you'll will bridge the gap between cutting-edge AI research and real-world enterprise applications, ensuring our solutions are robust, scalable, and aligned with both customer needs and Mistral's technological vision. What you will do - You’ll individually help deploy into production use cases with a considerable business impact across various industries. - You’ll work on state-of-the-art GenAI applications from consumer products to industrial use cases, driving with our customers a crucial technological transformation. - You’ll work in collaboration with our researchers, other AI engineers, product engineers on our most complex customer projects involving complex fine-tuning, state-of-the-art LLM applications, and contributing to our open-source codebases our open source codebases for tasks such as inference and fine-tuning. - You’ll be involved in pre-sales calls to understand potential clients' needs, challenges, and aspirations. You will provide technical guidance on our products and explain Mistral technologies to various stakeholders. - Your collaboration with our product and science team to improve continuously our product and model capabilities based on customers’ feedback How We Work in Applied AI - We care about people and outputs. - What matters is what you ship, not the time you spend on it - Bureaucracy is where urgency goes to vanish. You talk to whoever you need to talk to. The best idea wins, whether it comes from a principal engineer or someone in their first week. - Always ask why. The best solutions come from deep understanding, not from copying what worked before - We say what we mean. Feedback is direct, timely, and given because we care. - No politics. Low ego, high standards. - We embrace an unstructured environment and find joy in it. About you - You are fluent in English - You have 2+ years as a technical individual contributor (data scientist or software engineer) on AI-based products - You have proven experience in AI or machine learning product implementation with APIs, back-end and front-end interfaces. - You have experience in Fine Tuning LLMs, tackling advanced RAG or agentic use cases - You have deep understanding of concepts and algorithms underlying machine learning and LLMs - You have strong technical coding skills in Python - You hold strong communication skills with an ability to explain complex technical concepts in simple terms with technical and non-technical audiences Ideally you have: - Contributed to open-source projects in particular in the space of LLMs - Experience as a Customer Engineer, Forward Deployed Engineer, Sales Engineer, Solutions Architect or Technical Product Manager - You have experience with deep learning with Pytorch Why join us? You’ll have",
-      "locations": [
-        {
-          "label": "Amsterdam, Netherlands",
-          "city": "Amsterdam",
-          "country": "Netherlands",
-          "latitude": 52.3676,
-          "longitude": 4.9041,
-          "precision": "city"
-        }
-      ],
-      "workplace": "OnSite",
-      "employment": "FullTime",
-      "sourceTimestamp": "2026-10-09T14:25:41.918+00:00",
-      "sourceTimestampKind": "published"
-    },
-    {
-      "id": "job_312ed11b5a0f8d0656ad",
-      "logo": "data/job-logos/f1fff94a8e80.ico",
-      "title": "Applied AI, Forward Deployed Machine Learning Engineer - London",
-      "company": "Mistral AI",
-      "companyType": "Startup",
-      "url": "https://jobs.ashbyhq.com/mistral.ai/4c57adc5-5beb-49d2-9202-1db0807b9cb7",
-      "source": "Ashby",
-      "boardUrl": "https://jobs.ashbyhq.com/mistral.ai",
-      "area": "Data & AI",
-      "skills": [
-        "Python",
-        "PyTorch",
-        "Machine Learning",
-        "LLM"
-      ],
-      "description": "ABOUT MISTRAL Mistral provides full-stack AI solutions: from frontier models to developer tools, applications, and compute. We partner with enterprises tackling the hardest problems across high-stakes industries like finance, manufacturing, defense, healthcare, and the public sector, co-creating customized AI systems that they can run on their terms. We are a dynamic, collaborative team passionate about AI and its potential to transform society. Our diverse workforce thrives in competitive environments and is committed to driving innovation. Our teams are distributed between Europe, North America, Asia and the Middle East. We are creative, low-ego and team-spirited. About The Job Mistral AI is seeking a Applied AI Engineer to facilitate the adoption of its products among customers and collaborate with them to address complex technical challenges. The Applied AI team is Mistral's customer-facing technical organization. We work directly with enterprise clients from pre-sales through implementation to deploy cutting-edge AI solutions that deliver measurable business impact. Our team combines deep ML expertise with strong customer engagement skills, operating like startup CTOs who own end-to-end project execution. By joining the team you'll will bridge the gap between cutting-edge AI research and real-world enterprise applications, ensuring our solutions are robust, scalable, and aligned with both customer needs and Mistral's technological vision. What you will do - You’ll individually help deploy into production use cases with a considerable business impact across various industries. - You’ll work on state-of-the-art GenAI applications from consumer products to industrial use cases, driving with our customers a crucial technological transformation. - You’ll work in collaboration with our researchers, other AI engineers, product engineers on our most complex customer projects involving complex fine-tuning, state-of-the-art LLM applications, and contributing to our open-source codebases our open source codebases for tasks such as inference and fine-tuning. - You’ll be involved in pre-sales calls to understand potential clients' needs, challenges, and aspirations. You will provide technical guidance on our products and explain Mistral technologies to various stakeholders. - Your collaboration with our product and science team to improve continuously our product and model capabilities based on customers’ feedback How We Work in Applied AI - We care about people and outputs. - What matters is what you ship, not the time you spend on it - Bureaucracy is where urgency goes to vanish. You talk to whoever you need to talk to. The best idea wins, whether it comes from a principal engineer or someone in their first week. - Always ask why. The best solutions come from deep understanding, not from copying what worked before - We say what we mean. Feedback is direct, timely, and given because we care. - No politics. Low ego, high standards. - We embrace an unstructured environment and find joy in it. About you - You are fluent in English - You have 2+ years as a technical individual contributor (data scientist or software engineer) on AI-based products - You have proven experience in AI or machine learning product implementation with APIs, back-end and front-end interfaces. - You have experience in Fine Tuning LLMs, tackling advanced RAG or agentic use cases - You have deep understanding of concepts and algorithms underlying machine learning and LLMs - You have strong technical coding skills in Python - You hold strong communication skills with an ability to explain complex technical concepts in simple terms with technical and non-technical audiences Ideally you have: - Contributed to open-source projects in particular in the space of LLMs - Experience as a Customer Engineer, Forward Deployed Engineer, Sales Engineer, Solutions Architect or Technical Product Manager - You have experience with deep learning with Pytorch Why join us? You’ll have",
-      "locations": [
-        {
-          "label": "London, United Kingdom",
-          "city": "London",
-          "country": "United Kingdom",
-          "latitude": 51.5072,
-          "longitude": -0.1276,
-          "precision": "city"
-        }
-      ],
-      "workplace": "OnSite",
-      "employment": "FullTime",
-      "sourceTimestamp": "2026-10-09T14:15:58.066+00:00",
-      "sourceTimestampKind": "published"
-    },
-    {
-      "id": "job_daacc744621c19259112",
-      "logo": "data/job-logos/f1fff94a8e80.ico",
-      "title": "Head of HR Business Partner",
-      "company": "Mistral AI",
-      "companyType": "Startup",
-      "url": "https://jobs.ashbyhq.com/mistral.ai/53b65f67-323d-4612-8c35-812f33682c14",
-      "source": "Ashby",
-      "boardUrl": "https://jobs.ashbyhq.com/mistral.ai",
-      "area": "Operations",
-      "skills": [],
-      "description": "ABOUT MISTRAL Mistral provides full-stack AI solutions: from frontier models to developer tools, applications, and compute. We partner with enterprises tackling the hardest problems across high-stakes industries like finance, manufacturing, defense, healthcare, and the public sector, co-creating customized AI systems that they can run on their terms. We are a dynamic, collaborative team passionate about AI and its potential to transform society. Our diverse workforce thrives in competitive environments and is committed to driving innovation. Our teams are distributed between Europe, North America, Asia and the Middle East. We are creative, low-ego and team-spirited. THE ROLE As the Head of HR Business Partner , you will lead the HR People Partner function and help shape the people strategy that enables Mistral AI to grow. You will partner with senior leaders on organizational topics, guide complex people decisions, and ensure managers and employees receive consistent, high-quality support across the business. You will coach and support the HR People Partner team while driving the development of scalable people policies, programs, and processes. Your work will strengthen our culture, align people initiatives with business priorities, and build the foundations needed to support Mistral AI's continued growth. WHAT YOU WILL DO - Lead and develop the HR People Partner team, providing coaching, guidance, and support. - Partner with senior leaders on organizational design, talent, performance, and employee relations topics. - Define and evolve people strategies that support business priorities and organizational growth. - Drive the development of scalable People policies, programs, and processes across the organization. - Use People metrics and organizational insights to inform decisions and advise leadership. - Ensure a consistent employee experience and approach to people practices across teams and geographies. - Champion Mistral AI's culture by embedding its values into leadership practices and People initiatives. WHAT WE'RE LOOKING FOR - Bachelor's or Master's degree in Human Resources, Business Administration, or a related field. - Significant experience leading human resources business partnering in a startup or high-growth environment. - Experience leading and developing People Partners or human resources teams. - Experience supporting international employee populations, with strong knowledge of French employment law and human resources practices. - Proven ability to develop and implement people strategies that align with business priorities and organizational growth. - Strong communication, coaching, and stakeholder management skills, with the ability to influence senior leaders. - Strong analytical and problem-solving skills, with confidence using data to inform decisions. - A hands-on approach, a builder mindset, and experience creating scalable people practices. WHAT WE OFFER We offer a comprehensive benefits package designed to support your well-being, growth, and work-life balance. Benefits vary by country and may include healthcare coverage, parental leave, retirement plans, relocation support, wellness programs, meal and transportation allowances, and other location-specific perks. For the most up-to-date details on benefits available in your location, please refer to our Benefits page https://app.notion.com/p/mistralai/Benefits-at-Mistral-36e6ba59a7fe836b93dd01737fcc27ef?source=copy_link. PRIVACY POLICY Your privacy matters to us. You can learn more about how we handle your personal data in our Applicant Privacy Policy https://legal.mistral.ai/terms/applicant-privacy-policy.",
-      "locations": [
-        {
-          "label": "Paris, France",
-          "city": "Paris",
-          "country": "France",
-          "latitude": 48.8566,
-          "longitude": 2.3522,
-          "precision": "city"
-        }
-      ],
-      "workplace": null,
-      "employment": "FullTime",
-      "sourceTimestamp": "2026-10-09T10:27:20.059+00:00",
-      "sourceTimestampKind": "published"
-    },
-    {
-      "id": "job_40e84ab2f7df9f05ab77",
-      "logo": "data/job-logos/f1fff94a8e80.ico",
-      "title": "Benefits Manager",
-      "company": "Mistral AI",
-      "companyType": "Startup",
-      "url": "https://jobs.ashbyhq.com/mistral.ai/99a0af1d-8bc9-4b77-b187-77374a571c62",
-      "source": "Ashby",
-      "boardUrl": "https://jobs.ashbyhq.com/mistral.ai",
-      "area": "Operations",
-      "skills": [
-        "Security"
-      ],
-      "description": "ABOUT MISTRAL Mistral provides full-stack AI solutions: from frontier models to developer tools, applications, and compute. We partner with enterprises tackling the hardest problems across high-stakes industries like finance, manufacturing, defense, healthcare, and the public sector, co-creating customized AI systems that they can run on their terms. We are a dynamic, collaborative team passionate about AI and its potential to transform society. Our diverse workforce thrives in competitive environments and is committed to driving innovation. Our teams are distributed between Europe, North America, Asia and the Middle East. We are creative, low-ego and team-spirited. The role As a Benefits Manager at Mistral, you will own and scale the benefits infrastructure supporting our team across multiple countries. You will partner closely with HR, Finance, and Legal to ensure our benefits offerings are competitive, compliant, and aligned with our growth, translating complex compliance and operational needs into streamlined, employee-focused experiences. What you'll do - Own benefits strategy end-to-end across our countries, including enrollment, renewals, changes, and offboarding, ensuring reliable issue resolution and compliance. - Drive benefits strategy by benchmarking market competitiveness, proposing local adjustments, and recommending offerings in line with our Total Rewards strategy. - Manage brokers, insurers, and benefits vendors: lead RFPs and renewals, negotiate cost-quality trade-offs, and enforce service level agreements. - Ensure compliance with local benefits, insurance, and social-security regulations in all operating jurisdictions, proactively adapting practices and flagging evolving risks in cooperation with Legal. - Design and enhance benefits processes and policies to be clear, scalable, and well-documented; lead impactful improvement projects as the company scales. - Leverage data to inform decisions by maintaining high-quality benefits data, building reporting and KPIs (such as cost per employee, participation, utilization, satisfaction), and translating insights into actionable recommendations. - Own the employee experience of benefits by delivering clear, empathetic communications during enrollment and life events and sensitively handling situations such as illness, family changes, or loss. - Partner with Finance for benefits budgeting and forecasting, and collaborate with HR Ops and payroll to ensure deductions and contributions are accurate and timely. - Serve as a key contributor on Mobility, working closely with cross-functional groups to keep our immigration and mobility offerings compliant and competitive. What we're looking for - Experience managing benefits for multi-country organizations during hypergrowth and new market entry - Deep knowledge of benefits regulations and practices in at least one core region (EU and/or US), with sound judgment for consulting experts - Skilled in managing, negotiating with, and holding external vendors and brokers accountable for cost and service quality - Proven ability to design, document, and improve scalable processes - Proficient in HRIS/benefits platforms, strong reporting, and keen on automation/AI to increase efficiency - Excellent stakeholder communication: empathetic with employees, credible with leadership on strategic trade-offs - Team-first, low-ego mindset with a focus on cross-functional collaboration and employee experience WHAT WE OFFER We offer a comprehensive benefits package designed to support your well-being, growth, and work-life balance. Benefits vary by country and may include healthcare coverage, parental leave, retirement plans, relocation support, wellness programs, meal and transportation allowances, and other location-specific perks. For the most up-to-date details on benefits available in your location, please refer to our Benefits page https://app.notion.com/p/mistralai/Benefits-at-Mistral-36e6ba59a7fe836b93dd01737fcc27ef?source=copy_link. ",
-      "locations": [
-        {
-          "label": "London, United Kingdom",
-          "city": "London",
-          "country": "United Kingdom",
-          "latitude": 51.5072,
-          "longitude": -0.1276,
-          "precision": "city"
-        },
-        {
-          "label": "Paris, France",
-          "city": "Paris",
-          "country": "France",
-          "latitude": 48.8566,
-          "longitude": 2.3522,
-          "precision": "city"
-        }
-      ],
-      "workplace": null,
-      "employment": "FullTime",
-      "sourceTimestamp": "2026-10-09T07:54:42.170+00:00",
-      "sourceTimestampKind": "published"
-    },
-    {
-      "id": "job_ca28406d6515a548cec9",
-      "logo": "data/job-logos/f1fff94a8e80.ico",
-      "title": "Talent Acquisition Specialist, Early Careers - EMEA",
-      "company": "Mistral AI",
-      "companyType": "Startup",
-      "url": "https://jobs.ashbyhq.com/mistral.ai/72a2da95-0844-4b5a-8656-7d73360c788d",
-      "source": "Ashby",
-      "boardUrl": "https://jobs.ashbyhq.com/mistral.ai",
-      "area": "People & HR",
-      "skills": [],
-      "description": "ABOUT MISTRAL Mistral provides full-stack AI solutions: from frontier models to developer tools, applications, and compute. We partner with enterprises tackling the hardest problems across high-stakes industries like finance, manufacturing, defense, healthcare, and the public sector, co-creating customized AI systems that they can run on their terms. We are a dynamic, collaborative team passionate about AI and its potential to transform society. Our diverse workforce thrives in competitive environments and is committed to driving innovation. Our teams are distributed between Europe, North America, Asia and the Middle East. We are creative, low-ego and team-spirited. THE ROLE As a Talent Acquisition Lead, Early Careers, you will play a pivotal role in shaping the next generation of AI talent at Mistral. You will design, build, and run our global early careers strategy — spanning internships, graduate hiring, and campus recruitment — positioning Mistral as a premier destination for ambitious students and recent graduates in AI. This is a rare opportunity to build early careers programs from the ground up at one of the world's leading AI companies. You will own the full lifecycle of the intern and graduate experience: from sourcing and selecting high-potential talent through international school and university partnerships, to designing inclusive, well-structured programs that develop and convert that talent into future Mistral employees. Working from our Paris HQ, you will partner closely with hiring managers across all our departments to ensure early careers pipelines keep pace with our rapid global growth. 📌 Location: this role is located at our Paris, France HQ, with hybrid onsite collaboration. WHAT YOU WILL DO - Design and execute strategic early careers programs with clear goals for intern and graduate pipelines, aligned with Mistral's global growth plans and talent needs. - Partner with hiring managers and the People team to define role requirements, train and scale interview panels, and align on early careers priorities. - Own the end-to-end recruitment process for interns and early careers hires globally — from role definition and sourcing through offers and conversion decisions. - Build and maintain partnerships with top international schools and universities, creating sustainable, multi-year sourcing channels for high-potential candidates. - Build inclusive and equitable intern programs with structured learning objectives, meaningful core projects, and mentor/buddy pairing systems for every cohort - Drive global campus recruitment: represent Mistral at career fairs, host on-campus events, and develop targeted employer branding strategies for student markets. - Recruit, onboard, and lead a team of hands-on recruiters: set priorities, coach and develop the team, and scale capacity in step with hiring demand across geographies. - Build scalable systems and best practices: workflows, documentation, and tools to support rapid growth across geographies. - Embody our culture as an ambassador for Mistral, on campus and internally. WHAT WE'RE LOOKING FOR - Proven experience: 7+ years in recruiting, preferably in tech, high-growth, or competitive environments. - Early careers depth: Exposure to global early careers, internships, or graduate recruitment - Team leadership: Demonstrated experience building, growing, and managing a team of recruiters in a fast-scaling environment. - Partnership expertise: Expertise in international school and university partnership development and global campus recruitment. - Program building: Demonstrated experience building inclusive and equitable intern programs, with excellent project management skills and exceptional attention to detail. - Data-driven mindset: Skilled at analyzing metrics to solve problems and optimize recruitment processes. - Global perspective: Experience with international hiring and fluent English communication; French is a plus. - Stakeholder influence: Ability to advise ",
-      "locations": [
-        {
-          "label": "Paris, France",
-          "city": "Paris",
-          "country": "France",
-          "latitude": 48.8566,
-          "longitude": 2.3522,
-          "precision": "city"
-        }
-      ],
-      "workplace": "Hybrid",
-      "employment": "FullTime",
-      "sourceTimestamp": "2026-10-09T07:48:30.140+00:00",
       "sourceTimestampKind": "published"
     }
   ],
