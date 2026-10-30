@@ -1,5 +1,12 @@
 # Repository context — start here
 
+## Reverse-engineering-informed build-stack analysis
+
+- Added `docs/REA_BUILD_STACK.md`: what to use to build a custom StartupMap + Jack & Jill. REA CLI/MCP was unusable (Node 26.7.0 unsupported, pi registration missing), so static inspection of the public homepages and StartupMap's public JS bundle was used instead; every finding is labeled observed/inferred/unknown.
+- Observed: StartupMap = React + Vite + Mapbox GL JS + Supabase storage, with a public `/api/*` route surface (jobs, startups, funds, me/matches, following, saved-jobs, match-emails, logo-proxy). Jack & Jill = Next.js App Router (Turbopack) on Vercel. No private APIs called, no tokens extracted, no runtime observed.
+- Document maps both products to a recommended stack (keep MapLibre/OpenFreeMap + Supabase, add React/Vite and Next.js where warranted) and lists build items. Documentation-only change.
+
+
 ## Employer integration plan
 
 - Added `docs/EMPLOYER_INTEGRATION_PLAN.md`: self-serve employer onboarding, company verification, ATS auto-detection and sync, abuse controls, free-versus-paid split and acceptance tests. Linked from the unified implementation plan.
