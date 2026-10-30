@@ -19,7 +19,7 @@ Design rules enforced in this module:
 
 The exact request/response schema is vendor-specific and deliberately
 configurable: set ``JEV_API_URL`` from the official documentation (see
-``docs/JEV_NOTES.md``). Without that variable the client refuses to run rather
+``docs/APP_ARCHITECTURE_AND_AUTOMATION.md``). Without that variable the client refuses to run rather
 than guessing an endpoint.
 """
 from __future__ import annotations

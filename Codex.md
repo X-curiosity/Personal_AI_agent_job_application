@@ -1,5 +1,11 @@
 # Repository context — start here
 
+## Docs consolidation
+
+- Consolidated `docs/` to five files: `IMPLEMENTATION_PLAN.md` (map + job agent + employer self-serve + product direction + reverse-engineering build stack), `APP_ARCHITECTURE_AND_AUTOMATION.md`, `DESIGN_QUESTIONS.md`, `HOSTED_MVP.md`, and `PRIVACY_NOTICE_DRAFT.md`.
+- Removed twelve superseded/generated docs (historical implementation reports, competitor/product notes, JEV/StartupMap notes, and the generated logo-recovery JSON). Code and README references were re-pointed to the surviving docs. Historical entries below may still name the old files.
+
+
 ## Dedicated map page, country flags, and design questions
 
 - Made the Map a dedicated `/map` route: the nav now navigates to `/map` (and `/map/<city>`), Jobs to `/`, with the view derived from the path. Added a bare `/map` rewrite in vercel.json so direct loads work.
@@ -155,7 +161,7 @@ Updated 15 October 2026 (Europe/Zurich). No Codex.md was present when the role-f
 
 Local, single-user career preparation prototype plus a separate public static Hired explorer and an isolated hosted account foundation. Python 3.12+, Streamlit, Pydantic, SQLite; dependencies in `pyproject.toml` / `uv.lock`. Keep this stack unless a measured limitation justifies replacing it. The public explorer is deployed on Vercel; the full local app remains local and hosted multi-user authentication is not publicly enabled.
 
-Primary context: [README.md](README.md). Module context: [src/tau_job_application/codex.md](src/tau_job_application/codex.md). Delivery reports: [role-first portal](docs/ROLE_FIRST_IMPLEMENTATION_REPORT.md) and [company catalogue](docs/COMPANY_CATALOG_IMPLEMENTATION_REPORT.md).
+Primary context: [README.md](README.md). Module context: [src/tau_job_application/codex.md](src/tau_job_application/codex.md). Delivery reports: [unified implementation plan](docs/IMPLEMENTATION_PLAN.md) and [unified implementation plan](docs/IMPLEMENTATION_PLAN.md).
 
 Hosted MVP scaffold: `hosted_ui.py` is separate from the local `ui.py`; `hosted.py` uses per-user Supabase clients and RLS-backed private rows/files, with SQL in `supabase/migrations/`. Registration uses passwordless magic links/OTP; account deletion requires fresh OTP verified by the Edge Function. The migration was applied to the configured Supabase project, but hosted email/OAuth/deletion/Render checks are incomplete. `render.yaml` keeps public sign-up, LinkedIn, and deletion off by default. Local SQLite remains the full app's store of record, and no local records are migrated. Never use a Supabase service-role key in the Streamlit app. See [docs/HOSTED_MVP.md](docs/HOSTED_MVP.md) and [the privacy notice draft](docs/PRIVACY_NOTICE_DRAFT.md) for scope, setup, and limitations.
 
@@ -192,7 +198,7 @@ Interests are many-to-many navigation, not degree/eligibility rules. A role may 
 
 ## Recent additions
 
-Product display name is **Co-Apply GPT** (package stays `tau_job_application`). Multi-agent team (`agents.py`, `agent_tools_extended.py`, `agents_ui.py`, CLI `agent-team`), role-page company browser (`company_browser_ui.py`, `yc_directory.py`, `capital_atlas.py` with `AtlasStore`), work eligibility (`eligibility*.py`), actively-hiring index (`hiring_index.py`: boards-first live checks + YC directory flags, `refresh-data` CLI, 6-hour launchd schedule via `install_schedule.sh`), period filters on role feeds, expanded interest taxonomy, progressive interview levels (`interview.py`: level = 1 + one per three 75+ rehearsals), the structured candidate profile (`structured_profile.py`: on-demand assembly, recruiter-style deterministic query, JSON export), and connected accounts (`accounts.py` + `accounts_ui.py` at `?view=account`: GitHub public-API linking, LinkedIn OIDC sign-in via the user's own registered app with tokens discarded after the identity call, Gmail status pointing to the existing per-conversation reply flow). Navigation is a sticky top bar (`_top_nav`); UI copy avoids dash placeholders. LinkedIn is never scraped or automated; live hiring rows read official ATS boards only. See [delivery report](docs/MULTI_AGENT_FRAMEWORK.md).
+Product display name is **Co-Apply GPT** (package stays `tau_job_application`). Multi-agent team (`agents.py`, `agent_tools_extended.py`, `agents_ui.py`, CLI `agent-team`), role-page company browser (`company_browser_ui.py`, `yc_directory.py`, `capital_atlas.py` with `AtlasStore`), work eligibility (`eligibility*.py`), actively-hiring index (`hiring_index.py`: boards-first live checks + YC directory flags, `refresh-data` CLI, 6-hour launchd schedule via `install_schedule.sh`), period filters on role feeds, expanded interest taxonomy, progressive interview levels (`interview.py`: level = 1 + one per three 75+ rehearsals), the structured candidate profile (`structured_profile.py`: on-demand assembly, recruiter-style deterministic query, JSON export), and connected accounts (`accounts.py` + `accounts_ui.py` at `?view=account`: GitHub public-API linking, LinkedIn OIDC sign-in via the user's own registered app with tokens discarded after the identity call, Gmail status pointing to the existing per-conversation reply flow). Navigation is a sticky top bar (`_top_nav`); UI copy avoids dash placeholders. LinkedIn is never scraped or automated; live hiring rows read official ATS boards only. See [unified implementation plan](docs/IMPLEMENTATION_PLAN.md).
 
 ## Next engineering work
 

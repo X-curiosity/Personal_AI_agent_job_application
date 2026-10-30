@@ -2,7 +2,7 @@
 
 This unified plan combines public startup-map browsing with shared job collection and a private recommendation agent. It preserves the implementation detail from the former map and job-agent plans.
 
-**Status:** proposed implementation, not a claim that these features are deployed. Provider recommendations are not authorization to purchase services. See the [architecture Q&A](APP_ARCHITECTURE_AND_AUTOMATION.md) and [product integration plan](MAP_AND_AUTONOMOUS_AGENT_PLAN.md) for broader context.
+**Status:** proposed implementation, not a claim that these features are deployed. Provider recommendations are not authorization to purchase services. See the [architecture Q&A](APP_ARCHITECTURE_AND_AUTOMATION.md) and the product-direction appendix below for broader context.
 
 ## Contents
 
@@ -377,7 +377,7 @@ Monitor source freshness, parse failures, closure anomalies, queue lag, analysis
 
 ## Part III — Employer integration
 
-Startups submit jobs automatically through a self-serve onboarding flow. See the dedicated [employer integration plan](EMPLOYER_INTEGRATION_PLAN.md). Employer-submitted jobs share the same database as collected jobs, with domain verification, provenance, sync status and abuse controls.
+Startups submit jobs automatically through a self-serve onboarding flow. See the dedicated the employer-integration appendix below. Employer-submitted jobs share the same database as collected jobs, with domain verification, provenance, sync status and abuse controls.
 
 ## Integrated delivery order
 
@@ -389,3 +389,422 @@ Startups submit jobs automatically through a self-serve onboarding flow. See the
 6. **Scale only after measurement:** broader coverage, rendering optimization, recommendation evaluation and monitored provider budgets.
 
 Each track retains its detailed rollout and acceptance tests above. Verify the final integrated version before enabling production services or increasing paid usage.
+
+## Appendix — Employer integration (self-serve job submission)
+
+This is a proposed employer-facing plan, not a deployed feature. It complements the [unified implementation plan](IMPLEMENTATION_PLAN.md) (map + job agent), which covers the candidate-facing map, collection, and recommendation agent.
+
+### 1. Two meanings of "automatic"
+
+1. **Employers push jobs to us** — a company signs up, connects a source, and jobs flow in automatically. This is self-serve onboarding.
+2. **We pull jobs automatically** — reading official ATS boards on a schedule, which the project already does for a bounded set of employers.
+
+A real "startup enters its jobs automatically" product is mostly the first, with the second as a fallback for companies that do not sign up. The two feeds share the same job records.
+
+### 2. Recommended employer flow
+
+```text
+Company signs up → proves it owns the company → connects a source → we verify → jobs sync on a schedule → jobs go live
+```
+
+#### Step 1 — Claim and verify the company
+
+- Employer creates an account, then finds or creates their company record (already in the catalogue, or new).
+- Verify control. Cheapest reliable checks:
+  - Email at the company domain (`person@company.com`) plus a one-time confirmation token.
+  - DNS TXT record, or sign-in through the ATS owner account.
+- Verification is required; otherwise anyone could post fake jobs under a real startup's name.
+
+#### Step 2 — Connect a source
+
+| Connection | Effort for the company | Our work |
+| --- | --- | --- |
+| Official ATS API (Greenhouse, Lever, Ashby, Workable, Recruitee, …) | Paste board token / company subdomain | Read the public board API already supported |
+| ATS owner webhook | Enable webhooks where their plan allows | Receive signed created/updated/closed events |
+| `JobPosting` structured data + sitemap | Nothing — already on their careers site | Crawl the careers sitemap on a schedule |
+| Feed (XML / RSS / JSON) | Provide a feed URL | Poll it |
+| Manual form | Type/paste job details | Review before publish |
+
+Best path: **auto-detect the ATS from the careers URL** and default to the official API — least work for the startup, most reliable for us.
+
+#### Step 3 — Automatic sync
+
+- A worker checks connected sources on a schedule and on webhook events.
+- New jobs appear; changed jobs update; closed jobs drop out.
+- Store `first_seen`, `last_seen`, `source_timestamp`, and `status`. A failed sync must never silently close jobs.
+- Jobs go live after automated checks (valid URL, title, location, description). Human review is an escalation for first-time posters or flagged content.
+
+#### Step 4 — Trust and abuse controls
+
+- Rate-limit job creation per company; flag suspicious volume.
+- Preserve provenance: every job shows its source and submitter.
+- Companies edit/close only their own jobs; users can report stale or fake ones.
+- Never let a company overwrite another company's records.
+
+### 3. Employer dashboard
+
+- See and edit their own live jobs.
+- Close filled roles, which removes them from active recommendations without deleting history.
+- View source sync status, last success and errors.
+- Review reported listings.
+
+### 4. Free versus paid
+
+| Item | Cost |
+| --- | --- |
+| Employer account + self-serve portal | Free to offer; build cost is time |
+| Official ATS board APIs (Greenhouse / Lever / Ashby) | Free public endpoints in most cases |
+| Webhooks | Depends on the ATS plan; many require an API/integration tier |
+| Structured-data crawling | Compute plus polite rate limits |
+| Hosted worker + database + auth | Ongoing infrastructure cost |
+| Optional human job review | People time; scale only if needed |
+
+### 5. Relationship to the job agent
+
+Employer-submitted jobs flow into the same shared job database the candidate-facing agent reads:
+
+```text
+Self-serve employers ─┐
+Official board APIs ──┼──→ shared jobs database ──→ public map + private agent
+Structured-data crawl ┘
+```
+
+One job identity feeds both surfaces. A job submitted by an employer is not inherently more trustworthy than one collected from their official ATS; both carry provenance and freshness. An employer marking a job closed is authoritative for that record.
+
+### 6. First version and acceptance tests
+
+First deliver:
+
+1. Employer sign-up and company verification (domain email/DNS).
+2. ATS auto-detection from a pasted careers URL.
+3. Scheduled sync plus webhook where available.
+4. Employer dashboard for editing and closing jobs.
+5. Automated quality checks before publish.
+
+Acceptance checks:
+
+- An employer cannot claim a company without domain/DNS verification.
+- Connecting a supported ATS imports jobs without manual entry.
+- A closed job disappears from active search and recommendations but stays in history.
+- A failed sync preserves existing jobs with a stale indicator.
+- A company cannot edit or close another company's jobs.
+- Abusive volume is rate-limited and flagged.
+- Every live job shows its source and provenance.
+
+### References
+
+- [Unified implementation plan](IMPLEMENTATION_PLAN.md): map, office accuracy, and the autonomous job agent.
+- [App architecture and automation](APP_ARCHITECTURE_AND_AUTOMATION.md): current ingestion, job freshness, and provider constraints.
+
+## Appendix — Product direction (StartupMap + Jack & Jill)
+
+### Product direction
+
+Combine a **public startup map** with a **private career agent**, both using the same company and jobs database. They are two ways of discovering opportunities, not separate apps.
+
+This is a proposed integration plan, not a claim that these features are already live. For implementation details and current limitations, see [App architecture and automation](APP_ARCHITECTURE_AND_AUTOMATION.md).
+
+### 1. What to take from each product
+
+| Inspiration | Features to build |
+| --- | --- |
+| StartupMap | Browse companies geographically; filter by sector, stage and hiring status; open company profiles and current vacancies. |
+| Jack & Jill | Understand candidate preferences, proactively discover roles, explain matches, notify the candidate and support next steps. |
+
+The public [StartupMap](https://startupmap.one/) page describes a curated European company directory with roles pulled daily from company career pages. [Jack & Jill](https://www.jackandjill.ai/) advertises proactive discovery, direct introductions and interview/negotiation support.
+
+These are their public product descriptions, not an independent verification of coverage or insight into their internal architecture. In particular, **direct introductions require participating employers—not just an AI model**.
+
+### 2. How it would work in Hired
+
+#### Public experience: Explore
+
+Anyone can browse the map without an account:
+
+- Company profiles, verified locations, logos and source links.
+- Filters for city, industry, funding stage and available roles.
+- Clear distinction between offices and estimated city locations.
+- Actions to **follow this company** or **add this role to my folder**, with sign-in when saving private preferences.
+
+#### Private experience: My agent
+
+The user signs in, uploads a CV and sets preferences. For example:
+
+> Find junior ML roles in Belgium or remote in Europe. Prefer small startups. Exclude unpaid internships.
+
+The agent then:
+
+1. Checks approved job sources on a schedule.
+2. Filters out incompatible roles.
+3. Compares relevant roles with the selected CV version.
+4. Proposes a short, ranked list with supporting evidence, gaps and freshness information.
+5. Learns from **interested / not interested** feedback without silently changing hard requirements.
+6. For usable matches below 70%, suggests two projects addressing learnable gaps.
+7. Prepares sourced contact research, outreach drafts or applications for approval.
+
+The agent keeps running when the user closes the website. That requires a hosted background worker, not an open browser tab.
+
+### 3. Existing foundations and missing integration
+
+| Existing foundation | Integration still needed |
+| --- | --- |
+| Public map and company catalogue | Better location accuracy, street-level navigation and verified startup classification |
+| Official job-source connectors | Broader employer coverage and reliable refresh/closure handling |
+| CV extraction and deterministic skill matching | Evidence-based ranking beyond keyword coverage |
+| Hosted account/storage foundation | Production activation and end-to-end isolation checks |
+| Reviewed application runner | Hosted execution, task tracking and secure approval handoff |
+| Targets and application records | Role folders, saved searches, preferences and feedback |
+
+These foundations exist in the repository; that does not mean every hosted feature has been activated or verified in production.
+
+**The company catalogue is not a live vacancy feed.** Monitoring thousands of companies means discovering and maintaining their official career sources. Directory presence or a hiring flag must not be presented as proof of a current vacancy.
+
+### 4. Recommended architecture
+
+Keep the existing stack where practical:
+
+```text
+Official employer sources
+          ↓
+Scheduled ingestion workers
+          ↓
+Shared companies + offices + jobs database
+          ├── Public map and search
+          └── Private agent
+                 ↓
+          CV + preferences + role folders
+                 ↓
+          Ranked recommendations
+                 ↓
+          In-app/email notifications
+                 ↓
+          User-approved next actions
+```
+
+#### Responsibilities
+
+- **Vercel:** public interface and authenticated workspace.
+- **Supabase:** accounts, private CV storage, database and owner-scoped access policies.
+- **Hosted Python worker:** source collection, analysis and scheduled tasks.
+- **Durable task queue:** retries, cancellation, duplicate prevention and visible task status.
+- **Optional LLM:** interpret preferences and draft explanations/projects. Deterministic rules enforce eligibility, permissions and approval boundaries.
+
+#### Efficient execution
+
+The agent should analyze new or changed jobs—not repeatedly process the whole internet for every user. Shared ingestion and cached analyses keep costs manageable.
+
+Keep job identities and source history stable. Bind private analyses to the user, job content version, CV version and scoring version. Recompute when relevant inputs change. A failed source request must not mark all its vacancies closed.
+
+The map and agent should share the same job records, so a role discovered on the map can be saved into a folder and analyzed without a second import or inconsistent vacancy status.
+
+### 5. What autonomous should mean initially
+
+| Automatic preparation | Requires approval |
+| --- | --- |
+| Job discovery and filtering | Sending a message |
+| CV matching and explanations | Sharing a CV |
+| Two-project suggestions | Submitting an application |
+| Relevant opportunity notifications | Other external actions on the user's behalf |
+
+Most value comes from finding a few genuinely relevant opportunities and explaining why they matter. A useful product does not need unrestricted browser automation.
+
+Approval must cover the actual recipient, message, attachments or application values. Changes invalidate approval. An uncertain submission outcome must not cause a blind retry.
+
+**70% must mean a defined evidence-coverage score**, not a 70% probability of being hired. Missing or unreadable CV evidence should produce uncertainty, not misleading precision. Exactly 70% is not below the threshold. Project proposals alone must not increase a match score; completed work needs evidence.
+
+### 6. The hardest parts
+
+#### Job coverage and freshness
+
+Identify sources, respect access rules and rate limits, remove closed jobs, avoid duplicates and make stale data visible. Broad company coverage does not automatically produce broad vacancy coverage.
+
+#### Recommendation quality
+
+Seniority, work authorization, location and candidate intent matter more than shared keywords. Explain recommendations using job requirements and actual CV evidence. Treat unknown information explicitly.
+
+#### Reliable private execution
+
+Implement tenant isolation, secure storage, retries, audit trails, notifications, cancellation and cost controls. Keep private CVs and contact data out of the public catalogue and GitHub snapshot pipeline.
+
+#### Employer relationships
+
+Direct introductions like those advertised by Jack & Jill need an employer-facing product and participating recruiters. Generating a contact suggestion or an email draft is not equivalent to arranging an introduction.
+
+LinkedIn sign-in does not grant unrestricted people-search or messaging permissions. Contact research and outreach must use supported sources/channels and preserve uncertainty about inferred email addresses.
+
+#### Geographic completeness
+
+“All startups” is not a dataset whose completeness we can guarantee. Publish measured coverage and clear unknowns. A sourced HQ coordinate is not necessarily the workplace of a vacancy; an estimated city centre is not an exact office.
+
+### 7. Recommended delivery sequence
+
+#### Phase 1: complete manual workflow
+
+- Activate and verify hosted sign-in and private CV storage.
+- Create role folders with explicit criteria and a selected CV version.
+- Save companies and roles from the public map.
+- Analyze selected roles and show evidence, gaps and uncertainty.
+- Propose two grounded projects for usable below-threshold results.
+- Prepare sourced contact suggestions and editable drafts, without sending.
+
+#### Phase 2: autonomous preparation
+
+- Expand the reviewed employer-source registry.
+- Add durable ingestion and per-folder scheduled analysis.
+- Rank new or changed opportunities and collect feedback.
+- Send opt-in daily shortlists with links to the private workspace.
+- Add freshness monitoring, budgets, cancellation and failure alerts.
+
+#### Phase 3: reviewed execution
+
+- Connect supported outbound channels with user authorization.
+- Approve exact recipients/content and individual applications.
+- Record actual outcomes and prevent duplicate submissions.
+- Stop on CAPTCHA, ambiguous questions, restrictions or unsupported flows.
+
+#### Phase 4: coverage and employer participation
+
+- Expand regions and role categories based on measured source quality.
+- Improve office verification and map navigation.
+- Evaluate recommendation usefulness with users.
+- Build employer onboarding and mutual-interest introductions if demand supports it.
+
+### 8. First experience to deliver
+
+> Browse the map → save a role/company → create a folder → activate the agent → receive a daily shortlist → approve the next step.
+
+Start with a well-covered region and role category, then expand. **Finish this connected workflow before adding voice conversations, mass outreach or employer-side recruiting agents.** It delivers both discovery modes without rebuilding everything.
+
+#### Minimum acceptance criteria
+
+- A map role can be saved and analyzed in the same user's folder.
+- User A cannot access user B's CV, preferences or analyses.
+- Scheduled preparation runs without an open browser session.
+- A new relevant job generates at most one notification per configured policy.
+- Failed ingestion preserves known jobs with a stale indicator rather than falsely closing them.
+- Every recommendation explains its evidence and important unknowns.
+- Below-threshold project suggestions are grounded in learnable gaps.
+- No message, CV share or employer submission occurs without the required approval.
+
+### References
+
+- [StartupMap](https://startupmap.one/): public geographic browsing inspiration.
+- [Jack & Jill](https://www.jackandjill.ai/): public proactive discovery/introduction inspiration.
+- [Hired app architecture and automation](APP_ARCHITECTURE_AND_AUTOMATION.md): current implementation, job ingestion, mapping providers, scoring, outreach and concrete blockers.
+
+## Appendix — Build stack from reverse-engineering findings
+
+Reverse-engineering-informed build-stack assessment using the REA browser observation provider (Chrome DevTools Protocol) plus static inspection of the shipped bundles.
+
+### Method
+
+- **REA MCP is now connected** in this session. I launched the Playwright-bundled headless Chromium (`chrome-headless-shell`) with `--remote-debugging-port` and inspected both targets with REA's `inspect_web_page` (CDP, passive — JavaScript is parsed/observed, not executed by REA).
+- **StartupMap evidence:** REA `inspect_web_page` result `ev_6ad8eb0247683e53bfd413f4ae8e18c7545dd653eb29b40cfe271a0d79dd50eb` (origin `https://startupmap.one`).
+- **Jack & Jill evidence:** REA `inspect_web_page` result for `https://www.jackandjill.ai/jack` (origin `https://www.jackandjill.ai`).
+- Static bundle inspection of StartupMap's public `index-*.js` was also used to enumerate referenced API routes.
+- Every finding is labeled **observed** (seen by REA/static) versus **inferred** versus **unknown**. No private APIs were called, no credentials extracted, no runtime mutations performed. The headless browser was only used for passive page observation.
+
+### 1. StartupMap — observed stack
+
+| Component | Evidence (REA CDP) | Status |
+| --- | --- | --- |
+| UI framework | Main bundle `static/index-D1jAOKa0.js` (hashed Vite output), React markers | Observed — React |
+| Build tool | `index-*.js` / `index-*.css` hashed names | Observed — Vite |
+| Map | `static/mapbox-CWlMv1cL.js` chunk | Observed — Mapbox GL JS |
+| Analytics | `static/posthog-DlmmmYUv.js`, `cairn/array/*/config.js`, `static/analytics-DlcoREUq.js` | Observed — PostHog + custom chunk |
+| Attribution/surveys | `cairn/static/surveys.js`, `web-vitals.js`, `dead-clicks-autocapture.js` | Observed — Cairn |
+| Edge/CDN | `cdn-cgi/challenge-platform/scripts/jsd/main.js` | Observed — Cloudflare (challenge + CDN) |
+| Backend/storage | Logo URLs on `…supabase.co/storage/v1/object/public/startup-logos/…` (earlier observation) | Observed — Supabase storage |
+
+#### Public API surface referenced in the bundle
+
+Route strings present in the shipped JavaScript (static observation; not called):
+
+- **Jobs/companies:** `/api/jobs`, `/api/jobs/summary`, `/api/startups`, `/api/funds/`
+- **User:** `/api/me`, `/api/me/profile`, `/api/me/preferences`, `/api/me/answers`, `/api/me/board`
+- **Matching:** `/api/me/matches`, `/api/me/match-count`, `/api/me/match-emails`
+- **Following/saving:** `/api/me/following`, `/api/me/follows`, `/api/me/saved-jobs`, `/api/me/org-search`
+- **Email:** `/api/broadcast`, `/api/email-subscribers-count`, `/api/me/newsletter`, `/api/me/follow-emails`
+- **Utilities:** `/api/logo-proxy`, `/api/me/merge`, `/api/me/share`, `/api/save-user-settings`
+
+#### Interpretation
+
+StartupMap is a **React SPA (Vite) + Mapbox GL JS**, fronted by Cloudflare, using PostHog/Cairn analytics, with a **Supabase-backed API** exposing jobs, companies, funds, saved-jobs/follows, a "Match me" onboarding, and match emails. The map is Mapbox-based (consistent with its stated "Mapbox" provider).
+
+### 2. Jack & Jill (`/jack`) — observed stack
+
+| Component | Evidence (REA CDP) | Status |
+| --- | --- | --- |
+| Framework | `/_next/static/immutable/chunks/*.js` + `turbopack-*.js` | Observed — Next.js App Router, Turbopack build |
+| Hosting/analytics | `/_vercel/insights/script.js` | Observed — Vercel + Vercel Insights |
+| Typography | Preloaded `ABCDiatype*`, `ABCMarist*` woff2 | Observed — Fontshare brand fonts |
+| Two-sided traction | Customer logos on `/jack`: Tavus, Maze, Ramp, Corgi, Multiverse, Strala, Attio | Observed — employer/customer references |
+| Page purpose | `/jack` title: "get a direct introduction to jobs you actually want" | Observed — candidate-side product |
+
+Jack & Jill is a **Next.js + Turbopack app on Vercel** (with Vercel Insights) presenting a candidate-side "Jack" flow and company-side "Jill" marketplace. Its internal matching and introduction logic remains **unknown** from the public page.
+
+### 3. What we already use vs. what each product implies
+
+| Need | Our current choice | StartupMap uses | Jack & Jill uses |
+| --- | --- | --- | --- |
+| Map renderer | MapLibre GL JS + OpenFreeMap | Mapbox GL JS | n/a |
+| Frontend (map site) | Vanilla JS static | React + Vite | Next.js (Turbopack) |
+| Backend/data | Python + SQLite (local), Supabase (hosted scaffold) | Supabase-backed API | Unknown, on Vercel |
+| Jobs | Official ATS connectors | `/api/jobs` service | "scans millions of jobs" |
+| Matching | Deterministic skill coverage | `/api/me/matches` | Unknown proprietary |
+| Analytics | None public | PostHog + Cairn + Cloudflare | Vercel Insights |
+
+We do **not** need to copy their stacks to copy their products. Our MapLibre choice is valid; the gap is data services and the matching workflow, not the renderer.
+
+### 4. Recommended stack to build the custom version
+
+#### Public map + browsing (StartupMap equivalent)
+
+| Layer | Recommendation |
+| --- | --- |
+| Renderer | Keep **MapLibre GL JS** (no Mapbox migration needed) |
+| Tiles/style | Keep **OpenFreeMap**; evaluate a paid provider only when coverage/style demands it |
+| Frontend | **React + Vite** once the static vanilla JS outgrows maintainability |
+| Data API | **Supabase** PostgREST/RPC for companies, jobs, offices, followers |
+| Asset serving | Self-host logos (already done); a bounded, allowlisted logo-proxy only if needed |
+| Hosting | Vercel static + Supabase |
+
+#### Matching + private agent (Jack & Jill equivalent)
+
+| Layer | Recommendation |
+| --- | --- |
+| Frontend | **Next.js (App Router) on Vercel** for the authenticated workspace |
+| Auth | Supabase Auth (magic link + optional LinkedIn OIDC) |
+| Storage | Supabase private storage for CVs |
+| Job ingestion | Hosted Python worker + official ATS connectors + employer self-serve (see employer plan) |
+| Matching | Deterministic evidence coverage now; add grounded LLM only for nuanced interpretation |
+| Queue | Postgres-backed durable queue (or managed queue if load justifies it) |
+| Notifications | Supabase/email adapter with opt-in digests |
+
+#### Two-sided marketplace (later)
+
+Jack & Jill's "direct introduction, paid on hire" requires a **company-side product and recruiter participation**. That is a separate employer surface (see the employer-integration appendix below), not something the matching model alone can produce. The customer logos observed on `/jack` reflect that employer participation, not an automation trick.
+
+### 5. Observed feature surface → build items
+
+1. **Company/startup browser** with filters (city, sector, funding stage, hiring status).
+2. **Open-roles list** with counts and source links.
+3. **Company profile** with logo, description, website, location, stage.
+4. **Follow company / save job** (requires accounts).
+5. **"Match me" onboarding** (role areas, experience, work style, location, stage, industries).
+6. **Match count + match email** (opt-in digest).
+7. **Candidate "Jack"** — preferences, proactive discovery, explanations.
+8. **Recruiter "Jill"** — employer side, mutual-interest introductions (later, gated by participation).
+
+### 6. What remains unverified
+
+- StartupMap's and Jack & Jill's backend architecture, data pipelines and matching models (not observable from public bundles).
+- Whether StartupMap's `/api/*` routes are serverless functions, a Supabase API, or another backend (only Supabase storage and route strings are observed).
+- The exact cost/licensing of any hosted map, geocoding or model service we might adopt — provider terms change and must be checked at decision time.
+- Any access tokens, credentials, or private coordinates (deliberately not extracted). PostHog's embedded `phc_…` value is a public analytics key, not a secret to rotate.
+
+### References
+
+- [Unified implementation plan](IMPLEMENTATION_PLAN.md) — map details and the autonomous job agent.
+
+- [App architecture and automation](APP_ARCHITECTURE_AND_AUTOMATION.md) — current implementation and constraints.

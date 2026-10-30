@@ -1,6 +1,6 @@
 # Career hub feature context
 
-See [root context](../../Codex.md) and [delivery report](../../docs/ROLE_FIRST_IMPLEMENTATION_REPORT.md).
+See [root context](../../Codex.md) and [delivery report](../../docs/IMPLEMENTATION_PLAN.md).
 
 ## Modules and interfaces
 
@@ -49,7 +49,7 @@ No new runtime packages, JavaScript bundles, visitor events, fingerprinting or e
 
 `.venv/bin/python -m pytest tests/test_company_catalog.py tests/test_career_hub.py tests/test_career_hub_ui.py -q` covers catalogue parsing/bounds/persistence/board validation plus graph overlap, custom roles, ownership, document bounds, confirmation subsets, reply attribution, and mocked connector contracts. UI tests cover onboarding, automatic cluster loading, dedicated vacancy creation, document assessment and draft persistence. Run the whole suite before release.
 
-New-feature verification: `.venv/bin/python -m pytest tests/test_yc_directory.py tests/test_company_browser_ui.py tests/test_eligibility.py tests/test_eligibility_ui.py tests/test_agents.py tests/test_agents_ui.py tests/test_capital_atlas.py -q`. See [multi-agent delivery report](../../docs/MULTI_AGENT_FRAMEWORK.md).
+New-feature verification: `.venv/bin/python -m pytest tests/test_yc_directory.py tests/test_company_browser_ui.py tests/test_eligibility.py tests/test_eligibility_ui.py tests/test_agents.py tests/test_agents_ui.py tests/test_capital_atlas.py -q`. See [multi-agent delivery report](../../docs/IMPLEMENTATION_PLAN.md).
 
 ## Known limits
 

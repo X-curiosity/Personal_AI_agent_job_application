@@ -1,6 +1,6 @@
 """Hiring-company map: every company type, one honest pin each.
 
-Adapted from the startupmap.one map patterns (docs/STARTUPMAP_RE_NOTES.md):
+Adapted from the startupmap.one map patterns (docs/IMPLEMENTATION_PLAN.md):
 pins colored by company stage (early/growth/scale-up/big — the generalization
 beyond startups), a verified-live visual distinction, stage/industry/signal
 filters, and an optional "my match answers" filter. Deliberate differences:

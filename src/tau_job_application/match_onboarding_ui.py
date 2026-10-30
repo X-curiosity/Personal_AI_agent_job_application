@@ -1,6 +1,6 @@
 """Guided match onboarding UI: five steps with a live company-match count.
 
-Follows the startupmap.one seeker-join pattern (docs/STARTUPMAP_RE_NOTES.md),
+Follows the startupmap.one seeker-join pattern (docs/IMPLEMENTATION_PLAN.md),
 generalized to every company type in the local data. Role areas and experience
 shape the role pages offered at the end; only stage, industry and location
 filter the company count, and the sidebar always says which facts did it.

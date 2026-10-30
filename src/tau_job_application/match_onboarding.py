@@ -1,7 +1,7 @@
 """Guided match onboarding: role areas → experience → work style → stage → industry.
 
 The flow follows the seeker-join pattern reverse-engineered from startupmap.one
-(see docs/STARTUPMAP_RE_NOTES.md), generalized from startups-only to every
+(see docs/IMPLEMENTATION_PLAN.md), generalized from startups-only to every
 company type in the local data: early startups, growth and scale-ups, and big
 established companies. Everything is deterministic and local — no profile fact
 leaves the machine, and a match is an honest filter over stored public facts,
