@@ -76,6 +76,26 @@ export function continentForCountry(country) {
   return 'World';
 }
 
+const COUNTRY_CODE = {
+  'united kingdom':'GB','england':'GB','scotland':'GB','wales':'GB','france':'FR','germany':'DE',
+  'netherlands':'NL','switzerland':'CH','sweden':'SE','denmark':'DK','norway':'NO','finland':'FI',
+  'ireland':'IE','spain':'ES','portugal':'PT','italy':'IT','austria':'AT','belgium':'BE',
+  'luxembourg':'LU','poland':'PL','czech republic':'CZ','czechia':'CZ','slovakia':'SK','hungary':'HU',
+  'romania':'RO','bulgaria':'BG','greece':'GR','estonia':'EE','latvia':'LV','lithuania':'LT',
+  'croatia':'HR','slovenia':'SI','iceland':'IS','united states':'US','usa':'US','canada':'CA',
+  'mexico':'MX','brazil':'BR','argentina':'AR','chile':'CL','colombia':'CO','peru':'PE',
+  'australia':'AU','new zealand':'NZ','china':'CN','india':'IN','japan':'JP','south korea':'KR',
+  'singapore':'SG','indonesia':'ID','vietnam':'VN','thailand':'TH','malaysia':'MY','philippines':'PH',
+  'israel':'IL','united arab emirates':'AE','saudi arabia':'SA','qatar':'QA','turkey':'TR','russia':'RU',
+  'nigeria':'NG','kenya':'KE','egypt':'EG','south africa':'ZA','ghana':'GH','morocco':'MA',
+  'tunisia':'TN','senegal':'SN','ethiopia':'ET','taiwan':'TW','hong kong':'HK','ukraine':'UA',
+};
+export function countryFlag(country) {
+  const code = COUNTRY_CODE[String(country || '').trim().toLocaleLowerCase('en')];
+  if (!code) return '';
+  return String.fromCodePoint(...[...code].map(ch => 0x1F1E6 + ch.charCodeAt(0) - 65));
+}
+
 export function buildCityRoutes(records) {
   const routes = new Map();
   for (const record of records) {

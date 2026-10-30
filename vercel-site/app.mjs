@@ -1,4 +1,4 @@
-import {PAGE_SIZE, buildCityCountries, buildCityRoutes, citySlug, continentForCountry, declutterDirectoryGroups, directoryGroups, filterJobs, matchSkills, readJobs, readState, stateQuery} from './jobs-core.mjs';
+import {PAGE_SIZE, buildCityCountries, buildCityRoutes, citySlug, continentForCountry, countryFlag, declutterDirectoryGroups, directoryGroups, filterJobs, matchSkills, readJobs, readState, stateQuery} from './jobs-core.mjs';
 import {readCatalogue} from './map-core.mjs';
 const $ = id => document.getElementById(id);
 const el = (tag, className, text) => { const node = document.createElement(tag); if (className) node.className = className; if (text != null) node.textContent = text; return node; };
@@ -15,14 +15,20 @@ const dateLabel = value => { const date = new Date(value); return Number.isNaN(d
 let jobs = [], filtered = [], companies = [], filteredCompanies = [], state = readState(location.search), page = 0, loading = false, map, mapReady = false, pendingFit = false;
 let knownCities = new Map(), knownCityCountries = new Map();
 const pathCity = () => { try { return location.pathname.startsWith('/map/') ? citySlug(decodeURIComponent(location.pathname.split('/')[2] || '')) : ''; } catch { return ''; } };
+const isMapPage = () => location.pathname === '/map' || location.pathname.startsWith('/map/');
 const markers = [], controls = {q:$('search'), area:$('area'), type:$('type'), location:$('location'), hiring:$('hiring')};
 function samePlace(value) { return state.cityRoute ? citySlug(value) === state.cityRoute : value === state.location; }
 function sameCountry(value) { return !state.country || value === state.country; }
 function updateURL(replace = false) {
-  const route = state.cityRoute || citySlug(state.location);
-  const slug = knownCities.has(route) ? route : '';
-  const path = slug ? `/map/${slug}` : (location.pathname.startsWith('/map/') ? '/' : location.pathname);
-  const query = stateQuery({...state, location: slug ? '' : state.location, country: slug && (knownCityCountries.get(route) || []).length <= 1 ? '' : state.country});
+  const map = state.view === 'map';
+  let path;
+  if (map) {
+    const route = state.cityRoute || (knownCities.has(citySlug(state.location)) ? citySlug(state.location) : '');
+    path = route ? `/map/${route}` : '/map';
+  } else {
+    path = '/';
+  }
+  const query = stateQuery({...state, view: '', location: map && state.cityRoute ? '' : state.location, country: map && state.cityRoute && (knownCityCountries.get(state.cityRoute) || []).length <= 1 ? '' : state.country});
   const url = `${path}${query ? '?' + query : ''}`;
   if (url !== location.pathname + location.search) history[replace ? 'replaceState' : 'pushState'](null, '', url);
 }
@@ -38,7 +44,7 @@ $('filters').addEventListener('submit', e => { e.preventDefault(); applyFilters(
 controls.q.addEventListener('input', () => { clearTimeout(searchTimer); searchTimer = setTimeout(() => applyFilters(true,true),180); });
 for (const key of ['area','type','location','hiring']) controls[key].addEventListener('change', () => applyFilters(true));
 $('filters').addEventListener('reset', e => { e.preventDefault(); state = {...readState(''),view:state.view}; state.cityRoute = ''; restoreControls(); page = 0; updateURL(); render(); fitResults(); });
-window.addEventListener('popstate', () => { state = readState(location.search); applyPathCity(); restoreControls(); render(); const view = state.view === 'map' ? 'map' : 'jobs'; document.querySelector('.explorer-body').dataset.view = view; $('nav-jobs').setAttribute('aria-current',view === 'jobs' ? 'page' : 'false'); $('nav-map').setAttribute('aria-current',view === 'map' ? 'page' : 'false'); });
+window.addEventListener('popstate', () => { state = readState(location.search); state.view = isMapPage() ? 'map' : 'jobs'; applyPathCity(); restoreControls(); render(); const view = state.view; document.querySelector('.explorer-body').dataset.view = view; $('nav-jobs').setAttribute('aria-current',view === 'jobs' ? 'page' : 'false'); $('nav-map').setAttribute('aria-current',view === 'map' ? 'page' : 'false'); });
 $('previous').addEventListener('click', () => { page--; renderList(); $('jobs-heading').focus(); });
 $('next').addEventListener('click', () => { page++; renderList(); $('jobs-heading').focus(); });
 $('fit-map').addEventListener('click', fitResults);
@@ -86,7 +92,7 @@ function renderArea() {
   const continentButton = el('button','area-crumb',continent); continentButton.type = 'button'; continentButton.addEventListener('click',() => { controls.location.value = ''; state.country = ''; applyFilters(true); }); crumbs.append(continentButton);
   if (city && country) {
     crumbs.append(el('span','area-separator','›'));
-    const countryButton = el('button','area-crumb',country); countryButton.type = 'button'; countryButton.addEventListener('click',() => { controls.location.value = country; applyFilters(true); }); crumbs.append(countryButton);
+    const flag = countryFlag(country); const countryButton = el('button','area-crumb',(flag ? flag + ' ' : '') + country); countryButton.type = 'button'; countryButton.addEventListener('click',() => { controls.location.value = country; applyFilters(true); }); crumbs.append(countryButton);
   }
   if (city) crumbs.append(el('span','area-separator','›'),el('strong','',selected));
   area.append(crumbs,el('p','area-summary',city ? `${filteredCompanies.length} companies · ${filteredCompanies.filter(company => companyJobs(company).length > 0).length} with open roles` : `${new Set(filtered.map(job => job.company)).size} companies · ${filtered.length} open roles in this snapshot`));
@@ -146,7 +152,7 @@ function renderCompanyDetail(company) {
   const detail = $('job-detail'); detail.replaceChildren();
   const top = el('div','detail-top'), headingWrap = el('div'), title = el('h2','',company.name); title.id = 'detail-title'; title.tabIndex = -1;
   const status = hiringStatus(company);
-  headingWrap.append(title,el('p','detail-subtitle',`${company.location || company.locationLabel} · ${company.industry}`),el('span',`hiring-badge ${status.tone}`,status.key === 'hiring' ? '● Hiring now' : status.key === 'flag' ? '○ Lists hiring (directory flag)' : '○ No open roles in snapshot')); top.append(companyMark({company:company.name,logo:company.logo}),headingWrap); detail.append(top);
+  const flag = countryFlag(company.country); headingWrap.append(title,el('p','detail-subtitle',`${flag ? flag + ' ' : ''}${company.location || company.locationLabel} · ${company.industry}`),el('span',`hiring-badge ${status.tone}`,status.key === 'hiring' ? '● Hiring now' : status.key === 'flag' ? '○ Lists hiring (directory flag)' : '○ No open roles in snapshot')); top.append(companyMark({company:company.name,logo:company.logo}),headingWrap); detail.append(top);
   const actions = el('div','detail-actions');
   const back = el('button','button','← Back to area'); back.type = 'button'; back.addEventListener('click',() => { state.company=''; setView('map'); render(); }); actions.append(back);
   if (company.website) actions.append(externalLink('Visit company website ↗',company.website,true)); if (company.sourceUrl) actions.append(externalLink('Check public source ↗',company.sourceUrl)); detail.append(actions);
@@ -174,7 +180,7 @@ function selectArea(city, country) {
 function addAreaMarker(group, level) {
   const card = el('div','area-map-card');
   const thumb = el('span','area-map-thumb');
-  if (group.logo) { const image = el('img','company-logo'); image.src = '/' + group.logo; image.alt = ''; thumb.append(image); } else thumb.textContent = initials(group.key);
+  if (group.logo) { const image = el('img','company-logo'); image.src = '/' + group.logo; image.alt = ''; thumb.append(image); } else { const flag = level === 'country' ? countryFlag(group.key) : ''; thumb.textContent = flag || initials(group.key); if (flag) thumb.classList.add('flag'); }
   card.append(thumb,el('span','area-map-title',group.label || group.key),el('span','area-map-count',`${group.companies.length} companies · ${group.jobs} roles`));
   card.tabIndex = 0; card.setAttribute('role','button'); card.setAttribute('aria-label',`${group.key}, ${group.companies.length} companies and ${group.jobs} roles`);
   const choose = () => {
@@ -250,6 +256,7 @@ async function loadJobs() {
     const response = await fetch('/data/jobs.json',{credentials:'omit',signal:AbortSignal.timeout(15000)});
     if (!response.ok) throw new Error('Snapshot unavailable');
     const payload = await response.json(); jobs = readJobs(payload);
+    if (isMapPage()) state.view = 'map';
     registerCities(jobs.flatMap(job => job.locations));
     addOptions('area',jobs.map(j => j.area)); addOptions('location',jobs.flatMap(j => j.locations.flatMap(p => [p.city,p.country])));
     applyPathCity(); restoreControls();

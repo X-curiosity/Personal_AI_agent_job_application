@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-import {buildCityCountries, buildCityRoutes, citySlug, continentForCountry, declutterDirectoryGroups, directoryGroups, filterJobs, matchSkills, readJobs, readState, stateQuery, safeURL} from '../vercel-site/jobs-core.mjs';
+import {buildCityCountries, buildCityRoutes, citySlug, continentForCountry, countryFlag, declutterDirectoryGroups, directoryGroups, filterJobs, matchSkills, readJobs, readState, stateQuery, safeURL} from '../vercel-site/jobs-core.mjs';
 import {readCatalogue} from '../vercel-site/map-core.mjs';
 const fixture = {id:'job_0123456789abcdef0123',title:'ML Engineer',company:'Example AI',companyType:'Startup',url:'https://jobs.example.com/1',boardUrl:'https://jobs.example.com',source:'Ashby',area:'Data & AI',skills:['Python','SQL'],description:'Build useful systems.',locations:[{label:'Paris, France',city:'Paris',country:'France',latitude:48.85,longitude:2.35,precision:'city'}],sourceTimestamp:'2026-10-25T00:00:00Z',sourceTimestampKind:'published'};
 const read = rows => readJobs({schemaVersion:1,jobs:rows});
@@ -40,6 +40,12 @@ test('city slugs and directory groups are generic and count real roles',()=>{
  const lisbon=directoryGroups([remote],[{company:'Remote Co',locations:[{city:'Lisbon',country:'Portugal',latitude:38.72,longitude:-9.14}]}],'city');
  const lisbonGroup=lisbon.find(group=>group.label==='Lisbon');
  assert.equal(lisbonGroup.latitude,38.72); assert.equal(lisbonGroup.longitude,-9.14);
+});
+
+test('country flags map names to emoji with a safe fallback',()=>{
+ assert.equal(countryFlag('France'),'🇫🇷'); assert.equal(countryFlag('United States'),'🇺🇸');
+ assert.equal(countryFlag('Belgium'),'🇧🇪'); assert.equal(countryFlag('England'),'🇬🇧');
+ assert.equal(countryFlag('Not a country'),'');
 });
 
 test('same-name cities in different countries remain separate area groups',()=>{

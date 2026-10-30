@@ -1,5 +1,14 @@
 # Repository context — start here
 
+## Dedicated map page, country flags, and design questions
+
+- Made the Map a dedicated `/map` route: the nav now navigates to `/map` (and `/map/<city>`), Jobs to `/`, with the view derived from the path. Added a bare `/map` rewrite in vercel.json so direct loads work.
+- Added country flags: `countryFlag` in jobs-core maps a country name to an emoji flag (safe empty fallback); shown on country cards, the breadcrumb, and company details.
+- "Prepare privately" now points to the local app (`127.0.0.1:8506`) instead of GitHub, reinforcing that private CVs/folders/matching stay local and never publish.
+- Added `docs/DESIGN_QUESTIONS.md`: 18 grounded design decisions across map, jobs, folders/agent, onboarding, branding, and scope, so the user can choose the next directions.
+- Verification: 421 Python tests + 22 Node tests pass; headless Chromium confirmed `/map` renders map-first with flags and country-aware breadcrumbs. Production deploy not yet verified for this push.
+
+
 ## Job source registry, ATS auto-detection, and scheduled ingestion
 
 - Built the scalable source registry that replaces "3 hand-picked boards" with a database of company → official careers ATS.
