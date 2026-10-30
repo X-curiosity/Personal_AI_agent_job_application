@@ -346,6 +346,7 @@ _NAV_ITEMS = {
     "Eligibility": "eligibility",
     "Agent team": "agents",
     "Auto-apply": "autoapply",
+    "Role folders": "folders",
     "Accounts": "account",
 }
 
@@ -359,7 +360,7 @@ def _top_nav() -> None:
         "career": "Role pages", "onboarding": "Role pages", "role": "Role pages",
         "application": "Applications", "applications": "Applications",
         "companies": "Companies", "eligibility": "Eligibility", "agents": "Agent team",
-        "account": "Accounts", "autoapply": "Auto-apply",
+        "account": "Accounts", "autoapply": "Auto-apply", "folders": "Role folders",
     }
     current_label = view_aliases.get(current, "Workspace")
     bar = st.columns((2.1, 5.9))
@@ -394,7 +395,7 @@ def main() -> None:
         _product_landing()
         return
 
-    workspace_id, thread_id = choose_scope(WORKSPACES, compact=_route_value("view") in {"career", "onboarding", "role", "application", "companies", "match", "eligibility", "agents", "account", "autoapply"})
+    workspace_id, thread_id = choose_scope(WORKSPACES, compact=_route_value("view") in {"career", "onboarding", "role", "application", "companies", "match", "eligibility", "agents", "account", "autoapply", "folders"})
     _top_nav()
     with st.sidebar:
         st.caption("Your career track and job workspace live here. Everything else is in the top bar.")
@@ -412,6 +413,10 @@ def main() -> None:
         return
     if _route_value("view") == "account":
         render_accounts(sys.modules[__name__], workspace_id)
+        return
+    if _route_value("view") == "folders":
+        from tau_job_application.role_folders_ui import render_role_folders
+        render_role_folders()
         return
     if _route_value("view") == "applications":
         _my_applications(workspace_id)

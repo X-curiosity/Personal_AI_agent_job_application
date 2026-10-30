@@ -1,5 +1,14 @@
 # Repository context — start here
 
+## Role folders: deterministic folder agent, scoring, and PDF projects
+
+- Built the folder-based discovery system. A folder encodes role keywords, region, company type and optional sector/sub-sector; the deterministic "general agent" (`run_all_folders`) runs each folder as its own sub-task and saves results.
+- New `role_folders.py`: `RoleFolder`/`RoleFolderStore` (SQLite `role_folders`/`folder_documents`/`folder_matches`), `discover_roles` (tokenized keyword + region + company-type matching), `score_role` (reuses `hosted_matching` evidence coverage), and `build_project` (domain-aware project idea per role). New `project_pdf.py` renders a valid dependency-free PDF (Helvetica, Latin-1) per match. New `role_folders_ui.py` Streamlit page wired into the top nav; CLI `folders` subcommand (list/create/documents/run/show/delete).
+- Scoring is skill-coverage against the folder's CV, not a hiring probability; a missing CV leaves the role unscored. Region mapping is a small honest country list (unknown → "Other").
+- Honest coverage limit: discovery reads the current public vacancy snapshot (68 roles, currently largely Mistral AI) plus the company directory — it does not yet ingest "every ML role in Europe". A sample run for "ML engineer - Europe - Startup" matched 9 real roles with mean score 61% and wrote one project PDF each.
+- Verification: 416 Python tests (11 new for folders/PDF) + 21 Node tests pass; end-to-end CLI run verified (create → attach CV/letter → run → PDFs → delete). No new runtime dependencies (PDF is hand-rendered). Production deployment and the hosted/multi-source ingestion remain separate.
+
+
 ## Map part: per-company recruiting status
 
 - Implemented the map browsing requirement: the Map view now lists the public company directory directly (not only after selecting a city), searchable by startup name, with a per-company recruiting badge and a recruiting-status filter.

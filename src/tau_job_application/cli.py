@@ -4,6 +4,7 @@ import argparse
 import asyncio
 import json
 from pathlib import Path
+import re
 import subprocess
 import sys
 
@@ -48,6 +49,29 @@ def _parser() -> argparse.ArgumentParser:
     auto.add_argument("--custom-answers", default="{}", help="JSON object of exact-label string/boolean answers")
     auto.add_argument("--form-selector", default="form")
     auto.add_argument("--allow-json", action="store_true")
+    folders = commands.add_parser("folders", help="Manage role folders and run the deterministic folder agent")
+    folder_commands = folders.add_subparsers(dest="folder_command", required=True)
+    folder_commands.add_parser("list", help="List role folders")
+    create = folder_commands.add_parser("create", help="Create a role folder")
+    create.add_argument("--name", required=True)
+    create.add_argument("--roles", default="", help="Comma-separated role keywords, e.g. 'ml engineer, machine learning'")
+    create.add_argument("--region", default="Any")
+    create.add_argument("--type", dest="company_type", default="any", choices=["any", "startup", "public", "private"])
+    create.add_argument("--sector", default="")
+    create.add_argument("--sub-sector", default="")
+    create.add_argument("--cv", type=Path, default=None)
+    create.add_argument("--letter", type=Path, default=None)
+    docs = folder_commands.add_parser("documents", help="Attach a CV and letter to an existing folder")
+    docs.add_argument("folder_id", type=int)
+    docs.add_argument("--cv", type=Path, default=None)
+    docs.add_argument("--letter", type=Path, default=None)
+    run = folder_commands.add_parser("run", help="Run the folder agent (all folders, or one with --folder)")
+    run.add_argument("--folder", type=int, default=None)
+    run.add_argument("--pdf-dir", type=Path, default=Path.cwd(), help="Directory to write one PDF project description per matched role")
+    show = folder_commands.add_parser("show", help="Show a folder's latest matches")
+    show.add_argument("folder_id", type=int)
+    delete = folder_commands.add_parser("delete", help="Delete a folder")
+    delete.add_argument("folder_id", type=int)
     return parser
 
 
@@ -65,6 +89,8 @@ def main() -> None:
         _refresh_data()
     elif args.command == "auto-apply":
         _auto_apply(args)
+    elif args.command == "folders":
+        _folders(args)
     else:
         asyncio.run(_run_agent(args.candidate, args.job))
 
@@ -90,6 +116,91 @@ def _auto_apply(args: argparse.Namespace) -> None:
     print(f"Auto-apply outcome: {outcome.status} — {outcome.reason}")
     if outcome.status != "submitted":
         raise SystemExit(1)
+
+
+def _mime_for(path: Path) -> str:
+    return {".pdf": "application/pdf",
+            ".docx": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+            ".txt": "text/plain", ".md": "text/markdown"}.get(path.suffix.casefold(), "text/plain")
+
+
+def _attach_documents(store, folder_id: int, cv: Path | None, letter: Path | None) -> None:
+    cv_bytes = cv_name = cv_mime = None
+    if cv:
+        cv_bytes, cv_name, cv_mime = cv.read_bytes(), cv.name, _mime_for(cv)
+    letter_text = letter.read_text(encoding="utf-8") if letter else None
+    store.set_documents(folder_id, cv_bytes, cv_name, cv_mime, letter_text)
+    print(f"Attached {cv_name or 'no CV'} and {'letter' if letter_text else 'no letter'} to folder #{folder_id}")
+
+
+def _write_project_pdf(pdf_dir: Path, folder_name: str, match: dict, letter_text: str | None) -> None:
+    from tau_job_application.project_pdf import render_project_pdf
+    pdf_dir.mkdir(parents=True, exist_ok=True)
+    slug = re.sub(r"[^a-z0-9]+", "-", f"{match['company']}-{match['title']}".casefold()).strip("-")[:60] or "project"
+    (pdf_dir / f"{slug}.pdf").write_bytes(render_project_pdf(match, folder_name, letter_text))
+    print(f"  wrote {pdf_dir / (slug + '.pdf')}")
+
+
+def _folders(args: argparse.Namespace) -> None:
+    from tau_job_application.role_folders import RoleFolder, RoleFolderStore, load_companies, load_jobs, run_folder, run_all_folders
+    store = RoleFolderStore()
+    if args.folder_command == "list":
+        folders = store.list()
+        if not folders:
+            print("No folders yet.")
+            return
+        for folder in folders:
+            print(f"[{folder['id']}] {folder['name']} — region={folder['region']} type={folder['company_type']} roles={', '.join(folder['role_keywords'])}")
+        return
+    if args.folder_command == "create":
+        folder = RoleFolder(name=args.name, role_keywords=[k.strip() for k in args.roles.split(",") if k.strip()],
+                            sector=args.sector, sub_sector=args.sub_sector, region=args.region, company_type=args.company_type)
+        folder_id = store.create(folder)
+        print(f"Created folder #{folder_id}: {folder.name}")
+        if args.cv or args.letter:
+            _attach_documents(store, folder_id, args.cv, args.letter)
+        return
+    if args.folder_command == "documents":
+        _attach_documents(store, args.folder_id, args.cv, args.letter)
+        return
+    if args.folder_command == "run":
+        jobs, companies = load_jobs(), load_companies()
+        if args.folder is not None:
+            folder_row = store.get(args.folder)
+            if not folder_row:
+                raise SystemExit(f"No folder #{args.folder}")
+            folder = RoleFolder(name=folder_row["name"], role_keywords=folder_row["role_keywords"], sector=folder_row["sector"],
+                                sub_sector=folder_row["sub_sector"], region=folder_row["region"], company_type=folder_row["company_type"], id=folder_row["id"])
+            matches = run_folder(store, folder, jobs, companies)
+            store.replace_matches(folder.id, matches)
+            summary = [{"id": folder.id, "name": folder.name, "matches": len(matches), "scores": [m.score for m in matches if m.score is not None]}]
+        else:
+            summary = run_all_folders(store, jobs, companies)["folders"]
+        for row in summary:
+            mean = round(sum(row["scores"]) / len(row["scores"])) if row["scores"] else None
+            print(f"Folder #{row['id']} {row['name']}: {row['matches']} matching roles" + (f", mean score {mean}%" if mean is not None else ""))
+        for row in summary:
+            docs = store.documents(row["id"])
+            for match in store.list_matches(row["id"]):
+                _write_project_pdf(args.pdf_dir, row["name"], match, docs.get("letter_text"))
+        return
+    if args.folder_command == "show":
+        folder = store.get(args.folder_id)
+        if not folder:
+            raise SystemExit(f"No folder #{args.folder_id}")
+        print(f"Folder #{folder['id']}: {folder['name']} (region={folder['region']}, type={folder['company_type']})")
+        matches = store.list_matches(args.folder_id)
+        if not matches:
+            print("No matches yet. Run 'folders run --folder <id>'.")
+            return
+        for match in matches:
+            score = f"{match['score']}%" if match["score"] is not None else "no CV"
+            print(f"  [{score}] {match['title']} @ {match['company']} ({match['area']}) — {match['url']}")
+        return
+    if args.folder_command == "delete":
+        store.delete(args.folder_id)
+        print(f"Deleted folder #{args.folder_id}")
+        return
 
 
 async def _run_agent(candidate_path: Path, job_path: Path) -> None:
