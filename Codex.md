@@ -1,5 +1,13 @@
 # Repository context — start here
 
+## Architecture questions — documentation-only push
+
+- Added `docs/APP_ARCHITECTURE_AND_AUTOMATION.md`, answering job freshness, industry ingestion approaches, MapLibre/OpenFreeMap versus office geocoding, the GitHub Actions bot, and a proposed manual/autonomous role-folder workflow.
+- Grounded current-state claims in the workflow, exporter, map configuration, hosted matcher and schema; linked external provider documentation. Explicitly distinguishes implemented behavior from proposals, skill coverage from hiring probability, and inferred contacts from verified recipients.
+- Checked relative document links and whitespace. No application code changed in this push; no new live deployment or runtime verification claimed.
+- Existing uncommitted logo recovery changes remain separate and are not included.
+
+
 ## Public catalogue refresh — current push
 
 - Capital Atlas refreshed locally: 2,429 records. StartupMap public pages imported: 2,844 records. Merged export: 10,247 companies, 8,803 cached local logos, 1,109 Wikidata HQ matches. No private APIs or StartupMap coordinates used.
