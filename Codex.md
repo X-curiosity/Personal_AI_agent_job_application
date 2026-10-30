@@ -1,5 +1,12 @@
 # Repository context — start here
 
+## Main-branch consolidation and official logos
+
+- User requested consolidating `xavier_dev` and `codex/role-market-evidence-match` into `main` and deleting those branches. `xavier_dev` has no commits missing from main; codex documentation was already cherry-picked to main. Merge codex history before deletion to preserve ancestry and local logo recovery work. Leave `haile_dev` and unrelated duplicate assets untouched.
+- Include official-logo recovery script, provenance/unresolved report, tests, and 13 recovered assets: 8,816 logos for 10,247 companies; 1,431 unresolved. Removed favicon proxy fallback for new downloads. Existing logos were not all reverified as official assets.
+- Verification for consolidation: 17 focused Python tests and 21 Node tests passed; whitespace check passed. Production deployment remains unverified.
+
+
 ## Architecture questions — documentation-only push
 
 - Added `docs/APP_ARCHITECTURE_AND_AUTOMATION.md`, answering job freshness, industry ingestion approaches, MapLibre/OpenFreeMap versus office geocoding, the GitHub Actions bot, and a proposed manual/autonomous role-folder workflow.
