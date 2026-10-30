@@ -1,5 +1,14 @@
 # Repository context — start here
 
+## Detailed architecture plans and repository cleanup
+
+- Added `docs/MAP_IMPLEMENTATION_PLAN.md`: map-provider comparison, public directory reuse, Google trial/allowance caveats, zoom/marker implementation, office precision/provenance, costs and rollout tests.
+- Added `docs/JOB_AGENT_IMPLEMENTATION_PLAN.md`: shared job collection versus private recommendations, source registry, durable queue, grounded AI, authorization, cost controls and tests. Distinguishes StartupMap's public claims from unverified backend hypotheses.
+- Linked both plans from `docs/APP_ARCHITECTURE_AND_AUTOMATION.md`. These are plans, not deployed features.
+- Removed 52 unnecessary tracked files from Git while preserving local copies: 41 logos unreferenced by both public snapshots or tracked text, two byte-identical numbered MapLibre vendor copies, and nine one-off scratch/generated application files. Kept runtime assets, tests, fixtures, migrations and historical development documentation. Added ignore rules to prevent accidental reintroduction; new public logos require explicit reviewed staging.
+- Verification is recorded in the commit workflow: focused Python/Node tests, document links, all public logo references tracked, and staged whitespace. No new browser or production verification claimed. Cleanup does not erase files from Git history.
+
+
 ## Map and autonomous agent integration — documentation
 
 - Added `docs/MAP_AND_AUTONOMOUS_AGENT_PLAN.md` at the user's request: StartupMap and Jack & Jill inspiration, public Explore/private agent experiences, existing foundations, shared architecture, approval boundaries, blockers and phased implementation.

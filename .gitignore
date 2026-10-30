@@ -27,5 +27,16 @@ vercel-site/data/*
 !vercel-site/data/wikidata_hq.json
 !vercel-site/data/world.geojson
 !vercel-site/data/logos/
-!vercel-site/data/logos/*
+# Existing tracked logos remain versioned; stage only reviewed, referenced new assets.
+vercel-site/data/logos/*
 venv/
+
+# Local one-off document experiments and generated application outputs.
+generated/
+scratch/
+
+# Accidental numbered copies; canonical runtime files remain tracked.
+vercel-site/* [0-9].mjs
+vercel-site/* [0-9].html
+vercel-site/vendor/* [0-9].js
+vercel-site/vendor/* [0-9].css
