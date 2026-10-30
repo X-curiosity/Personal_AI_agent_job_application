@@ -8,6 +8,7 @@ This unified plan combines public startup-map browsing with shared job collectio
 
 - [Part I — Map implementation](#part-i--map-implementation)
 - [Part II — Autonomous job-agent implementation](#part-ii--autonomous-job-agent-implementation)
+- [Part III — Employer integration](#part-iii--employer-integration)
 - [Integrated delivery order](#integrated-delivery-order)
 
 ## Shared architecture
@@ -373,6 +374,10 @@ Tests and operational checks:
 - Users can pause autonomous preparation and control notification frequency.
 
 Monitor source freshness, parse failures, closure anomalies, queue lag, analysis cost and recommendation feedback. A green scheduler alone is not proof of fresh jobs or useful recommendations.
+
+## Part III — Employer integration
+
+Startups submit jobs automatically through a self-serve onboarding flow. See the dedicated [employer integration plan](EMPLOYER_INTEGRATION_PLAN.md). Employer-submitted jobs share the same database as collected jobs, with domain verification, provenance, sync status and abuse controls.
 
 ## Integrated delivery order
 

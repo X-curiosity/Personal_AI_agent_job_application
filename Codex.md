@@ -1,5 +1,11 @@
 # Repository context — start here
 
+## Employer integration plan
+
+- Added `docs/EMPLOYER_INTEGRATION_PLAN.md`: self-serve employer onboarding, company verification, ATS auto-detection and sync, abuse controls, free-versus-paid split and acceptance tests. Linked from the unified implementation plan.
+- Documentation-only change; no runtime or deployment behavior claimed.
+
+
 ## Unified implementation plan
 
 - Merged the map and autonomous job-agent plans into `docs/IMPLEMENTATION_PLAN.md`, retaining both detailed sections and adding shared architecture, navigation and an integrated delivery sequence.
