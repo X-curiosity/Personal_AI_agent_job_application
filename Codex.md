@@ -1,5 +1,12 @@
 # Repository context — start here
 
+## REA inspection update
+
+- REA MCP became available in this session; inspected both targets with `inspect_web_page` (passive CDP) via a locally launched headless Chromium, and updated `docs/REA_BUILD_STACK.md` with REA-authored evidence.
+- New observed findings: StartupMap additionally loads PostHog + Cairn analytics and is fronted by Cloudflare (challenge platform), confirming React + Vite + Mapbox GL JS + Supabase. Jack & Jill `/jack` confirms Next.js App Router (Turbopack) on Vercel with Vercel Insights and Fontshare fonts; customer logos (Tavus, Maze, Ramp, Corgi, Multiverse, Strala, Attio) observed.
+- Method is passive observation; no private APIs called, no credentials/tokens extracted, no runtime mutations. Documentation-only change.
+
+
 ## Reverse-engineering-informed build-stack analysis
 
 - Added `docs/REA_BUILD_STACK.md`: what to use to build a custom StartupMap + Jack & Jill. REA CLI/MCP was unusable (Node 26.7.0 unsupported, pi registration missing), so static inspection of the public homepages and StartupMap's public JS bundle was used instead; every finding is labeled observed/inferred/unknown.
