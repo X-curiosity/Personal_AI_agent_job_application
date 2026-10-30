@@ -16,11 +16,11 @@ from tau_job_application.role_folders import (
 from tau_job_application.project_pdf import build_project_sections, render_document, render_project_pdf
 
 
-def _job(title, company, company_type="Startup", skills=("Python",), country="Belgium", area="Data & AI", url="https://jobs.example.com/1"):
+def _job(title, company, company_type="Startup", skills=("Python",), country="Belgium", area="Data & AI", url="https://jobs.example.com/1", logo=""):
     return {"id": f"job_{abs(hash((title, company))) % 10**20:020d}", "title": title, "company": company,
             "companyType": company_type, "area": area, "description": f"{title} at {company}.", "skills": list(skills),
             "locations": [{"label": f"{country}", "city": "Brussels", "country": country, "latitude": 50.85, "longitude": 4.35, "precision": "city"}],
-            "url": url, "source": "Ashby"}
+            "url": url, "source": "Ashby", "logo": logo}
 
 
 def _cv() -> bytes:
@@ -111,15 +111,17 @@ def test_run_folder_end_to_end(tmp_path):
     folder_id = store.create(RoleFolder(name="ML engineer - Europe - Startup", role_keywords=["ml engineer"], region="Europe", company_type="startup"))
     store.set_documents(folder_id, _cv(), "cv.txt", "text/plain", "I like ML.")
     folder = RoleFolder(name="ML engineer - Europe - Startup", role_keywords=["ml engineer"], region="Europe", company_type="startup", id=folder_id)
-    jobs = [_job("ML Engineer", "Euro AI", "Startup", ("Python", "SQL", "Kubernetes"), "Belgium"),
+    jobs = [_job("ML Engineer", "Euro AI", "Startup", ("Python", "SQL", "Kubernetes"), "Belgium", logo="data/job-logos/abc123.ico"),
             _job("ML Engineer", "US Corp", "Public", ("Python",), "United States")]
     companies = {"euro ai": {"industry": "Logistics", "summary": None, "type": "startup"}}
     matches = run_folder(store, folder, jobs, companies)
     assert [m.company for m in matches] == ["Euro AI"]
     assert matches[0].score == 67
+    assert matches[0].logo == "data/job-logos/abc123.ico"
     assert "Kubernetes" in matches[0].missing
     stored = store.list_matches(folder_id)
     assert len(stored) == 1 and stored[0]["score"] == 67
+    assert stored[0]["logo"] == "data/job-logos/abc123.ico"
 
 
 def test_run_all_folders(tmp_path):

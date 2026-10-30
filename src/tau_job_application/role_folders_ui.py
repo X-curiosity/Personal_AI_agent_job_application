@@ -1,6 +1,7 @@
 """Streamlit page for role folders: create, attach CV/letter, run, download PDFs."""
 from __future__ import annotations
 
+import base64
 from pathlib import Path
 
 import streamlit as st
@@ -25,6 +26,25 @@ def _mime(name: str) -> str:
 
 def _slug(text: str) -> str:
     return "".join(ch if ch.isalnum() else "-" for ch in text.casefold()).strip("-")[:60] or "project"
+
+
+_MIME = {".ico": "image/x-icon", ".png": "image/png", ".jpg": "image/jpeg", ".jpeg": "image/jpeg",
+         ".webp": "image/webp", ".gif": "image/gif", ".svg": "image/svg+xml"}
+
+
+def _logo_html(logo: str | None, size: int = 34) -> str | None:
+    """Render a local logo as an inline image; browsers support .ico, which st.image does not."""
+    if not logo:
+        return None
+    from tau_job_application.role_folders import _project_root
+    path = (_project_root() / "vercel-site" / str(logo).lstrip("/")).resolve()
+    if not path.is_file() or _project_root() not in path.parents:
+        return None
+    mime = _MIME.get(path.suffix.casefold(), "image/png")
+    data = base64.b64encode(path.read_bytes()).decode()
+    return (f'<img src="data:{mime};base64,{data}" alt="" '
+            f'style="height:{size}px;width:{size}px;object-fit:contain;background:#fff;'
+            f'border-radius:6px;border:1px solid #E6DFD1;padding:2px;">')
 
 
 def render_role_folders() -> None:
@@ -81,9 +101,13 @@ def render_role_folders() -> None:
             if matches:
                 st.caption(f"{len(matches)} matching roles, highest score first.")
                 for match in matches:
+                    logo_html = _logo_html(match.get("logo"))
+                    col_logo, col_text = st.columns([0.7, 11.3])
+                    if logo_html:
+                        col_logo.markdown(logo_html, unsafe_allow_html=True)
                     score = f"{match['score']}%" if match["score"] is not None else "no CV"
-                    st.markdown(f"**{score}** · {match['title']} @ {match['company']} · {match['area']}")
-                    st.caption(match["url"])
+                    col_text.markdown(f"**{score}** · {match['title']} @ {match['company']} · {match['area']}")
+                    col_text.caption(match["url"])
                     st.download_button(
                         "Download project PDF",
                         render_project_pdf(match, folder["name"], documents.get("letter_text")),

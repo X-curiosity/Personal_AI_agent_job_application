@@ -20,9 +20,18 @@ import sqlite3
 from tau_job_application.hosted_matching import cv_text, match_cv_to_job
 from tau_job_application.job_skills import extract_skills
 
-DEFAULT_DATABASE = Path(__file__).resolve().parents[2] / ".job_assistant" / "assistant.sqlite"
-DEFAULT_JOBS = Path(__file__).resolve().parents[2] / "vercel-site" / "data" / "jobs.json"
-DEFAULT_COMPANIES = Path(__file__).resolve().parents[2] / "vercel-site" / "data" / "companies.json"
+def _project_root() -> Path:
+    """Find the repository root from the launch directory, so the same paths
+    work whether this module is imported from source or from site-packages."""
+    for directory in (Path.cwd(), *Path.cwd().parents):
+        if (directory / "pyproject.toml").is_file() or (directory / "fixtures").is_dir():
+            return directory
+    return Path.cwd()
+
+
+DEFAULT_DATABASE = _project_root() / ".job_assistant" / "assistant.sqlite"
+DEFAULT_JOBS = _project_root() / "vercel-site" / "data" / "jobs.json"
+DEFAULT_COMPANIES = _project_root() / "vercel-site" / "data" / "companies.json"
 
 # Country name (casefolded) -> canonical region. Kept intentionally small and
 # honest: unknown countries fall back to "Other" rather than being guessed.
@@ -117,6 +126,7 @@ class FolderMatch:
     matched: list[str]
     missing: list[str]
     project: dict
+    logo: str | None = None
 
 
 def load_jobs(path: Path = DEFAULT_JOBS) -> list[dict]:
@@ -133,6 +143,7 @@ def load_jobs(path: Path = DEFAULT_JOBS) -> list[dict]:
             "area": str(row.get("area") or "Other"), "description": str(row.get("description") or ""),
             "skills": [str(s) for s in row.get("skills", []) if s],
             "locations": locations, "url": row["url"], "source": str(row.get("source") or ""),
+            "logo": str(row.get("logo") or ""),
         })
     return jobs
 
@@ -272,9 +283,14 @@ class RoleFolderStore:
                     area TEXT NOT NULL,
                     url TEXT NOT NULL,
                     score INTEGER,
-                    project_json TEXT NOT NULL
+                    project_json TEXT NOT NULL,
+                    logo TEXT
                 );
             """)
+        with self._connect() as connection:
+            columns = {row[1] for row in connection.execute("PRAGMA table_info(folder_matches)").fetchall()}
+            if "logo" not in columns:
+                connection.execute("ALTER TABLE folder_matches ADD COLUMN logo TEXT")
 
     def create(self, folder: RoleFolder) -> int:
         with self._connect() as connection:
@@ -322,15 +338,15 @@ class RoleFolderStore:
         with self._connect() as connection:
             connection.execute("DELETE FROM folder_matches WHERE folder_id = ?", (folder_id,))
             connection.executemany(
-                "INSERT INTO folder_matches (folder_id, run_at, job_id, title, company, area, url, score, project_json) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                [(folder_id, run_at, m.job_id, m.title, m.company, m.area, m.url, m.score, json.dumps(m.project)) for m in matches],
+                "INSERT INTO folder_matches (folder_id, run_at, job_id, title, company, area, url, score, project_json, logo) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                [(folder_id, run_at, m.job_id, m.title, m.company, m.area, m.url, m.score, json.dumps(m.project), m.logo) for m in matches],
             )
 
     def list_matches(self, folder_id: int) -> list[dict]:
         with self._connect() as connection:
-            rows = connection.execute("SELECT run_at, job_id, title, company, area, url, score, project_json FROM folder_matches WHERE folder_id = ? ORDER BY score DESC NULLS LAST, company", (folder_id,)).fetchall()
+            rows = connection.execute("SELECT run_at, job_id, title, company, area, url, score, project_json, logo FROM folder_matches WHERE folder_id = ? ORDER BY score DESC NULLS LAST, company", (folder_id,)).fetchall()
         return [{"run_at": r["run_at"], "job_id": r["job_id"], "title": r["title"], "company": r["company"],
-                 "area": r["area"], "url": r["url"], "score": r["score"], "project": json.loads(r["project_json"])} for r in rows]
+                 "area": r["area"], "url": r["url"], "score": r["score"], "project": json.loads(r["project_json"]), "logo": r["logo"]} for r in rows]
 
     def delete(self, folder_id: int) -> None:
         with self._connect() as connection:
@@ -345,6 +361,7 @@ class RoleFolderStore:
     def _connect(self) -> sqlite3.Connection:
         connection = sqlite3.connect(self.path)
         connection.row_factory = sqlite3.Row
+        connection.execute("PRAGMA foreign_keys = ON")
         return connection
 
     @staticmethod
@@ -364,6 +381,7 @@ def run_folder(store: RoleFolderStore, folder: RoleFolder, jobs: list[dict], com
             job_id=job["id"], title=job["title"], company=job["company"], area=job["area"], url=job["url"],
             locations=[str(loc.get("label")) for loc in job["locations"]], score=score,
             matched=matched, missing=missing, project=project,
+            logo=job.get("logo") or (company or {}).get("logo") or None,
         ))
     matches.sort(key=lambda m: (m.score is None, -(m.score or 0)))
     if folder.id is not None:

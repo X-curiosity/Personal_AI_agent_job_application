@@ -1,5 +1,14 @@
 # Repository context — start here
 
+## Role folders UI and company logos
+
+- Finished the role-folders UI integration: the Streamlit "Role folders" page renders, shows matched roles with scores and a per-role project-PDF download, and now renders company logos.
+- Fixed path resolution so `role_folders` defaults work whether imported from source or from the installed package (`_project_root()` finds the repo via `pyproject.toml`/`fixtures`), and enabled `PRAGMA foreign_keys` so folder deletion cascades to matches/documents.
+- Logos render as inline base64 `<img>` because the hiring companies' logos are `.ico`, which Streamlit's `st.image` cannot display. Matches carry a `logo` field (job logo first, else the company catalogue logo).
+- Verified in headless Chromium against a seeded folder: 9 Mistral AI matches rendered with logos and "Download project PDF" buttons. Reinstalled the package (`uv sync --no-editable --reinstall-package tau-job-application`) so the installed app sees the new modules.
+- Checks: 416 Python tests + 21 Node tests pass. Local test fixtures (folders/matches/documents) cleaned from the DB.
+
+
 ## Role folders: deterministic folder agent, scoring, and PDF projects
 
 - Built the folder-based discovery system. A folder encodes role keywords, region, company type and optional sector/sub-sector; the deterministic "general agent" (`run_all_folders`) runs each folder as its own sub-task and saves results.
