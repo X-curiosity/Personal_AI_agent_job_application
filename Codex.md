@@ -1,5 +1,12 @@
 # Repository context — start here
 
+## Unified implementation plan
+
+- Merged the map and autonomous job-agent plans into `docs/IMPLEMENTATION_PLAN.md`, retaining both detailed sections and adding shared architecture, navigation and an integrated delivery sequence.
+- Removed the two superseded planning files and updated architecture-document links. Historical entries below refer to their original names.
+- Documentation-only change. Verified local Markdown links and section anchors; no runtime behavior or deployment changes claimed.
+
+
 ## Detailed architecture plans and repository cleanup
 
 - Added `docs/MAP_IMPLEMENTATION_PLAN.md`: map-provider comparison, public directory reuse, Google trial/allowance caveats, zoom/marker implementation, office precision/provenance, costs and rollout tests.

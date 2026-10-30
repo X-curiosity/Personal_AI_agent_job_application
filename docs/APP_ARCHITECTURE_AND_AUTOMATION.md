@@ -61,7 +61,7 @@ A production aggregator also spends substantial effort on expired listings, dupl
 
 ## 3. Is there a map API for street-level cities and exact company locations?
 
-See the [detailed map implementation plan](MAP_IMPLEMENTATION_PLAN.md) for the consolidated StartupMap/YC reuse discussion, Google free allowances and restrictions, Leaflet/Mapbox/MapLibre comparison, file-level zoom/marker changes, office enrichment schema, costs and rollout tests.
+See the [unified implementation plan — map](IMPLEMENTATION_PLAN.md#part-i--map-implementation) for the consolidated StartupMap/YC reuse discussion, Google free allowances and restrictions, Leaflet/Mapbox/MapLibre comparison, file-level zoom/marker changes, office enrichment schema, costs and rollout tests.
 
 **Yes, but displaying a map and knowing an office address are different problems.**
 
@@ -107,7 +107,7 @@ Private CVs, contact data, credentials, and application histories must never be 
 
 ## 5. How do we build role folders with manual and autonomous modes?
 
-See the [job-agent implementation plan](JOB_AGENT_IMPLEMENTATION_PLAN.md) for source registries, shared ingestion, private recommendation tasks, queue semantics, AI boundaries, cost controls and acceptance tests.
+See the [unified implementation plan — job agent](IMPLEMENTATION_PLAN.md#part-ii--autonomous-job-agent-implementation) for source registries, shared ingestion, private recommendation tasks, queue semantics, AI boundaries, cost controls and acceptance tests.
 
 **This is feasible. The missing piece is a hosted, durable workflow—not an impossible AI capability.** Some building blocks already exist: CV parsing, deterministic matching, target/application storage, and a reviewed browser-application runner. They do not yet form this complete hosted product.
 
