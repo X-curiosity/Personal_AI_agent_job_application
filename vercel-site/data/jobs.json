@@ -1,8 +1,185 @@
 {
   "schemaVersion": 1,
-  "exportedAt": "2026-10-29T12:00:22.228234+00:00",
+  "exportedAt": "2026-10-30T11:54:35.924595+00:00",
   "live": false,
   "jobs": [
+    {
+      "id": "job_45bf06465e5c754ab202",
+      "logo": "data/job-logos/f1fff94a8e80.ico",
+      "title": "AI Scientist - Domain Expert Crashworthiness",
+      "company": "Mistral AI",
+      "companyType": "Startup",
+      "url": "https://jobs.ashbyhq.com/mistral.ai/bc659575-b7c2-406c-825b-fdd58c503594",
+      "source": "Ashby",
+      "boardUrl": "https://jobs.ashbyhq.com/mistral.ai",
+      "area": "Data & AI",
+      "skills": [
+        "Machine Learning"
+      ],
+      "description": "ABOUT MISTRAL Mistral provides full-stack AI solutions: from frontier models to developer tools, applications, and compute. We partner with enterprises tackling the hardest problems across high-stakes industries like finance, manufacturing, defense, healthcare, and the public sector, co-creating customized AI systems that they can run on their terms. We are a dynamic, collaborative team passionate about AI and its potential to transform society. Our diverse workforce thrives in competitive environments and is committed to driving innovation. Our teams are distributed between Europe, North America, Asia and the Middle East. We are creative, low-ego and team-spirited. ABOUT THE JOB Mistral AI is looking for a Domain Expert in crashworthiness simulations to help build AI-accelerated simulation capabilities for industrial engineering. You will work at the intersection of industrial simulation, physics modeling, machine learning, and engineering workflows. Your role is to bring deep solid-mechanics expertise into the design, training, evaluation, and deployment of AI Physics Models for real engineering use cases. This is a hands-on technical role. We are looking for someone who understands industrial structural simulation not only conceptually, but through direct experience with simulation models, solver workflows, data generation, validation, and engineering decision-making. You will work with research, product, and customer-facing teams to ensure that our models are useful against real engineering standards — not only benchmark metrics. Relevant application areas may include automotive crashworthiness, aerospace structures, consumer-electronics drop/reliability, manufacturing, durability/fatigue, and other nonlinear structural mechanics problems. WHAT YOU WILL DO - Work with our research team to define, generate, and iteratively improve simulation datasets for training and evaluating crashworthiness foundation models, balancing coverage of relevant physical scenarios, simulation fidelity, and computational cost. - Design and run high-fidelity simulation campaigns using structural mechanics solvers such as Abaqus, LS-DYNA, Ansys Mechanical, Radioss or equivalent tools. - Define the relevant variation space for training data: geometry, mesh resolution, material behavior, boundary conditions, loading, contact, joints, failure modes, and engineering KPIs. - Build or guide automated pipelines for simulation setup, execution, post-processing, dataset creation, and model evaluation. - Work with research teams to train and evaluate AI models on simulation data, and diagnose failure modes caused by data gaps, poor coverage, numerical artifacts, or model limitations. - Evaluate model outputs against industrial engineering needs, including field-level accuracy, scalar KPIs, deformation modes, load paths, energy absorption, stress/strain fields, failure indicators, uncertainty, and out-of-domain behavior. - Work with industrial customers to understand their simulation workflows and engineering priorities, define use cases and success criteria, and incorporate their feedback into model development and validation. ABOUT YOU - You have deep expertise in crashworthiness, solid mechanics, and structural mechanics, with substantial experience in industrial simulation workflows. - You have a Master’s degree or equivalent technical depth in mechanical engineering, aerospace engineering, civil/structural engineering, computational mechanics, applied physics, or a related field. - You have 4+ years of relevant industrial experience (or PhD +1 years) in domains such as automotive, aerospace, and consumer electronics. - You have hands-on experience with explicit dynamics for crash or impact simulation and understand nonlinear FEM and related topics such as contact, plasticity, structural dynamics, buckling, material modeling, fracture/damage, fatigue, crashworthiness, or durability. - You have direct experience with simulation validation, correlation, m",
+      "locations": [
+        {
+          "label": "Paris, France",
+          "city": "Paris",
+          "country": "France",
+          "latitude": 48.8566,
+          "longitude": 2.3522,
+          "precision": "city"
+        },
+        {
+          "label": "Amsterdam, Netherlands",
+          "city": "Amsterdam",
+          "country": "Netherlands",
+          "latitude": 52.3676,
+          "longitude": 4.9041,
+          "precision": "city"
+        },
+        {
+          "label": "Linz, Austria",
+          "city": "Austria",
+          "country": "Austria",
+          "latitude": 47.5162,
+          "longitude": 14.5501,
+          "precision": "country"
+        },
+        {
+          "label": "Munich, Germany",
+          "city": "Munich",
+          "country": "Germany",
+          "latitude": 48.1351,
+          "longitude": 11.582,
+          "precision": "city"
+        },
+        {
+          "label": "London, United Kingdom",
+          "city": "London",
+          "country": "United Kingdom",
+          "latitude": 51.5072,
+          "longitude": -0.1276,
+          "precision": "city"
+        },
+        {
+          "label": "Berlin, Germany",
+          "city": "Berlin",
+          "country": "Germany",
+          "latitude": 52.52,
+          "longitude": 13.405,
+          "precision": "city"
+        }
+      ],
+      "workplace": "Remote",
+      "employment": "FullTime",
+      "sourceTimestamp": "2026-10-30T11:41:20.590+00:00",
+      "sourceTimestampKind": "published"
+    },
+    {
+      "id": "job_f09a9f1507a8f76d5dd7",
+      "logo": "data/job-logos/f1fff94a8e80.ico",
+      "title": "Research Engineer,  Robotics",
+      "company": "Mistral AI",
+      "companyType": "Startup",
+      "url": "https://jobs.ashbyhq.com/mistral.ai/25944723-62e2-498e-8149-a588907c39d6",
+      "source": "Ashby",
+      "boardUrl": "https://jobs.ashbyhq.com/mistral.ai",
+      "area": "Engineering",
+      "skills": [
+        "Python",
+        "Machine Learning"
+      ],
+      "description": "ABOUT MISTRAL Mistral provides full-stack AI solutions: from frontier models to developer tools, applications, and compute. We partner with enterprises tackling the hardest problems across high-stakes industries like finance, manufacturing, defense, healthcare, and the public sector, co-creating customized AI systems that they can run on their terms. We are a dynamic, collaborative team passionate about AI and its potential to transform society. Our diverse workforce thrives in competitive environments and is committed to driving innovation. Our teams are distributed between Europe, North America, Asia and the Middle East. We are creative, low-ego and team-spirited. The Role As a Research Engineer on the Robotics team, you will deploy and refine state-of-the-art AI models for mobile manipulation on real robots. This role exists to bridge the gap between cutting-edge research and real-world robotic applications, ensuring that Mistral’s in-house models are not only theoretically sound but also practical, scalable, and effective in dynamic environments. You will join a team of engineers and researchers dedicated to pushing the boundaries of what robots can achieve. Your work will directly impact the development of autonomous systems, enabling them to operate reliably in complex, real-world scenarios. The scope of this role spans from architecting data pipelines for model training to maintaining fleets of diverse robots, all while collaborating closely with cross-functional teams to validate and iterate on robotic systems. What You Will Do - Deploy state-of-the-art AI models for mobile manipulation on real robots in production environments. - Architect and optimize data pipelines to support the training of advanced robotics models on large-scale datasets. - Set up, maintain, and scale fleets of robots, ensuring their operational readiness and reliability. - Design and conduct experiments to validate robotic systems in real-world conditions. - Collaborate with engineers and researchers to refine models and improve system performance. What We're Looking For - Hands-on experience developing software for real-world robotics applications. - Mastery of Python and a strong background as a software developer. - High engineering competence, with the ability to design complex systems and deploy them in production. - A self-starter mindset, with the autonomy to drive projects forward and the adaptability to collaborate effectively. - Experience with robotic control frameworks, such as ROS, and proficiency in sensor integration and actuator control. - Knowledge of control theory, machine learning, or computer vision as applied to robotics. - Experience with robotics simulators, hardware development, or maintaining large codebases. - A proactive approach, with a focus on delivering results and continuously improving systems. WHAT WE OFFER We offer a comprehensive benefits package designed to support your well-being, growth, and work-life balance. Benefits vary by country and may include healthcare coverage, parental leave, retirement plans, relocation support, wellness programs, meal and transportation allowances, and other location-specific perks. For the most up-to-date details on benefits available in your location, please refer to our Benefits page https://app.notion.com/p/mistralai/Benefits-at-Mistral-36e6ba59a7fe836b93dd01737fcc27ef?source=copy_link. PRIVACY POLICY Your privacy matters to us. You can learn more about how we handle your personal data in our Applicant Privacy Policy https://legal.mistral.ai/terms/applicant-privacy-policy.",
+      "locations": [
+        {
+          "label": "Paris, France",
+          "city": "Paris",
+          "country": "France",
+          "latitude": 48.8566,
+          "longitude": 2.3522,
+          "precision": "city"
+        }
+      ],
+      "workplace": "OnSite",
+      "employment": "FullTime",
+      "sourceTimestamp": "2026-10-29T18:53:22.845+00:00",
+      "sourceTimestampKind": "published"
+    },
+    {
+      "id": "job_8c53ac433757b3407bc5",
+      "logo": "data/job-logos/f1fff94a8e80.ico",
+      "title": "Applied Science - Time Series",
+      "company": "Mistral AI",
+      "companyType": "Startup",
+      "url": "https://jobs.ashbyhq.com/mistral.ai/4e604675-047a-47af-9883-a99b30ee4a64",
+      "source": "Ashby",
+      "boardUrl": "https://jobs.ashbyhq.com/mistral.ai",
+      "area": "Operations",
+      "skills": [
+        "Python",
+        "PyTorch",
+        "Machine Learning"
+      ],
+      "description": "ABOUT MISTRAL Mistral provides full-stack AI solutions: from frontier models to developer tools, applications, and compute. We partner with enterprises tackling the hardest problems across high-stakes industries like finance, manufacturing, defense, healthcare, and the public sector, co-creating customized AI systems that they can run on their terms. We are a dynamic, collaborative team passionate about AI and its potential to transform society. Our diverse workforce thrives in competitive environments and is committed to driving innovation. Our teams are distributed between Europe, North America, Asia and the Middle East. We are creative, low-ego and team-spirited. ABOUT THE JOB Mistral AI is seeking Applied Scientists and Research Engineers focused on time series. You will design, train, and deploy state-of-the-art time-series foundation models, and apply them to the most demanding forecasting problems in industry, from power grids and plants to trading desks. Timestral, our family of time-series foundation models, ranked first on amongst all benchmarks at release (tech report https://arxiv.org/pdf/2610.37585v1: https://arxiv.org/pdf/2610.37585v1 ). The role has two sides: building the next generations of Timestral with our Science team, and taking them into production with our industrial and financial clients, adapted to their data. Working cross-functionally with both external and internal science, engineering, and product teams you will deliver high-impact AI solutions. We are made of researchers, engineers, product builders, ex-founders who love tackling the most complex real world problems in the industry. WHAT YOU WILL DO - Run pre-training, post-training and deploy state of the art time-series foundation models on clusters with thousands of GPUs. - Generate and curate large-scale time-series datasets, real and synthetic, and build evaluators and benchmarks for forecasting and other time-series tasks. - Push the frontier of Timestral: architectures, training recipes, scaling, and new capabilities such as anomaly detection, classification and embeddings. - Fine-tune and adapt Timestral on client data, in the cloud or on-premise, and benchmark it against the client's existing models. - Develop the necessary tools and frameworks to facilitate data generation, model training, evaluation and deployment. - Collaborate with cross-functional teams to tackle complex use cases, including agents that combine Timestral with Mistral LLMs. - Manage research projects and communications with client research teams. ABOUT YOU - Fluent in English with excellent communication skills, at ease explaining complex technical concepts to both technical and non-technical audiences. - Expert with PyTorch or JAX. - Solid knowledge of modern deep learning and large language models: architectures, pre-training, post-training and evaluation. - Experience pre-training or fine-tuning time-series foundation models or large transformer models at scale. - Strong background in time-series modelling: probabilistic forecasting, multivariate series and covariates, and classical baselines (statistical models, gradient boosting). - Not afraid of contributing to a big codebase; finds their way around independently with little guidance. - Writes clean, readable, high-performance, fault-tolerant Python code. - Doesn't need roadmaps: moves independently and is comfortable with uncertainty. - Low-ego, collaborative and eager to learn. - Track record of success through personal projects, professional projects or academia. NICE TO HAVE - Ex-founder or builder - PhD / Master in a relevant field (Machine Learning, Statistics, Applied Mathematics, Physics). Exceptional candidates from other backgrounds welcome. - Research on time-series foundation models: pre-training, scaling, synthetic data or evaluation. - Hands-on experience training or fine-tuning LLMs, building agents and tool use, or models that combine text and time series. - Industry experience in energy, indust",
+      "locations": [
+        {
+          "label": "Paris, France",
+          "city": "Paris",
+          "country": "France",
+          "latitude": 48.8566,
+          "longitude": 2.3522,
+          "precision": "city"
+        },
+        {
+          "label": "London, United Kingdom",
+          "city": "London",
+          "country": "United Kingdom",
+          "latitude": 51.5072,
+          "longitude": -0.1276,
+          "precision": "city"
+        }
+      ],
+      "workplace": null,
+      "employment": "FullTime",
+      "sourceTimestamp": "2026-10-29T15:13:17.761+00:00",
+      "sourceTimestampKind": "published"
+    },
+    {
+      "id": "job_7a9b1ab6e70d3dac9355",
+      "logo": "data/job-logos/f1fff94a8e80.ico",
+      "title": "Applied Science - Cybersecurity",
+      "company": "Mistral AI",
+      "companyType": "Startup",
+      "url": "https://jobs.ashbyhq.com/mistral.ai/bc1dc526-615f-47f6-a80a-8f1b95bf75ae",
+      "source": "Ashby",
+      "boardUrl": "https://jobs.ashbyhq.com/mistral.ai",
+      "area": "Engineering",
+      "skills": [
+        "Python",
+        "Machine Learning",
+        "Security"
+      ],
+      "description": "ABOUT MISTRAL Mistral provides full-stack AI solutions: from frontier models to developer tools, applications, and compute. We partner with enterprises tackling the hardest problems across high-stakes industries like finance, manufacturing, defense, healthcare, and the public sector, co-creating customized AI systems that they can run on their terms. We are a dynamic, collaborative team passionate about AI and its potential to transform society. Our diverse workforce thrives in competitive environments and is committed to driving innovation. Our teams are distributed between Europe, North America, Asia and the Middle East. We are creative, low-ego and team-spirited. ABOUT THE JOB Mistral AI is seeking Applied Scientists to build frontier cybersecurity models. You will develop SOTA models across different domains of cybersecurity, from vulnerability analysis to incident response and remediation. You’ll build the environments, training-data pipelines, and evaluations that make these capabilities real and measurable. You'll work closely with cybersecurity actors and real production data, as well as cross-functionally with science, engineering, and product teams teams to deliver high-impact, trustworthy AI for security. We are made of researchers, engineers, product builders, ex-founders who love tackling the most complex real world problems in the industry. You might come from security with a genuine interest in AI science, or from AI science with a genuine interest in security, both paths fit. What matters is curiosity for the side you know less well, and the drive to go deep on it. WHAT YOU WILL DO - Develop, pre-train and post-train domain-specialized foundation models for agentic defensive security. - Work across a diverse set of complex real world problems to build the future of AI for cybersecurity. - Design evaluations and benchmarks that measure realistic security capability on customer-representative tasks. - Build sandboxed execution environments, RL tasks, and verifiers grounded in real customer workflows, and generate and curate the training data for training frontier models. - Develop the necessary tools and frameworks to facilitate data generation, model training, evaluation and deployment. - Own technical delivery across project sprints and manage research communications with customer teams. ABOUT YOU - Fluent in English with excellent communication skills: at ease explaining complex technical to both technical and non-technical audiences. - Experience building harnesses, benchmarks or RL environments for code, agentic or security tasks. - Hands-on security background in one or more of: vulnerability research, exploit development, red teaming, or detection and incident response. - Not afraid of contributing to a big codebase; finds their way around independently with little guidance. - Writes clean, readable, high-performance, fault-tolerant Python code. - Doesn’t need roadmaps: moves independently and navigates uncertainty with confidence. - Low-ego, collaborative and eager to learn. - Track record of success through personal projects, professional projects or academia. NICE TO HAVE - PhD / Master in a relevant field (Mathematics, Security, Machine Learning). Exceptional candidates from other backgrounds welcome - Contributions to a large open-source or industry codebase. - Publications in top ML/security venues and/or contributions to open-source security or observability tools. - Experience working on large code bases or large machine learning models at scale. - Enjoys improving existing code: typing, tests, CI pipelines. WHAT WE OFFER We offer a comprehensive benefits package designed to support your well-being, growth, and work-life balance. Benefits vary by country and may include healthcare coverage, parental leave, retirement plans, relocation support, wellness programs, meal and transportation allowances, and other location-specific perks. For the most up-to-date details on benefits available in your locat",
+      "locations": [
+        {
+          "label": "Paris, France",
+          "city": "Paris",
+          "country": "France",
+          "latitude": 48.8566,
+          "longitude": 2.3522,
+          "precision": "city"
+        },
+        {
+          "label": "London, United Kingdom",
+          "city": "London",
+          "country": "United Kingdom",
+          "latitude": 51.5072,
+          "longitude": -0.1276,
+          "precision": "city"
+        }
+      ],
+      "workplace": null,
+      "employment": "FullTime",
+      "sourceTimestamp": "2026-10-29T15:11:23.727+00:00",
+      "sourceTimestampKind": "published"
+    },
     {
       "id": "job_01a82330046839304840",
       "logo": "data/job-logos/f1fff94a8e80.ico",
@@ -14,7 +191,7 @@
       "boardUrl": "https://jobs.ashbyhq.com/mistral.ai",
       "area": "Sales",
       "skills": [],
-      "description": "ABOUT MISTRAL Mistral provides full-stack AI solutions: from frontier models to developer tools, applications, and compute. We partner with enterprises tackling the hardest problems across high-stakes industries like finance, manufacturing, defense, healthcare, and the public sector, co-creating customized AI systems that they can run on their terms. We are a dynamic, collaborative team passionate about AI and its potential to transform society. Our diverse workforce thrives in competitive environments and is committed to driving innovation. Our teams are distributed between Europe, North America, Asia and the Middle East. We are creative, low-ego and team-spirited. Role Summary: As our Enterprise Sales Executive, you will be instrumental in shaping Mistral’s adoption with our largest customers across a variety of industries. You will be driving deals end2end: from prospective, first intro call until closing and beyond — together with our dedicated implementation specialist, tech and legal teams. What you will do: Lead development (strategic outbound and qualified inbound): - Handle strategic outreach as well as warm introductions to promising enterprise customers - Converting inbound deals where upselling / more bespoke agreements can be achieved Value prop validation for customer: - Provide hands-on support and guidance to clients during a potential Proof of Concept (POC) phase, ensuring a smooth and successful evaluation process - Leverage successful POC outcomes to facilitate the conversion of POCs into long-term, revenue-generating contracts Deal management & closing: - Develop and execute strategic sales plans to convert leads into valued customers — you are the first point of contact for all external stakeholders and are responsible for properly managing deals and aligning all stakeholders (heavy involvement of customer engineering, product, and commercial teams, both on operational and C-level) - Handle customer negotiation end2end, together with our legal and implementation specialist team Executive Engagement: - Cultivate and maintain strong relationships with C-level executives, heads of innovation/AI, and other key decision-makers within target organisations - Comprehend their specific challenges and needs, positioning our solution as an integral part of their strategic initiatives Technical Aptitude: - Demonstrate a deep understanding of the technical intricacies of our product and articulate its value proposition effectively to potential clients - Work side-by-side with our implementation team to ensure that customer’s questions, concerns and challenges are taken care of during pre-sales, deployment and post-deployment phase - Collaborate with our technical team to address any customer inquiries or concerns Training and enablement: -Empower internal teams with the knowledge and resources that you collect in customer conversations to drive product roadmap and align on priorities Who you are: - 7-10 years experience in Sales (enterprise sales/consultative selling, ideally selling a highly complex, technical product) - Excellent academics: Bachelor and/or Master Degree in Business, Computer Science, or a related field - Significant work experience within AI ecosystem or related data/infrastructure field - Experience at successful fast growing startup, ideally in deep-tech - Strong technical skills to navigate quickly evolving products and steer technical discussions - Excellent French, German and English - Outstanding negotiation and communication skills WHAT WE OFFER We offer a comprehensive benefits package designed to support your well-being, growth, and work-life balance. Benefits vary by country and may include healthcare coverage, parental leave, retirement plans, relocation support, wellness programs, meal and transportation allowances, and other location-specific perks. For the most up-to-date details on benefits available in your location, please refer to our Benefits page https://app.notion.com/p/mistralai",
+      "description": "ABOUT MISTRAL Mistral provides full-stack AI solutions: from frontier models to developer tools, applications, and compute. We partner with enterprises tackling the hardest problems across high-stakes industries like finance, manufacturing, defense, healthcare, and the public sector, co-creating customized AI systems that they can run on their terms. We are a dynamic, collaborative team passionate about AI and its potential to transform society. Our diverse workforce thrives in competitive environments and is committed to driving innovation. Our teams are distributed between Europe, North America, Asia and the Middle East. We are creative, low-ego and team-spirited. Role Summary: As our Enterprise Sales Executive, you will be instrumental in shaping Mistral’s adoption with our largest customers across a variety of industries. You will be driving deals end2end: from prospective, first intro call until closing and beyond — together with our dedicated implementation specialist, tech and legal teams. What you will do: Lead development (strategic outbound and qualified inbound): - Handle strategic outreach as well as warm introductions to promising enterprise customers - Converting inbound deals where upselling / more bespoke agreements can be achieved Value prop validation for customer: - Provide hands-on support and guidance to clients during a potential Proof of Concept (POC) phase, ensuring a smooth and successful evaluation process - Leverage successful POC outcomes to facilitate the conversion of POCs into long-term, revenue-generating contracts Deal management & closing: - Develop and execute strategic sales plans to convert leads into valued customers — you are the first point of contact for all external stakeholders and are responsible for properly managing deals and aligning all stakeholders (heavy involvement of customer engineering, product, and commercial teams, both on operational and C-level) - Handle customer negotiation end2end, together with our legal and implementation specialist team Executive Engagement: - Cultivate and maintain strong relationships with C-level executives, heads of innovation/AI, and other key decision-makers within target organisations - Comprehend their specific challenges and needs, positioning our solution as an integral part of their strategic initiatives Technical Aptitude: - Demonstrate a deep understanding of the technical intricacies of our product and articulate its value proposition effectively to potential clients - Work side-by-side with our implementation team to ensure that customer’s questions, concerns and challenges are taken care of during pre-sales, deployment and post-deployment phase - Collaborate with our technical team to address any customer inquiries or concerns Training and enablement: -Empower internal teams with the knowledge and resources that you collect in customer conversations to drive product roadmap and align on priorities Who you are: - 7-10 years experience in Sales (enterprise sales/consultative selling, ideally selling a highly complex, technical product) - Excellent academics: Bachelor and/or Master Degree in Business, Computer Science, or a related field - Significant work experience within AI ecosystem or related data/infrastructure field - Experience at successful fast growing startup, ideally in deep-tech - Strong technical skills to navigate quickly evolving products and steer technical discussions - Fluency in French and English is mandatory; proficiency in German would be considered an advantage. - Outstanding negotiation and communication skills WHAT WE OFFER We offer a comprehensive benefits package designed to support your well-being, growth, and work-life balance. Benefits vary by country and may include healthcare coverage, parental leave, retirement plans, relocation support, wellness programs, meal and transportation allowances, and other location-specific perks. For the most up-to-date details on benefits available in your location, pleas",
       "locations": [
         {
           "label": "Zurich, Switzerland",
@@ -2266,126 +2443,6 @@
       "workplace": "Hybrid",
       "employment": "FullTime",
       "sourceTimestamp": "2026-10-15T08:44:08.139+00:00",
-      "sourceTimestampKind": "published"
-    },
-    {
-      "id": "job_5d5138c0b51a7beff485",
-      "logo": "data/job-logos/f1fff94a8e80.ico",
-      "title": "Internal Event Manager - Paris",
-      "company": "Mistral AI",
-      "companyType": "Startup",
-      "url": "https://jobs.ashbyhq.com/mistral.ai/41deac4a-ebd0-41b4-8087-0a17434f9120",
-      "source": "Ashby",
-      "boardUrl": "https://jobs.ashbyhq.com/mistral.ai",
-      "area": "Operations",
-      "skills": [],
-      "description": "ABOUT MISTRAL Mistral provides full-stack AI solutions: from frontier models to developer tools, applications, and compute. We partner with enterprises tackling the hardest problems across high-stakes industries like finance, manufacturing, defense, healthcare, and the public sector, co-creating customized AI systems that they can run on their terms. We are a dynamic, collaborative team passionate about AI and its potential to transform society. Our diverse workforce thrives in competitive environments and is committed to driving innovation. Our teams are distributed between Europe, North America, Asia and the Middle East. We are creative, low-ego and team-spirited. THE ROLE We’re seeking an Internal Event Manager to lead our internal event strategy and execution. In this role, you’ll develop and implement a comprehensive events plan, manage our new event spaces, and collaborate with internal teams and external agencies to deliver exceptional experiences for Mistralers. WHAT YOU'LL DO - Design and execute a strategy for internal events, ensuring alignment with Mistral’s culture and objectives. - Plan and manage events from start to finish, including logistics, vendor coordination, and on-site execution. - Build and maintain relationships with vendors, venues, and service providers in Paris. - Act as the primary contact for internal teams hosting events in our new HQ. - Ensure events are delivered on time, within budget, and to the highest standards. WHAT WE ARE LOOKING FOR - At least +6 years, with 3 years as an Event Manager or in a similar role, ideally in a corporate or tech environment. - Strong organizational and project management skills. - Excellent communication and interpersonal abilities. - A network of trusted vendors and venues in Paris. - Fluency in English and French. - It would be ideal if you had: - Knowledge of AV and technical event requirements. - Familiarity with CRM or event management software. WHAT WE OFFER We offer a comprehensive benefits package designed to support your well-being, growth, and work-life balance. Benefits vary by country and may include healthcare coverage, parental leave, retirement plans, relocation support, wellness programs, meal and transportation allowances, and other location-specific perks. For the most up-to-date details on benefits available in your location, please refer to our Benefits page https://app.notion.com/p/mistralai/Benefits-at-Mistral-36e6ba59a7fe836b93dd01737fcc27ef?source=copy_link. PRIVACY POLICY Your privacy matters to us. You can learn more about how we handle your personal data in our Applicant Privacy Policy https://legal.mistral.ai/terms/applicant-privacy-policy.",
-      "locations": [
-        {
-          "label": "Paris, France",
-          "city": "Paris",
-          "country": "France",
-          "latitude": 48.8566,
-          "longitude": 2.3522,
-          "precision": "city"
-        }
-      ],
-      "workplace": "OnSite",
-      "employment": "FullTime",
-      "sourceTimestamp": "2026-10-15T08:00:59.578+00:00",
-      "sourceTimestampKind": "published"
-    },
-    {
-      "id": "job_59d5ac6432ce4b0d253c",
-      "logo": "data/job-logos/f1fff94a8e80.ico",
-      "title": "Research Engineer, GPU Performance",
-      "company": "Mistral AI",
-      "companyType": "Startup",
-      "url": "https://jobs.ashbyhq.com/mistral.ai/de9344e8-cba8-4855-9272-c3a1711b85ca",
-      "source": "Ashby",
-      "boardUrl": "https://jobs.ashbyhq.com/mistral.ai",
-      "area": "Engineering",
-      "skills": [
-        "LLM"
-      ],
-      "description": "ABOUT MISTRAL Mistral provides full-stack AI solutions: from frontier models to developer tools, applications, and compute. We partner with enterprises tackling the hardest problems across high-stakes industries like finance, manufacturing, defense, healthcare, and the public sector, co-creating customized AI systems that they can run on their terms. We are a dynamic, collaborative team passionate about AI and its potential to transform society. Our diverse workforce thrives in competitive environments and is committed to driving innovation. Our teams are distributed between Europe, North America, Asia and the Middle East. We are creative, low-ego and team-spirited. ABOUT THE ROLE As a Research Engineer, GPU performance, you will sit at the heart of that spectrum: your low-level work directly determines how fast our frontier models can be trained and served. Working hand-in-hand with Research Scientists, you'll make every GPU count. Mistral AI is hiring an expert in pushing large language model's GPU utilization and performance to their limits.. In this role, you will own the performance of our models end-to-end: writing the low-level code that extracts the maximum capacity from high-end hardware, and rethinking model architectures so they run efficiently at scale. WHAT YOU WILL DO - Develop low-level code that takes full advantage of high-end GPUs and maxes out their capacity — from custom kernels to memory-layout and communication optimisations. - Rethink parts of the generative model architecture to make them more suitable for efficient inference, in collaboration with Research Scientists. - Integrate low-level efficient code into a high-level MLOps framework, so that optimisations benefit every training run and deployment rather than a single experiment. - Profile, benchmark and squeeze performance out of large-scale training and inference on thousands of GPUs. - Model LLM execution on various GPUs with high fidelity to assess hardware usage and build serving performance estimates. WHAT WE'RE LOOKING FOR - High technical competence for writing custom low-level kernels and pushing GPUs to their limits. - High expertise in the distributed computation infrastructure of current-generation GPU clusters. - Overall understanding of the field of generative AI; knowledge of, or interest in, fine-tuning and using language models for applications. - Strong software-design instincts: testing, code review, CI/CD. - Self-starter, low-ego, collaborative. WHAT WE OFFER We offer a comprehensive benefits package designed to support your well-being, growth, and work-life balance. Benefits vary by country and may include healthcare coverage, parental leave, retirement plans, relocation support, wellness programs, meal and transportation allowances, and other location-specific perks. For the most up-to-date details on benefits available in your location, please refer to our Benefits page https://app.notion.com/p/mistralai/Benefits-at-Mistral-36e6ba59a7fe836b93dd01737fcc27ef?source=copy_link. PRIVACY POLICY Your privacy matters to us. You can learn more about how we handle your personal data in our Applicant Privacy Policy https://legal.mistral.ai/terms/applicant-privacy-policy.",
-      "locations": [
-        {
-          "label": "Paris, France",
-          "city": "Paris",
-          "country": "France",
-          "latitude": 48.8566,
-          "longitude": 2.3522,
-          "precision": "city"
-        }
-      ],
-      "workplace": null,
-      "employment": "FullTime",
-      "sourceTimestamp": "2026-10-14T18:48:51.976+00:00",
-      "sourceTimestampKind": "published"
-    },
-    {
-      "id": "job_15bb7687cc1a02f0bd54",
-      "logo": "data/job-logos/f1fff94a8e80.ico",
-      "title": "VP Product, Cloud & Inference",
-      "company": "Mistral AI",
-      "companyType": "Startup",
-      "url": "https://jobs.ashbyhq.com/mistral.ai/c55aa346-38ea-46b5-8b39-1ce40e56dfe1",
-      "source": "Ashby",
-      "boardUrl": "https://jobs.ashbyhq.com/mistral.ai",
-      "area": "Operations",
-      "skills": [
-        "Distributed Systems"
-      ],
-      "description": "ABOUT MISTRAL Mistral provides full-stack AI solutions: from frontier models to developer tools, applications, and compute. We partner with enterprises tackling the hardest problems across high-stakes industries like finance, manufacturing, defense, healthcare, and the public sector, co-creating customized AI systems that they can run on their terms. We are a dynamic, collaborative team passionate about AI and its potential to transform society. Our diverse workforce thrives in competitive environments and is committed to driving innovation. Our teams are distributed between Europe, North America, Asia and the Middle East. We are creative, low-ego and team-spirited. THE ROLE Mistral is building a sovereign AI cloud. Our product surface is expanding fast - GPU clusters, compute orchestration, storage, networking, serverless containers, inference, and training. We're hiring a VP Product to own our cloud infrastructure and inference portfolio end to end: the foundational systems that power Mistral's datacenters, and the inference platform that brings the world's most advanced generative AI models to production. This is a broad mandate. You'll own both scopes and, as the business scales, build the organization and stream leadership to delegate them. You'll define the vision, hire and grow the team, and set the operating rhythm that lets a fast-moving org deliver with focus. This is a highly visible role with the opportunity to shape how Mistral's technology is adopted globally and to unlock a major new line of business. WHAT YOU'LL DO - Strategy & vision Define and evangelize the product vision, strategy, and annual goals for our Inference and Cloud products, aligned with customer needs, company objectives and market trends. - Go-to-market Own adoption, revenue contribution, and gross margin. Partner with marketing and GTM teams on positioning, pricing and packaging, launch plans, and adoption strategy. - Team leadership Build the product organization for these products: hire product managers and stream leads, set the operating cadence (quarterly product reviews, roadmap reviews), and develop PMs through clear growth paths. - Customer & market fit Work directly with AI-native startups and enterprises running advanced AI workloads to drive product–market fit across the portfolio. - Delivery & execution Partner with engineering leadership to build a world-class compute infrastructure and inference platform delivering high-performance, cost-efficient AI at scale, with reliability, SLAs, and cost-per-token economics as first-class product concerns. - Market & technology insights Track the competitive landscape and emerging technologies across AI infrastructure and managed inference to inform product strategy and identify new opportunities - Research & open source Partner with research and engineering teams to turn emerging model architectures and advances in open-source inference into product opportunities that improve performance and efficiency WHAT WE'RE LOOKING FOR - Extensive experience in tech and infrastructure, including significant time leading product organizations with a proven track record of bringing cloud infrastructure, large-scale distributed systems, or inference products to market. - Engineering background prior to moving into product management - You've taken an infra or inference product from early stage to material revenue and adoption. - Proven people leadership: you've hired and grown senior PMs, organized teams around clear stream ownership, and built durable operating cadences. - Fluency in the economics of the business: comfortable owning gross margin, unit economics, and the tradeoffs behind pricing and capacity. - Ability to align and inspire cross-functional teams without direct authority, and to communicate credibly with executives, engineers, and customers. - Low ego, high bias for action, and comfort in ambiguity — equally at home crafting a strategy narrative and diving into metrics, a UX detail, or a c",
-      "locations": [
-        {
-          "label": "Paris, France",
-          "city": "Paris",
-          "country": "France",
-          "latitude": 48.8566,
-          "longitude": 2.3522,
-          "precision": "city"
-        },
-        {
-          "label": "London, United Kingdom",
-          "city": "London",
-          "country": "United Kingdom",
-          "latitude": 51.5072,
-          "longitude": -0.1276,
-          "precision": "city"
-        }
-      ],
-      "workplace": "Hybrid",
-      "employment": "FullTime",
-      "sourceTimestamp": "2026-10-14T06:03:57.264+00:00",
-      "sourceTimestampKind": "published"
-    },
-    {
-      "id": "job_b385389e7a2056de9282",
-      "logo": "data/job-logos/f1fff94a8e80.ico",
-      "title": "Public Affairs, Head of Germany",
-      "company": "Mistral AI",
-      "companyType": "Startup",
-      "url": "https://jobs.ashbyhq.com/mistral.ai/7b7f4718-a517-4a2f-8e6e-ef8b0508c84c",
-      "source": "Ashby",
-      "boardUrl": "https://jobs.ashbyhq.com/mistral.ai",
-      "area": "Operations",
-      "skills": [],
-      "description": "ABOUT MISTRAL Mistral provides full-stack AI solutions: from frontier models to developer tools, applications, and compute. We partner with enterprises tackling the hardest problems across high-stakes industries like finance, manufacturing, defense, healthcare, and the public sector, co-creating customized AI systems that they can run on their terms. We are a dynamic, collaborative team passionate about AI and its potential to transform society. Our diverse workforce thrives in competitive environments and is committed to driving innovation. Our teams are distributed between Europe, North America, Asia and the Middle East. We are creative, low-ego and team-spirited. THE ROLE As a Head of Public Affairs for Germany on the Policy and Government Relations team, you will shape Mistral AI’s presence and influence in Germany, ensuring the company plays a leading role in the future of AI policy and regulation. This role exists to establish Mistral AI as a trusted thought leader in Germany, driving both public interest and business growth by navigating complex regulatory landscapes. You will work closely with policymakers, industry leaders, and internal teams to build a regulatory ecosystem that supports innovation while enabling adoption in the public sector. Your impact will be immediate: from shaping policy strategies to unlocking revenue opportunities, you will help Mistral AI thrive in one of its most critical markets. This role directly reports to our Public Affairs Director for EMEA, and may evolve to a larger DACH and/or Central Europe scope in the future. WHAT YOU WILL DO - Monitor and analyze AI-related policy developments in Germany and the EU, assessing their impact on Mistral AI. - Develop and execute a long-term public affairs strategy, including parliamentary engagement, position papers, and lobbying campaigns. - Engage with policymakers, industry leaders, and key opinion leaders to foster constructive dialogue on AI and technology policy. - Prioritize and respond to policy issues affecting Mistral AI, proposing solutions that align with business and community interests. - Advise cross-functional teams on regulatory changes, ensuring compliance and informing product and business decisions. - Collaborate with Sales to design strategies that accelerate public sector adoption of AI. - Track industry trends and best practices in public affairs, ensuring the team remains ahead of regulatory shifts. - Build and maintain a strong network in Germany to amplify Mistral AI’s influence and reputation. WHAT WE'RE LOOKING FOR - Extensive public affairs experience, with a track record of impacting policy-making, ideally in both public and private sectors. - Deep understanding of German institutions (federal, regional, and local) and the ability to map decision-making power. - Expertise in tech regulations, including GDPR, Copyright, AI Act, DMA, and tax laws. - Experience in highly scrutinized environments, where public affairs are critical to business success. - Trust-building skills, with the ability to defend positions rigorously, foster long-term relationships, and act as a thought partner. - Team player with a bias for action, ownership, and the ability to navigate ambiguity. - AI knowledge and familiarity with long-term industrial plans or model development (a plus). - Open Source mindset, aligning with Mistral AI’s commitment to openness and collaboration. WHAT WE OFFER We offer a comprehensive benefits package designed to support your well-being, growth, and work-life balance. Benefits vary by country and may include healthcare coverage, parental leave, retirement plans, relocation support, wellness programs, meal and transportation allowances, and other location-specific perks. For the most up-to-date details on benefits available in your location, please refer to our Benefits page https://app.notion.com/p/mistralai/Benefits-at-Mistral-36e6ba59a7fe836b93dd01737fcc27ef?source=copy_link. PRIVACY POLICY Your privacy matters to ",
-      "locations": [
-        {
-          "label": "Berlin, Germany",
-          "city": "Berlin",
-          "country": "Germany",
-          "latitude": 52.52,
-          "longitude": 13.405,
-          "precision": "city"
-        }
-      ],
-      "workplace": "OnSite",
-      "employment": "FullTime",
-      "sourceTimestamp": "2026-10-13T13:58:49.343+00:00",
       "sourceTimestampKind": "published"
     }
   ],
