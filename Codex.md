@@ -1,5 +1,12 @@
 # Repository context — start here
 
+## StartupMap-matching UI palette and cleanup
+
+- Matched the public site's colors/typography to StartupMap (verified from its shipped CSS): ink `#1F1B16`, canvas `#F5F1E9`, surface `#FFFEFB`, border `#E6DFD1`, terracotta `#B4432F`, amber `#F0A04B`, peach `#F5E3C8`, font DM Sans. Removed the rotated yellow "DISCOVER" hero circle and added a dark `.button.primary` style.
+- Verified in headless Chromium that computed body bg/color/font and the `--ink/--orange/--paper` variables now equal StartupMap's. 22 Node tests pass.
+- Deeper layout restructure (StartupMap's slim left nav rail + a filter sidebar with category counts, vs our top header + horizontal filters) is not yet done; that is the next UI step if desired.
+
+
 ## Docs consolidation
 
 - Consolidated `docs/` to five files: `IMPLEMENTATION_PLAN.md` (map + job agent + employer self-serve + product direction + reverse-engineering build stack), `APP_ARCHITECTURE_AND_AUTOMATION.md`, `DESIGN_QUESTIONS.md`, `HOSTED_MVP.md`, and `PRIVACY_NOTICE_DRAFT.md`.
