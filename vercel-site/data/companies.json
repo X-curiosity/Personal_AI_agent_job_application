@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "exportedAt": "2026-10-26T09:18:46.322524+00:00",
+  "exportedAt": "2026-10-26T10:12:38.117673+00:00",
   "companies": [
     {
       "id": "company_cf86470430f4d8af1a93",
@@ -146043,7 +146043,7 @@
       "country": "United States",
       "countryCode": "US",
       "region": "California",
-      "logo": null,
+      "logo": "data/logos/company_7fda0b9381c2474684df.png",
       "type": "startup",
       "fundingStage": "Early",
       "tags": [
@@ -146603,7 +146603,7 @@
       "country": "Czechia",
       "countryCode": null,
       "region": "South Moravian Region",
-      "logo": null,
+      "logo": "data/logos/company_f3ae0996919dc649c4cf.ico",
       "type": "startup",
       "fundingStage": "Early",
       "tags": [
@@ -148844,7 +148844,7 @@
       "country": "United States",
       "countryCode": "US",
       "region": "California",
-      "logo": null,
+      "logo": "data/logos/company_43869783067e8501e59e.png",
       "type": "startup",
       "fundingStage": "Early",
       "tags": [
@@ -149394,7 +149394,7 @@
       "country": "United Kingdom",
       "countryCode": "GB",
       "region": "England",
-      "logo": null,
+      "logo": "data/logos/company_bbad2d941d9f3a391fc4.png",
       "type": "startup",
       "fundingStage": "Early",
       "tags": [
@@ -149454,7 +149454,7 @@
       "country": "United States",
       "countryCode": "US",
       "region": "California",
-      "logo": null,
+      "logo": "data/logos/company_68cd9f78e6e79979723f.jpg",
       "type": "startup",
       "fundingStage": "Early",
       "tags": [
@@ -150990,7 +150990,7 @@
       "country": "China",
       "countryCode": "CN",
       "region": "518040",
-      "logo": null,
+      "logo": "data/logos/company_e11643583e621e5246db.ico",
       "type": "public",
       "fundingStage": null,
       "tags": []
@@ -151815,7 +151815,7 @@
       "country": "Japan",
       "countryCode": "JP",
       "region": "754-0894",
-      "logo": null,
+      "logo": "data/logos/company_af77571dec230f4a43c1.png",
       "type": "public",
       "fundingStage": null,
       "tags": []
@@ -152565,7 +152565,7 @@
       "country": "United States",
       "countryCode": "US",
       "region": null,
-      "logo": null,
+      "logo": "data/logos/company_d38d581cc01eec96d595.png",
       "type": "private",
       "fundingStage": null,
       "tags": []
@@ -153040,7 +153040,7 @@
       "country": "China",
       "countryCode": "CN",
       "region": "518118",
-      "logo": null,
+      "logo": "data/logos/company_cd465cbbc6efdf77f22f.ico",
       "type": "public",
       "fundingStage": null,
       "tags": []
@@ -153415,7 +153415,7 @@
       "country": "Malaysia",
       "countryCode": "MY",
       "region": "50088 Kuala Lumpur",
-      "logo": null,
+      "logo": "data/logos/company_725373ad0d3785a1d0d0.png",
       "type": "private",
       "fundingStage": null,
       "tags": []
@@ -153465,7 +153465,7 @@
       "country": "China",
       "countryCode": "CN",
       "region": "100032",
-      "logo": null,
+      "logo": "data/logos/company_b2fe4356f9c78bbdfb1b.png",
       "type": "public",
       "fundingStage": null,
       "tags": []
@@ -154490,7 +154490,7 @@
       "country": "United States",
       "countryCode": "US",
       "region": "California",
-      "logo": null,
+      "logo": "data/logos/company_3b00f237bc5d67d6d96f.jpg",
       "type": "public",
       "fundingStage": null,
       "tags": []
@@ -154765,7 +154765,7 @@
       "country": "India",
       "countryCode": "IN",
       "region": "400021",
-      "logo": null,
+      "logo": "data/logos/company_cc7a50984994016a0dea.ico",
       "type": "public",
       "fundingStage": null,
       "tags": []

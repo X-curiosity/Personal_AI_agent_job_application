@@ -126,7 +126,7 @@ def test_logo_source_prefers_direct_url_and_validates_domains():
     candidates = _logo_source({"website": "https://www.acme.com/about"})
     assert candidates[0] == "https://www.acme.com/apple-touch-icon.png"
     assert candidates[1] == "https://www.acme.com/favicon.ico"
-    assert candidates[2] == "https://icons.duckduckgo.com/ip3/acme.com.ico"
+    assert len(candidates) == 2
     assert _logo_source({"website": "http://acme.com"}) == []
     assert _logo_source({}) == []
     assert _logo_source({"logo_url": "javascript:x"}) == []

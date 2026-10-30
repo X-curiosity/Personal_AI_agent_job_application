@@ -220,10 +220,8 @@ def split_location(location: str | None) -> tuple[str | None, str | None]:
 
 
 def _logo_source(payload: dict[str, Any]) -> list[str]:
-    """Candidate logo URLs in trust order: the directory's own logo URL, then
-    the company's own site assets, then DuckDuckGo's favicon proxy as a final
-    fallback. All fetches happen once at export time; visitors load the
-    self-hosted copy only."""
+    """Candidate logo URLs from official sources only: a directory-provided
+    asset or conventional icon paths on the company's declared website."""
 
     candidates: list[str] = []
     direct = safe_https(payload.get("logo_url"))
@@ -237,7 +235,6 @@ def _logo_source(payload: dict[str, Any]) -> list[str]:
             candidates.extend([
                 f"https://{host}/apple-touch-icon.png",
                 f"https://{host}/favicon.ico",
-                f"https://icons.duckduckgo.com/ip3/{bare}.ico",
             ])
     return candidates
 
