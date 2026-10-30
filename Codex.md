@@ -1,5 +1,14 @@
 # Repository context — start here
 
+## Map part: per-company recruiting status
+
+- Implemented the map browsing requirement: the Map view now lists the public company directory directly (not only after selecting a city), searchable by startup name, with a per-company recruiting badge and a recruiting-status filter.
+- Hiring status is derived truthfully: "Hiring now" when the company has ≥1 open role in the vacancy snapshot; "Lists hiring" when only a directory hiring flag exists; otherwise "No open roles". Solid job pins mark hiring companies; dashed directory pins mark companies with no confirmed open role.
+- Added `hiring` to URL state (jobs-core readState/stateQuery), a `#hiring` filter, `.hiring-badge` styles, and updated the map legend. Verified in headless Chromium: 10,247 companies browse, name search narrows the list, badges render in list and detail, and the hiring filter returns the companies with open roles.
+- Checks: 405 Python tests + 21 Node tests passed; `node --check` passed. No new runtime dependencies. Production deployment not yet verified for this push.
+- Not yet built (next phase, already planned in docs/IMPLEMENTATION_PLAN.md): the background general agent + per-folder sub-agents, per-folder CV/letter upload, role scoring, and PDF project descriptions.
+
+
 ## REA inspection update
 
 - REA MCP became available in this session; inspected both targets with `inspect_web_page` (passive CDP) via a locally launched headless Chromium, and updated `docs/REA_BUILD_STACK.md` with REA-authored evidence.

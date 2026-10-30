@@ -24,11 +24,11 @@ export function filterJobs(jobs, filters) {
 }
 export function readState(search) {
   const p = new URLSearchParams(search);
-  return Object.fromEntries(['q', 'area', 'type', 'location', 'country', 'job', 'company', 'view'].map(k => [k, clean(p.get(k), 200)]));
+  return Object.fromEntries(['q', 'area', 'type', 'location', 'country', 'hiring', 'job', 'company', 'view'].map(k => [k, clean(p.get(k), 200)]));
 }
 export function stateQuery(state) {
   const p = new URLSearchParams();
-  for (const k of ['q', 'area', 'type', 'location', 'country', 'job', 'company', 'view']) if (state[k]) p.set(k, state[k]);
+  for (const k of ['q', 'area', 'type', 'location', 'country', 'hiring', 'job', 'company', 'view']) if (state[k]) p.set(k, state[k]);
   return p.toString();
 }
 export function citySlug(value) {

@@ -23,6 +23,7 @@ test('skill match is exact, bounded and user supplied',()=>{
 });
 test('URL state retains only bounded explorer fields',()=>{
  const state=readState('?q=ML&view=map&job=job_0123456789abcdef0123&token=secret'); assert.equal(state.token,undefined); assert.deepEqual(readState(stateQuery(state)),state);
+ assert.equal(readState('?hiring=hiring').hiring,'hiring'); assert.equal(stateQuery({hiring:'hiring'}),'hiring=hiring');
 });
 test('city slugs and directory groups are generic and count real roles',()=>{
  assert.equal(citySlug('Bessé-sur-Braye'),'besse-sur-braye');

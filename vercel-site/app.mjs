@@ -15,7 +15,7 @@ const dateLabel = value => { const date = new Date(value); return Number.isNaN(d
 let jobs = [], filtered = [], companies = [], filteredCompanies = [], state = readState(location.search), page = 0, loading = false, map, mapReady = false, pendingFit = false;
 let knownCities = new Map(), knownCityCountries = new Map();
 const pathCity = () => { try { return location.pathname.startsWith('/map/') ? citySlug(decodeURIComponent(location.pathname.split('/')[2] || '')) : ''; } catch { return ''; } };
-const markers = [], controls = {q:$('search'), area:$('area'), type:$('type'), location:$('location')};
+const markers = [], controls = {q:$('search'), area:$('area'), type:$('type'), location:$('location'), hiring:$('hiring')};
 function samePlace(value) { return state.cityRoute ? citySlug(value) === state.cityRoute : value === state.location; }
 function sameCountry(value) { return !state.country || value === state.country; }
 function updateURL(replace = false) {
@@ -36,7 +36,7 @@ let searchTimer;
 function applyFilters(fit = false, replace = false) { readControls(); state.cityRoute = knownCities.has(citySlug(state.location)) ? citySlug(state.location) : ''; const countries = knownCityCountries.get(state.cityRoute) || []; if (!state.cityRoute) state.country = ''; else if (!countries.includes(state.country)) state.country = countries[0] || ''; state.job = ''; state.company = ''; page = 0; updateURL(replace); render(); if (fit) fitResults(); }
 $('filters').addEventListener('submit', e => { e.preventDefault(); applyFilters(true); });
 controls.q.addEventListener('input', () => { clearTimeout(searchTimer); searchTimer = setTimeout(() => applyFilters(true,true),180); });
-for (const key of ['area','type','location']) controls[key].addEventListener('change', () => applyFilters(true));
+for (const key of ['area','type','location','hiring']) controls[key].addEventListener('change', () => applyFilters(true));
 $('filters').addEventListener('reset', e => { e.preventDefault(); state = {...readState(''),view:state.view}; state.cityRoute = ''; restoreControls(); page = 0; updateURL(); render(); fitResults(); });
 window.addEventListener('popstate', () => { state = readState(location.search); applyPathCity(); restoreControls(); render(); const view = state.view === 'map' ? 'map' : 'jobs'; document.querySelector('.explorer-body').dataset.view = view; $('nav-jobs').setAttribute('aria-current',view === 'jobs' ? 'page' : 'false'); $('nav-map').setAttribute('aria-current',view === 'map' ? 'page' : 'false'); });
 $('previous').addEventListener('click', () => { page--; renderList(); $('jobs-heading').focus(); });
@@ -44,15 +44,25 @@ $('next').addEventListener('click', () => { page++; renderList(); $('jobs-headin
 $('fit-map').addEventListener('click', fitResults);
 function areaCitySelected() { return state.view === 'map' && knownCities.has(citySlug(state.location)); }
 function companyJobs(company) { return filtered.filter(job => job.company.toLocaleLowerCase('en') === company.name.toLocaleLowerCase('en') && (!state.location || job.locations.some(place => samePlace(place.city) && sameCountry(place.country)))); }
+function openRolesFor(company) { return jobs.filter(job => job.company.toLocaleLowerCase('en') === company.name.toLocaleLowerCase('en')); }
+function hiringStatus(company) {
+  if (openRolesFor(company).length) return {key:'hiring', label:'Hiring now', tone:'hiring'};
+  if (company.hiringSignal === 'directory_flag') return {key:'flag', label:'Lists hiring', tone:'flag'};
+  return {key:'none', label:'No open roles', tone:'none'};
+}
+function hiringMatch(company) { return !state.hiring || hiringStatus(company).key === state.hiring; }
 function filterDirectory() {
-  if (!areaCitySelected()) { filteredCompanies = []; return; }
+  if (state.view !== 'map') { filteredCompanies = []; return; }
   const query = state.q.toLocaleLowerCase('en');
+  const inArea = areaCitySelected();
   filteredCompanies = companies.filter(company => {
-    const cityMatch = (samePlace(company.locationLabel) && sameCountry(company.country)) || company.country === state.location || companyJobs(company).length > 0;
+    const locationMatch = inArea
+      ? (samePlace(company.locationLabel) && sameCountry(company.country)) || company.country === state.location || companyJobs(company).length > 0
+      : (!state.location || (samePlace(company.locationLabel) && sameCountry(company.country)) || company.country === state.location);
     const queryMatch = !query || [company.name,company.summary,company.industry,company.location].join(' ').toLocaleLowerCase('en').includes(query);
     const typeMatch = !state.type || (state.type === 'Startup' ? company.type === 'startup' : state.type === 'Public' ? company.type === 'public' : company.type === 'private');
     const roleMatch = !state.area || companyJobs(company).some(job => job.area === state.area);
-    return cityMatch && queryMatch && typeMatch && roleMatch;
+    return locationMatch && queryMatch && typeMatch && roleMatch && hiringMatch(company);
   });
 }
 function applyPathCity() {
@@ -67,9 +77,10 @@ function renderArea() {
   const continent = continentForCountry(country);
   area.hidden = !selected;
   area.replaceChildren();
-  $('jobs-heading').textContent = selected || 'Jobs for you to explore';
-  document.querySelector('.list-note').textContent = city ? 'Browse public company records and their current roles in this area. Directory presence is not proof of hiring.' : '“For you” means discovery, not a hiring prediction. Check the original advert before applying.';
-  document.title = selected ? `${selected} jobs · Hired` : 'Hired · European jobs, mapped to you';
+  const showCompanies = state.view === 'map';
+  $('jobs-heading').textContent = selected || (showCompanies ? 'Companies to explore' : 'Jobs for you to explore');
+  document.querySelector('.list-note').textContent = city ? 'Browse public company records and their current roles in this area. Directory presence is not proof of hiring.' : showCompanies ? 'Browse the public company directory. Hiring status reflects open roles in the vacancy snapshot or a directory hiring flag.' : '“For you” means discovery, not a hiring prediction. Check the original advert before applying.';
+  document.title = selected ? `${selected} jobs · Hired` : showCompanies ? 'Companies · Hired' : 'Hired · European jobs, mapped to you';
   if (!selected) return;
   const crumbs = el('nav','area-breadcrumbs'); crumbs.setAttribute('aria-label','Area breadcrumb');
   const continentButton = el('button','area-crumb',continent); continentButton.type = 'button'; continentButton.addEventListener('click',() => { controls.location.value = ''; state.country = ''; applyFilters(true); }); crumbs.append(continentButton);
@@ -81,9 +92,10 @@ function renderArea() {
   area.append(crumbs,el('p','area-summary',city ? `${filteredCompanies.length} companies · ${filteredCompanies.filter(company => companyJobs(company).length > 0).length} with open roles` : `${new Set(filtered.map(job => job.company)).size} companies · ${filtered.length} open roles in this snapshot`));
 }
 function render() {
-  filtered = filterJobs(jobs,state); filterDirectory(); renderArea(); $('clear-filters').hidden = !['q','area','type','location'].some(k => controls[k].value);
-  $('result-count').textContent = areaCitySelected() ? `${filteredCompanies.length} companies in this area · ${filtered.length} open roles` : `${filtered.length.toLocaleString()} ${filtered.length === 1 ? 'role' : 'roles'} · ${new Set(filtered.flatMap(j => j.locations.map(p => p.city))).size.toLocaleString()} mapped places`;
-  $('empty-state').textContent = areaCitySelected() ? 'No companies match this area and these filters.' : 'No roles match. Try a broader search or clear a filter.';
+  filtered = filterJobs(jobs,state); filterDirectory(); renderArea(); $('clear-filters').hidden = !['q','area','type','location','hiring'].some(k => controls[k].value);
+  const inArea = areaCitySelected();
+  $('result-count').textContent = state.view === 'map' ? `${inArea ? `${filteredCompanies.length} companies in this area` : `${filteredCompanies.length} companies`} · ${filtered.length} open roles in snapshot` : `${filtered.length.toLocaleString()} ${filtered.length === 1 ? 'role' : 'roles'} · ${new Set(filtered.flatMap(j => j.locations.map(p => p.city))).size.toLocaleString()} mapped places`;
+  $('empty-state').textContent = state.view === 'map' ? 'No companies match these filters.' : 'No roles match. Try a broader search or clear a filter.';
   if (state.job && !filtered.some(j => j.id === state.job)) state.job = '';
   if (state.company && !companies.some(company => company.id === state.company)) state.company = '';
   renderList(); renderPins();
@@ -97,7 +109,7 @@ function directoryForMap() {
     const typeMatch = !state.type || (state.type === 'Startup' ? company.type === 'startup' : state.type === 'Public' ? company.type === 'public' : company.type === 'private');
     const roleMatch = !state.area || companyJobs(company).some(job => job.area === state.area);
     const locationMatch = !state.location || (samePlace(company.locationLabel) && sameCountry(company.country)) || company.country === state.location;
-    return queryMatch && typeMatch && roleMatch && locationMatch;
+    return queryMatch && typeMatch && roleMatch && locationMatch && hiringMatch(company);
   });
 }
 function renderCompanyList() {
@@ -107,14 +119,14 @@ function renderCompanyList() {
     const roles = companyJobs(company), li = el('li','company-row'), button = el('button','job-button'); button.type = 'button';
     button.setAttribute('aria-label',`View ${company.name}, ${roles.length} open roles`);
     const content = el('span','job-summary'); content.append(el('span','job-title',company.name),el('span','job-company',`${company.location || company.locationLabel} · ${company.industry}`),el('span','job-location',company.summary || 'Public company directory record'));
-    const tags = el('span','company-tags'); tags.append(el('span','tag',company.type === 'startup' ? (company.fundingStage || 'Startup') : company.type === 'public' ? 'Public company' : 'Private company'),el('span','tag',`${roles.length} open roles`)); content.append(tags);
+    const status = hiringStatus(company), openCount = openRolesFor(company).length, tags = el('span','company-tags'); tags.append(el('span','tag',company.type === 'startup' ? (company.fundingStage || 'Startup') : company.type === 'public' ? 'Public company' : 'Private company'),el('span',`hiring-badge ${status.tone}`,status.key === 'hiring' ? `● ${status.label} · ${openCount} open role${openCount === 1 ? '' : 's'}` : `○ ${status.label}`)); content.append(tags);
     button.append(companyMark({company:company.name,logo:company.logo}),content,el('span','row-arrow','→')); button.addEventListener('click',() => selectCompany(company)); li.append(button); fragment.append(li);
   }
   $('job-list').replaceChildren(fragment); $('pagination').hidden = filteredCompanies.length <= PAGE_SIZE; $('page-label').textContent = `${page+1} / ${pages}`; $('previous').disabled = page === 0; $('next').disabled = page === pages-1;
   $('empty-state').hidden = filteredCompanies.length > 0;
 }
 function renderList() {
-  if (areaCitySelected()) { renderCompanyList(); return; }
+  if (state.view === 'map') { renderCompanyList(); return; }
   const pages = Math.max(1,Math.ceil(filtered.length / PAGE_SIZE)); page = Math.max(0,Math.min(page,pages-1));
   $('empty-state').hidden = filtered.length > 0 || loading || !$('load-error').hidden;
   const fragment = document.createDocumentFragment();
@@ -133,7 +145,8 @@ function renderCompanyDetail(company) {
   document.querySelector('.explorer-body').classList.add('has-detail');
   const detail = $('job-detail'); detail.replaceChildren();
   const top = el('div','detail-top'), headingWrap = el('div'), title = el('h2','',company.name); title.id = 'detail-title'; title.tabIndex = -1;
-  headingWrap.append(title,el('p','detail-subtitle',`${company.location || company.locationLabel} · ${company.industry}`)); top.append(companyMark({company:company.name,logo:company.logo}),headingWrap); detail.append(top);
+  const status = hiringStatus(company);
+  headingWrap.append(title,el('p','detail-subtitle',`${company.location || company.locationLabel} · ${company.industry}`),el('span',`hiring-badge ${status.tone}`,status.key === 'hiring' ? '● Hiring now' : status.key === 'flag' ? '○ Lists hiring (directory flag)' : '○ No open roles in snapshot')); top.append(companyMark({company:company.name,logo:company.logo}),headingWrap); detail.append(top);
   const actions = el('div','detail-actions');
   const back = el('button','button','← Back to area'); back.type = 'button'; back.addEventListener('click',() => { state.company=''; setView('map'); render(); }); actions.append(back);
   if (company.website) actions.append(externalLink('Visit company website ↗',company.website,true)); if (company.sourceUrl) actions.append(externalLink('Check public source ↗',company.sourceUrl)); detail.append(actions);
