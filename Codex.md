@@ -1,5 +1,18 @@
 # Repository context — start here
 
+## Job source registry, ATS auto-detection, and scheduled ingestion
+
+- Built the scalable source registry that replaces "3 hand-picked boards" with a database of company → official careers ATS.
+- New `job_sources.py`: `JobSource` + `JobSourceStore` (SQLite `job_sources` with `UNIQUE(source, board_identifier)` upsert and sync status), SSRF-safe `fetch_public_text`, pure `detect_ats_from_text` (Greenhouse/Lever/Ashby/Workable/Recruitee), bounded `detect_company_ats`, and `ingest_sources` (refreshes every enabled source via the documented public board APIs, marks success/error without fabricating jobs).
+- New `scripts/register_job_sources.py` auto-detects ATS boards from the company catalogue's websites (bounded batch/concurrency). A 6-company live demo detected and registered real boards (Amplitude → Ashby, Rescale → Ashby + Lever).
+- `export_public_jobs.py` now merges registered sources with the vetted baseline (Figma/Mistral/Cloudflare) and deduplicates; an empty registry still yields the reviewed defaults. The public snapshot remains European-scoped.
+- Verification: 421 Python tests (5 new for job_sources) + 21 Node tests pass; end-to-end detection demo verified against live sites. Honest limits: detection is best-effort per company (a few well-known careers paths), and the public snapshot's Europe filter is unchanged.
+
+## Repo cleanup
+
+- Removed the unused `Agent_skills/` directory (3 SKILL.md files not referenced anywhere). A dead-import scan of all 70 modules found only `hosted_ui` as not directly imported, but it is a tested/documented part of the hosted MVP scaffold, so it was kept. The codebase is otherwise fully wired; docs, fixtures, the hosted/supabase foundation and the public site were intentionally preserved.
+
+
 ## Role folders UI and company logos
 
 - Finished the role-folders UI integration: the Streamlit "Role folders" page renders, shows matched roles with scores and a per-role project-PDF download, and now renders company logos.

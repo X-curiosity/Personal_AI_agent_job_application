@@ -45,11 +45,36 @@ def company_logos() -> dict[str, str]:
     return {str(row.get("name", "")).casefold(): str(row.get("logo") or "") for row in rows if row.get("name")}
 
 
+class _Company:
+    def __init__(self, name: str, company_type: str) -> None:
+        self.name, self.company_type = name, company_type
+
+
+class _Board:
+    def __init__(self, source: str, identifier: str, url: str, name: str, company_type: str) -> None:
+        self.source, self.board_identifier, self.board_url = source, identifier, url
+        self.company = _Company(name, company_type)
+
+
+def _iter_boards():
+    """Registered sources plus the vetted baseline, deduplicated. An empty
+    registry still yields the reviewed default boards."""
+    from tau_job_application.job_sources import JobSourceStore
+    rows = JobSourceStore().list(enabled_only=True)
+    boards = [_Board(r["source"], r["board_identifier"], r["board_url"], r["company"], r["company_type"]) for r in rows]
+    seen = {(board.source, board.board_identifier) for board in boards}
+    for default in DEFAULT_VETTED_COMPANY_BOARDS:
+        if (default.source, default.board_identifier) not in seen:
+            boards.append(default)
+    return boards
+
+
 def export(limit: int = 120) -> dict:
     jobs = []
     errors = []
     logos = company_logos()
-    for board in DEFAULT_VETTED_COMPANY_BOARDS:
+    boards = _iter_boards()
+    for board in boards:
         try:
             openings = fetch_public_board_openings(board.source, board.board_identifier, company=board.company.name)
         except Exception as exc:  # retain source failure without exporting stale claims as live
@@ -94,7 +119,7 @@ def export(limit: int = 120) -> dict:
             })
     jobs.sort(key=lambda job: (job["sourceTimestamp"] or "", job["company"], job["title"]), reverse=True)
     # Keep the bounded preview diverse instead of letting the newest board fill it.
-    per_company = max(1, limit // len(DEFAULT_VETTED_COMPANY_BOARDS))
+    per_company = max(1, limit // max(1, len(boards)))
     counts: dict[str, int] = {}
     selected = []
     for job in jobs:
