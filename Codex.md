@@ -1,5 +1,12 @@
 # Repository context — start here
 
+## Map and autonomous agent integration — documentation
+
+- Added `docs/MAP_AND_AUTONOMOUS_AGENT_PLAN.md` at the user's request: StartupMap and Jack & Jill inspiration, public Explore/private agent experiences, existing foundations, shared architecture, approval boundaries, blockers and phased implementation.
+- The document distinguishes proposed features from current capabilities and public product descriptions from independently verified behavior. Includes delivery acceptance criteria and a link to the detailed architecture Q&A.
+- Documentation-only change; checked local links and whitespace. No runtime or production changes verified in this push.
+
+
 ## Main-branch consolidation and official logos
 
 - User requested consolidating `xavier_dev` and `codex/role-market-evidence-match` into `main` and deleting those branches. `xavier_dev` has no commits missing from main; codex documentation was already cherry-picked to main. Merge codex history before deletion to preserve ancestry and local logo recovery work. Leave `haile_dev` and unrelated duplicate assets untouched.
