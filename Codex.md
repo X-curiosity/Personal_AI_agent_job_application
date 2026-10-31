@@ -6,7 +6,7 @@
 
 | Surface | What | Where |
 | --- | --- | --- |
-| Public map & jobs | Global company directory + source-linked roles (full-page map, country flags, per-role CV matching) | `vercel-site/` (deployed on Vercel) |
+| Public map & jobs | Global company directory + source-linked roles (full-page map, country flags, per-role CV drag-drop, structured job descriptions, people-to-contact cards) | `vercel-site/` (deployed on Vercel) |
 | Local app | CV analysis, role folders + deterministic agent, PDF project ideas, reviewed auto-apply | `src/tau_job_application/` |
 | Hosted MVP | Supabase accounts/CV scaffold — **not live** | `supabase/`, `hosted_*.py` |
 
@@ -31,6 +31,10 @@ uv sync --no-editable --reinstall-package tau-job-application && ./run.sh
 ## Job sources
 
 `scripts/register_job_sources.py` auto-detects ATS boards from the catalogue (`--regions`, `--only-startups`); `scripts/export_public_jobs.py --limit N` rebuilds the snapshot; `scripts/submit_job.py` adds an employer submission; `.github/workflows/refresh-jobs.yml` refreshes daily at 06:00 UTC.
+
+## Authentication
+
+Private features (save jobs, CV folders, reviewed applications) need an account. The hosted scaffold already implements **passwordless email + LinkedIn OIDC** sign-in (`hosted_auth.py`, `hosted_ui.py`) but is **not live** — it needs LinkedIn OIDC app credentials, email delivery, and deployment. LinkedIn sign-in is identity only; it grants **no** people-search, messaging, or profile-photo access (LinkedIn restricts those). The public site stays account-free for browsing and local matching.
 
 ## Honest limits
 

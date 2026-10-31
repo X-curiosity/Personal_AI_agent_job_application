@@ -75,8 +75,9 @@ def _job_from_submission(submission: dict) -> dict:
                            "latitude": point.latitude, "longitude": point.longitude, "precision": point.precision})
     if not locations:
         raise ValueError(f"Unresolvable location: {submission['location']}")
-    description = re.sub(r"\s+", " ", submission["description"]).strip()
-    description = re.sub(r"\b[\w.+-]+@[\w.-]+\.[A-Za-z]{2,}\b", "[email in original advert]", description)[:4000]
+    description = re.sub(r"[ \t\r]+", " ", submission["description"]).strip()
+    description = re.sub(r"\n{3,}", "\n\n", description)
+    description = re.sub(r"\b[\w.+-]+@[\w.-]+\.[A-Za-z]{2,}\b", "[email in original advert]", description)[:6000]
     skills = extract_skills(f"{submission['title']} {description}")
     identity = f"{submission['company']}|{submission['source_id']}"
     return {
@@ -123,8 +124,9 @@ def export(limit: int = 120) -> dict:
                 locations.append({"label": raw.strip(), "city": point.label, "country": raw.strip().split(",")[-1].strip(), "latitude": point.latitude, "longitude": point.longitude, "precision": point.precision})
             if not locations or not opening.get("url"):
                 continue
-            description = re.sub(r"\s+", " ", opening.get("description") or "").strip()
-            description = re.sub(r"\b[\w.+-]+@[\w.-]+\.[A-Za-z]{2,}\b", "[email in original advert]", description)[:4000]
+            description = re.sub(r"[ \t\r]+", " ", opening.get("description") or "").strip()
+            description = re.sub(r"\n{3,}", "\n\n", description)
+            description = re.sub(r"\b[\w.+-]+@[\w.-]+\.[A-Za-z]{2,}\b", "[email in original advert]", description)[:6000]
             skills = extract_skills(f"{opening['title']} {description}")
             identity = f"{board.company.name}|{opening['source_id']}"
             logo = logos.get(board.company.name.casefold(), "")
