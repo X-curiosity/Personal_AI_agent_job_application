@@ -48,6 +48,7 @@ window.addEventListener('popstate', () => { state = readState(location.search); 
 $('previous').addEventListener('click', () => { page--; renderList(); $('jobs-heading').focus(); });
 $('next').addEventListener('click', () => { page++; renderList(); $('jobs-heading').focus(); });
 $('fit-map').addEventListener('click', fitResults);
+$('back-jobs').addEventListener('click', () => setView('jobs'));
 function areaCitySelected() { return state.view === 'map' && knownCities.has(citySlug(state.location)); }
 function companyJobs(company) { return filtered.filter(job => job.company.toLocaleLowerCase('en') === company.name.toLocaleLowerCase('en') && (!state.location || job.locations.some(place => samePlace(place.city) && sameCountry(place.country)))); }
 function openRolesFor(company) { return jobs.filter(job => job.company.toLocaleLowerCase('en') === company.name.toLocaleLowerCase('en')); }
@@ -180,8 +181,12 @@ function selectArea(city, country) {
 function addAreaMarker(group, level) {
   const card = el('div','area-map-card');
   const thumb = el('span','area-map-thumb');
-  if (group.logo) { const image = el('img','company-logo'); image.src = '/' + group.logo; image.alt = ''; thumb.append(image); } else { const flag = level === 'country' ? countryFlag(group.key) : ''; thumb.textContent = flag || initials(group.key); if (flag) thumb.classList.add('flag'); }
-  const titleFlag = level === 'city' ? countryFlag(group.country) : ''; card.append(thumb,el('span','area-map-title',`${titleFlag ? titleFlag + ' ' : ''}${group.label || group.key}`),el('span','area-map-count',`${group.companies.length} companies · ${group.jobs} roles`));
+  const flag = countryFlag(level === 'country' ? group.key : group.country);
+  if (flag) { thumb.textContent = flag; thumb.classList.add('flag'); }
+  else if (group.companies.length === 1 && group.logo) { const image = el('img','company-logo'); image.src = '/' + group.logo; image.alt = ''; thumb.append(image); }
+  else thumb.textContent = initials(group.key);
+  const title = level === 'city' ? `${flag ? flag + ' ' : ''}${group.label || group.key}` : (group.label || group.key);
+  card.append(thumb,el('span','area-map-title',title),el('span','area-map-count',`${group.companies.length} companies · ${group.jobs} roles`));
   card.tabIndex = 0; card.setAttribute('role','button'); card.setAttribute('aria-label',`${group.key}, ${group.companies.length} companies and ${group.jobs} roles`);
   const choose = () => {
     if (level === 'country') map.jumpTo({center:[group.longitude,group.latitude],zoom:5});

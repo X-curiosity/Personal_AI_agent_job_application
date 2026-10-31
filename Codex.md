@@ -12,7 +12,7 @@
 
 ### Public map & jobs
 
-- **Map:** globe → country cards (flags + counts) → city cards → individual company pins, with a `maxZoom` of 18 and a dedicated `/map` route. StartupMap-matched palette (ink `#1F1B16`, canvas `#F5F1E9`, terracotta `#B4432F`, DM Sans).
+- **Map:** globe → country cards (flags + counts) → city cards → individual company pins, with a `maxZoom` of 18 and a dedicated `/map` route. The map view is now full-page (fixed overlay, list as a floating panel, `← Jobs` to exit). Country and city markers show the country flag. StartupMap-matched palette (ink `#1F1B16`, canvas `#F5F1E9`, terracotta `#B4432F`, DM Sans).
 - **Jobs:** a bounded snapshot from reviewed Greenhouse/Lever/Ashby boards plus feed and employer-submitted sources. Currently **454 roles across 67 companies** (US 283, Europe 192, Americas 47, Asia 36, Oceania 3).
 - **Company catalogue:** 10,247 companies with 8,800+ self-hosted logos and 1,109 Wikidata HQ matches.
 
