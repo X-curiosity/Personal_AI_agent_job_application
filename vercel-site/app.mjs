@@ -1,4 +1,4 @@
-import {PAGE_SIZE, buildCityCountries, buildCityRoutes, citySlug, continentForCountry, countryFlag, declutterDirectoryGroups, directoryGroups, filterJobs, matchSkills, readJobs, readState, stateQuery} from './jobs-core.mjs';
+import {PAGE_SIZE, buildCityCountries, buildCityRoutes, citySlug, continentForCountry, countryFlag, declutterDirectoryGroups, directoryGroups, filterJobs, matchCvText, readJobs, readState, stateQuery} from './jobs-core.mjs';
 import {readCatalogue} from './map-core.mjs';
 const $ = id => document.getElementById(id);
 const el = (tag, className, text) => { const node = document.createElement(tag); if (className) node.className = className; if (text != null) node.textContent = text; return node; };
@@ -175,7 +175,7 @@ function renderDetail(job) {
   const drop = el('div','cv-dropzone',`Drop your CV here (.txt / .md) to match against ${job.skills.length} detected terms — or paste skills below`); drop.tabIndex = 0; drop.setAttribute('role','button');
   const input = el('textarea'); input.id = 'skill-profile'; input.maxLength = 1800; input.placeholder = 'Python, SQL, Docker';
   const result = el('div','match-result','Drop or paste skills to see exact overlap with terms found in this advert.');
-  const runMatch = () => { const matched = matchSkills(job,input.value); result.textContent = matched.length ? `${matched.length} exact term${matched.length === 1 ? '' : 's'} overlap: ${matched.join(', ')}. This is not a hiring probability; review the full context yourself.` : 'No exact overlap with the extracted terms yet. Missing terms are not proof that you lack relevant experience.'; };
+  const runMatch = () => { const matched = matchCvText(job,input.value); result.textContent = matched.length ? `${matched.length} matched term${matched.length === 1 ? '' : 's'}: ${matched.join(', ')}. This is not a hiring probability; review the full context yourself.` : 'No matching terms found yet. Missing terms are not proof that you lack relevant experience.'; };
   input.addEventListener('input',runMatch);
   drop.addEventListener('dragover', e => { e.preventDefault(); drop.classList.add('drag'); }); drop.addEventListener('dragleave', () => drop.classList.remove('drag'));
   drop.addEventListener('drop', e => { e.preventDefault(); drop.classList.remove('drag'); const file = e.dataTransfer.files && e.dataTransfer.files[0]; if (!file) return; if (/\.(txt|md)$/i.test(file.name)) { file.text().then(text => { input.value = text.slice(0,1800); runMatch(); drop.textContent = `Matched against ${file.name} — runs only in this page.`; }); } else { drop.textContent = 'PDF/DOCX CV matching runs in the local app (Prepare privately) — nothing is uploaded here.'; } });

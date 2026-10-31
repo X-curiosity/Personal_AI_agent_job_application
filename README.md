@@ -66,7 +66,7 @@ It is not an unattended bot and can't guarantee compatibility with every employe
 
 Read the plans in [`docs/`](docs/):
 
-- [App architecture and automation](docs/APP_ARCHITECTURE_AND_AUTOMATION.md) — jobs freshness, maps, the GitHub bot, outreach and legal limits.
+- [App architecture and automation](docs/IMPLEMENTATION_PLAN.md) — jobs freshness, maps, the GitHub bot, outreach and legal limits.
 - [Map & autonomous agent plan](docs/IMPLEMENTATION_PLAN.md) — StartupMap + Jack & Jill inspired direction.
 - [Unified implementation plan](docs/IMPLEMENTATION_PLAN.md) — map details, office accuracy, and the job agent build.
 - [Codex](Codex.md) — repository context and deployment history.

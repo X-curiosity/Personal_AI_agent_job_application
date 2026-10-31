@@ -155,3 +155,13 @@ export function matchSkills(job, profile) {
   const required = new Set(job.skills.map(s => s.toLocaleLowerCase('en')));
   return wanted.filter(skill => required.has(skill.toLocaleLowerCase('en')));
 }
+
+export function matchCvText(job, text) {
+  const haystack = String(text || '').toLocaleLowerCase('en');
+  return job.skills.filter(skill => {
+    const s = skill.toLocaleLowerCase('en');
+    if (!s) return false;
+    if (s.length <= 2) return new RegExp(`\\b${s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`).test(haystack);
+    return haystack.includes(s);
+  });
+}

@@ -14,7 +14,7 @@
 
 - **10,247 companies** (global directory), 8,800+ self-hosted logos.
 - **~1,066 roles across ~203 companies** from ~256 auto-detected ATS boards + feed + employer submissions (startups, private, and public companies).
-- Coverage is bounded by which employers expose a public ATS API — see [docs/INGESTION_BOTTLENECKS.md](docs/INGESTION_BOTTLENECKS.md).
+- Coverage is bounded by which employers expose a public ATS API — see [docs/IMPLEMENTATION_PLAN.md](docs/IMPLEMENTATION_PLAN.md).
 
 ## Run / test
 
@@ -44,5 +44,5 @@ Private features (save jobs, CV folders, reviewed applications) need an account.
 
 ## Docs
 
-- [Implementation plan](docs/IMPLEMENTATION_PLAN.md) · [Architecture Q&A](docs/APP_ARCHITECTURE_AND_AUTOMATION.md) · [Design questions](docs/DESIGN_QUESTIONS.md) · [Ingestion bottlenecks](docs/INGESTION_BOTTLENECKS.md) · [Hosted MVP](docs/HOSTED_MVP.md)
+- [Implementation plan](docs/IMPLEMENTATION_PLAN.md) · [Design questions](docs/DESIGN_QUESTIONS.md) · [Hosted MVP](docs/HOSTED_MVP.md) · [Caveats](docs/caveats.md)
 - Module context: [src/tau_job_application/codex.md](src/tau_job_application/codex.md)

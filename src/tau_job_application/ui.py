@@ -623,7 +623,7 @@ def _advisory_skill_refinement(result) -> None:
             disabled=not jev_available(),
             help=(
                 "Opt-in. Only the two skill labels and a fixed question leave this machine; no CV text, "
-                "adverts, or account data. Requires JEV_API_KEY and JEV_API_URL (docs/APP_ARCHITECTURE_AND_AUTOMATION.md)."
+                "adverts, or account data. Requires JEV_API_KEY and JEV_API_URL (docs/IMPLEMENTATION_PLAN.md)."
                 if jev_available() else
                 "Set JEV_API_KEY and JEV_API_URL to enable. The local decision model is used until then."
             ),

@@ -14,6 +14,6 @@ Generated 2026-10-31 · scope: company expansion (100+ companies) · skill: buil
 
 ## Notes
 
-- Africa remains ~0 roles because African employers rarely use Greenhouse/Lever/Ashby; this is a data-access gap, not a bug (see `docs/INGESTION_BOTTLENECKS.md`).
+- Africa remains ~0 roles because African employers rarely use Greenhouse/Lever/Ashby; this is a data-access gap, not a bug (see `docs/IMPLEMENTATION_PLAN.md`).
 - Scoring is skill overlap, not a hiring probability. Directory presence ≠ vacancy; HQ ≠ job location.
 - No LinkedIn scraping/automation is performed; people contacts are surfaced from public web search and open the profile link only.
