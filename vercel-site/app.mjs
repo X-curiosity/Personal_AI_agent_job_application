@@ -86,7 +86,7 @@ function renderArea() {
   const showCompanies = state.view === 'map';
   $('jobs-heading').textContent = selected || (showCompanies ? 'Companies to explore' : 'Jobs for you to explore');
   document.querySelector('.list-note').textContent = city ? 'Browse public company records and their current roles in this area. Directory presence is not proof of hiring.' : showCompanies ? 'Browse the public company directory. Hiring status reflects open roles in the vacancy snapshot or a directory hiring flag.' : '“For you” means discovery, not a hiring prediction. Check the original advert before applying.';
-  document.title = selected ? `${selected} jobs · Hired` : showCompanies ? 'Companies · Hired' : 'Hired · European jobs, mapped to you';
+  document.title = selected ? `${selected} jobs · Hired` : showCompanies ? 'Companies · Hired' : 'Hired · jobs, mapped to you';
   if (!selected) return;
   const crumbs = el('nav','area-breadcrumbs'); crumbs.setAttribute('aria-label','Area breadcrumb');
   const continentButton = el('button','area-crumb',continent); continentButton.type = 'button'; continentButton.addEventListener('click',() => { controls.location.value = ''; state.country = ''; applyFilters(true); }); crumbs.append(continentButton);
@@ -260,7 +260,7 @@ async function loadJobs() {
     registerCities(jobs.flatMap(job => job.locations));
     addOptions('area',jobs.map(j => j.area)); addOptions('location',jobs.flatMap(j => j.locations.flatMap(p => [p.city,p.country])));
     applyPathCity(); restoreControls();
-    $('job-total').textContent = `${jobs.length} European roles from ${new Set(jobs.map(j => j.company)).size} companies`;
+    $('job-total').textContent = `${jobs.length} roles from ${new Set(jobs.map(j => j.company)).size} companies`;
     $('snapshot-date').textContent = `Public-board snapshot exported ${dateLabel(payload.exportedAt)}`;
     loading = false; document.querySelector('.explorer-body').dataset.view = state.view === 'map' ? 'map' : 'jobs';
     render(); fitResults();

@@ -1,4 +1,4 @@
-"""Export a bounded, source-linked European vacancy snapshot for the static site.
+"""Export a bounded, source-linked global vacancy snapshot for the static site.
 
 Only reviewed public employer-board APIs are read. No LinkedIn or personal data.
 Coordinates describe listing cities/country centres, never company headquarters.
@@ -87,9 +87,6 @@ def export(limit: int = 120) -> dict:
                 point = geocode_location(raw)
                 if not point:
                     continue
-                country = raw.strip().split(",")[-1].strip().casefold()
-                if country not in EUROPE:
-                    continue
                 locations.append({"label": raw.strip(), "city": point.label, "country": raw.strip().split(",")[-1].strip(), "latitude": point.latitude, "longitude": point.longitude, "precision": point.precision})
             if not locations or not opening.get("url"):
                 continue
@@ -141,4 +138,4 @@ if __name__ == "__main__":
         raise SystemExit("Refresh failed; keeping the previous public snapshot: " + " | ".join(payload["errors"]))
     target = ROOT / "vercel-site/data/jobs.json"
     target.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n")
-    print(f"Exported {len(payload['jobs'])} European vacancies to {target}; source errors: {len(payload['errors'])}")
+    print(f"Exported {len(payload['jobs'])} global vacancies to {target}; source errors: {len(payload['errors'])}")

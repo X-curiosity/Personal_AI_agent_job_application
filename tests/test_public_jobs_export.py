@@ -26,11 +26,12 @@ def test_export_keeps_vacancy_locations_and_excludes_unresolved_places():
     with patch("tau_job_application.job_sources.JobSourceStore", return_value=_EmptyStore()), \
          patch("scripts.export_public_jobs.fetch_public_board_openings", return_value=rows):
         payload = export(limit=9)
-    assert len(payload["jobs"]) == 3  # one valid opening per reviewed source
-    job = payload["jobs"][0]
-    assert [place["city"] for place in job["locations"]] == ["Paris", "Dublin"]
-    assert all(place["precision"] == "city" for place in job["locations"])
-    assert job["sourceTimestampKind"] == "published"
+    assert len(payload["jobs"]) == 6  # two valid openings per reviewed source (Paris + New York)
+    paris = next(job for job in payload["jobs"] if any(place["city"] == "Paris" for place in job["locations"]))
+    assert [place["city"] for place in paris["locations"]] == ["Paris", "Dublin"]
+    assert all(place["precision"] == "city" for place in paris["locations"])
+    assert paris["sourceTimestampKind"] == "published"
+    assert any(place["city"] == "New York" for job in payload["jobs"] for place in job["locations"])
     assert payload["live"] is False
 
 

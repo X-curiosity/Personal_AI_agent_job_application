@@ -39,6 +39,7 @@ def main() -> None:
     parser.add_argument("--database", type=Path, default=_project_root() / ".job_assistant" / "assistant.sqlite")
     parser.add_argument("--only-startups", action="store_true", help="only scan companies typed as startups")
     parser.add_argument("--europe", action="store_true", help="only scan companies with a European country")
+    parser.add_argument("--regions", default="", help="comma-separated regions: Europe,United States,Asia,Africa,Americas,Oceania")
     args = parser.parse_args()
 
     catalogue = json.loads((_project_root() / "vercel-site" / "data" / "companies.json").read_text(encoding="utf-8"))
@@ -49,6 +50,10 @@ def main() -> None:
     if args.europe:
         eu = {"united kingdom", "uk", "england", "germany", "france", "netherlands", "switzerland", "sweden", "denmark", "norway", "finland", "ireland", "spain", "portugal", "italy", "austria", "belgium", "luxembourg", "poland", "czech republic", "czechia", "slovakia", "hungary", "romania", "bulgaria", "greece", "estonia", "latvia", "lithuania", "croatia", "slovenia", "iceland"}
         companies = [c for c in companies if (c.get("country") or "").casefold() in eu]
+    if args.regions:
+        from tau_job_application.role_folders import region_for_country
+        wanted = {r.strip().casefold() for r in args.regions.split(",") if r.strip()}
+        companies = [c for c in companies if region_for_country(c.get("country") or "").casefold() in wanted]
     companies = companies[: args.limit]
 
     store = JobSourceStore(args.database)

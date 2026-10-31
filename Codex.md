@@ -1,5 +1,14 @@
 # Repository context — start here
 
+## Global job coverage
+
+- Removed the Europe-only filter from `export_public_jobs.py`; the public vacancy snapshot is now global. Updated site copy (title/meta/notes) and the "European roles" counters to be region-neutral.
+- Scanned the company catalogue across all regions and registered 99 ATS sources total (US-heavy, plus Europe, Americas, Asia, Oceania). Re-exported: 454 roles across 67 companies (US 283, Europe 192, Americas 47, Asia 36, Oceania 3).
+- Added `--regions` (Europe,United States,Asia,Africa,Americas,Oceania) to `register_job_sources.py` for targeted scans.
+- Honest gap: Africa yields ~0 roles because African employers rarely use Greenhouse/Lever/Ashby/Workable/Recruitee; the ATS-based ingestion cannot cover them without other sources.
+- Verification: 421 Python + 22 Node tests pass; 43 new `data/job-logos/*.png` added.
+
+
 ## Map zoom hierarchy and full-page jobs
 
 - Reworked map precision: the map now starts on a globe (zoom 2.5) showing country cards with per-country company/role counts (e.g. United States 4,705, United Kingdom 451 · 112 roles, Spain 250, Germany …), then zooms to city cards within a country, then individual company pins at city/street level. Raised `maxZoom` 10 → 18, city-card click zoom 8 → 11, and bounds fit `maxZoom` 7 → 12.
