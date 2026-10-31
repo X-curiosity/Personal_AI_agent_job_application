@@ -7,6 +7,13 @@ export function safeURL(value) {
     return url.href;
   } catch { return null; }
 }
+export function sectorFor(area) {
+  const value = String(area || '').toLocaleLowerCase('en');
+  if (value.includes('finance') || value.includes('account')) return 'finance';
+  if (value.includes('engineer') || value.includes('data') || value.includes('ai') || value.includes('design') || value.includes('hardware') || value.includes('security')) return 'engineering';
+  return 'business';
+}
+
 export function readJobs(payload) {
   if (payload?.schemaVersion !== 1 || !Array.isArray(payload.jobs) || payload.jobs.length > 5000) throw new Error('Unsupported vacancy snapshot');
   const ids = new Set();
@@ -17,7 +24,8 @@ export function readJobs(payload) {
     if (!locations.length) throw new Error('Vacancy has no disclosed job location');
     const type = clean(raw.companyType, 60);
     const typeLower = type.toLowerCase();
-    return {id: raw.id, title: clean(raw.title), company: clean(raw.company), companyType: typeLower === 'startup' ? 'Startup' : typeLower === 'public' ? 'Public' : typeLower === 'private' ? 'Private' : type, logo: /^data\/job-logos\/[a-f0-9]{12}\.(png|jpg|webp|gif|ico)$/.test(raw.logo || '') ? raw.logo : null, url: safeURL(raw.url), boardUrl: safeURL(raw.boardUrl), source: clean(raw.source, 50), area: clean(raw.area, 80) || 'Other', skills: Array.isArray(raw.skills) ? raw.skills.slice(0, 20).map(s => clean(s, 60)).filter(Boolean) : [], description: clean(raw.description, 4000), locations, workplace: clean(raw.workplace, 60), employment: clean(raw.employment, 60), sourceTimestamp: clean(raw.sourceTimestamp, 60), sourceTimestampKind: ['published', 'created', 'updated'].includes(raw.sourceTimestampKind) ? raw.sourceTimestampKind : null};
+    const area = clean(raw.area, 80) || 'Other';
+    return {id: raw.id, title: clean(raw.title), company: clean(raw.company), companyType: typeLower === 'startup' ? 'Startup' : typeLower === 'public' ? 'Public' : typeLower === 'private' ? 'Private' : type, sector: sectorFor(area), logo: /^data\/job-logos\/[a-f0-9]{12}\.(png|jpg|webp|gif|ico)$/.test(raw.logo || '') ? raw.logo : null, url: safeURL(raw.url), boardUrl: safeURL(raw.boardUrl), source: clean(raw.source, 50), area, skills: Array.isArray(raw.skills) ? raw.skills.slice(0, 20).map(s => clean(s, 60)).filter(Boolean) : [], description: clean(raw.description, 4000), locations, workplace: clean(raw.workplace, 60), employment: clean(raw.employment, 60), sourceTimestamp: clean(raw.sourceTimestamp, 60), sourceTimestampKind: ['published', 'created', 'updated'].includes(raw.sourceTimestampKind) ? raw.sourceTimestampKind : null};
   });
 }
 export function filterJobs(jobs, filters) {

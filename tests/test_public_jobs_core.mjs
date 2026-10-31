@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-import {buildCityCountries, buildCityRoutes, citySlug, continentForCountry, countryFlag, declutterDirectoryGroups, directoryGroups, filterJobs, matchCvText, matchSkills, readJobs, readState, stateQuery, safeURL} from '../vercel-site/jobs-core.mjs';
+import {buildCityCountries, buildCityRoutes, citySlug, continentForCountry, countryFlag, declutterDirectoryGroups, directoryGroups, filterJobs, matchCvText, matchSkills, readJobs, readState, sectorFor, stateQuery, safeURL} from '../vercel-site/jobs-core.mjs';
 import {readCatalogue} from '../vercel-site/map-core.mjs';
 const fixture = {id:'job_0123456789abcdef0123',title:'ML Engineer',company:'Example AI',companyType:'Startup',url:'https://jobs.example.com/1',boardUrl:'https://jobs.example.com',source:'Ashby',area:'Data & AI',skills:['Python','SQL'],description:'Build useful systems.',locations:[{label:'Paris, France',city:'Paris',country:'France',latitude:48.85,longitude:2.35,precision:'city'}],sourceTimestamp:'2026-10-25T00:00:00Z',sourceTimestampKind:'published'};
 const read = rows => readJobs({schemaVersion:1,jobs:rows});
@@ -48,6 +48,12 @@ test('country flags map names to emoji with a safe fallback',()=>{
  assert.equal(countryFlag('France'),'🇫🇷'); assert.equal(countryFlag('United States'),'🇺🇸');
  assert.equal(countryFlag('Belgium'),'🇧🇪'); assert.equal(countryFlag('England'),'🇬🇧');
  assert.equal(countryFlag('Not a country'),'');
+});
+
+test('sectors map areas to finance, business, engineering',()=>{
+ assert.equal(sectorFor('Finance'),'finance'); assert.equal(sectorFor('Engineering'),'engineering');
+ assert.equal(sectorFor('Data & AI'),'engineering'); assert.equal(sectorFor('Sales'),'business');
+ const [job]=read([fixture]); assert.equal(job.sector,'engineering');
 });
 
 test('same-name cities in different countries remain separate area groups',()=>{

@@ -14,6 +14,14 @@ function companyMark(job) {
 const dateLabel = value => { const date = new Date(value); return Number.isNaN(date.valueOf()) ? 'Date unavailable' : date.toLocaleDateString('en', {year:'numeric',month:'short',day:'numeric',timeZone:'UTC'}); };
 let jobs = [], filtered = [], companies = [], filteredCompanies = [], state = readState(location.search), page = 0, loading = false, map, mapReady = false, pendingFit = false;
 let knownCities = new Map(), knownCityCountries = new Map(), jobsByCompany = new Map(), peopleByCompany = new Map();
+const PREFS_KEY = 'hired-prefs';
+function loadPrefs() { try { const p = JSON.parse(localStorage.getItem(PREFS_KEY)); if (p && typeof p === 'object') return Object.assign({sectors:[],keywords:'',location:'',companyType:''}, p); } catch {} return {sectors:[],keywords:'',location:'',companyType:''}; }
+let prefs = loadPrefs();
+function savePrefs() { try { localStorage.setItem(PREFS_KEY, JSON.stringify(prefs)); } catch {} }
+function applyPrefs(list) {
+  const kw = (prefs.keywords || '').toLocaleLowerCase('en'), loc = (prefs.location || '').toLocaleLowerCase('en');
+  return list.filter(job => (!prefs.sectors.length || prefs.sectors.includes(job.sector)) && (!kw || [job.title, job.company, ...job.skills, ...job.locations.map(p => p.label)].join(' ').toLocaleLowerCase('en').includes(kw)) && (!prefs.companyType || job.companyType === prefs.companyType) && (!loc || job.locations.some(p => (p.label || '').toLocaleLowerCase('en').includes(loc))));
+}
 const pathCity = () => { try { return location.pathname.startsWith('/map/') ? citySlug(decodeURIComponent(location.pathname.split('/')[2] || '')) : ''; } catch { return ''; } };
 const isMapPage = () => location.pathname === '/map' || location.pathname.startsWith('/map/');
 const markers = [], controls = {q:$('search'), area:$('area'), type:$('type'), location:$('location'), hiring:$('hiring')};
@@ -48,6 +56,7 @@ window.addEventListener('popstate', () => { state = readState(location.search); 
 $('previous').addEventListener('click', () => { page--; renderList(); $('jobs-heading').focus(); });
 $('next').addEventListener('click', () => { page++; renderList(); $('jobs-heading').focus(); });
 $('fit-map').addEventListener('click', fitResults);
+$('prefs-button').addEventListener('click', () => showOnboarding(true));
 $('back-jobs').addEventListener('click', () => setView('jobs'));
 function areaCitySelected() { return state.view === 'map' && knownCities.has(citySlug(state.location)); }
 function indexJobs() { jobsByCompany = new Map(); for (const job of jobs) { const key = job.company.toLocaleLowerCase('en'); (jobsByCompany.get(key) || jobsByCompany.set(key, []).get(key)).push(job); } }
@@ -100,7 +109,7 @@ function renderArea() {
   area.append(crumbs,el('p','area-summary',city ? `${filteredCompanies.length} companies · ${filteredCompanies.filter(company => companyJobs(company).length > 0).length} with open roles` : `${new Set(filtered.map(job => job.company)).size} companies · ${filtered.length} open roles in this snapshot`));
 }
 function render() {
-  filtered = filterJobs(jobs,state); filterDirectory(); renderArea(); $('clear-filters').hidden = !['q','area','type','location','hiring'].some(k => controls[k].value);
+  filtered = applyPrefs(filterJobs(jobs,state)); filterDirectory(); renderArea(); $('clear-filters').hidden = !['q','area','type','location','hiring'].some(k => controls[k].value);
   const inArea = areaCitySelected();
   $('result-count').textContent = state.view === 'map' ? `${inArea ? `${filteredCompanies.length} companies in this area` : `${filteredCompanies.length} companies`} · ${filtered.length} open roles in snapshot` : `${filtered.length.toLocaleString()} ${filtered.length === 1 ? 'role' : 'roles'} · ${new Set(filtered.flatMap(j => j.locations.map(p => p.city))).size.toLocaleString()} mapped places`;
   $('empty-state').textContent = state.view === 'map' ? 'No companies match these filters.' : 'No roles match. Try a broader search or clear a filter.';
@@ -182,8 +191,8 @@ function renderDetail(job) {
   match.append(drop,el('p','field-note','Runs only in this page. Nothing is saved or uploaded. For full PDF/DOCX CV analysis, use the private local app.'),input,result); detail.append(match);
   const contacts = el('section','detail-section'); contacts.append(el('h3','','People to contact'));
   const companyPeople = peopleByCompany.get(job.company.toLocaleLowerCase('en')) || [];
-  if (companyPeople.length) { const peopleList = el('div','people-list'); for (const person of companyPeople) { const link = document.createElement('a'); link.className = 'person-card'; link.href = person.linkedin; link.target = '_blank'; link.rel = 'noopener noreferrer'; link.setAttribute('aria-label', `Open the LinkedIn profile for ${person.name}`); link.append(el('span','person-avatar', initials(person.name))); const info = el('span','person-info'); info.append(el('strong','person-name',person.name), el('span','person-role', person.role + (person.location ? ' · ' + person.location : ''))); link.append(info); peopleList.append(link); } contacts.append(peopleList,el('p','field-note','Publicly listed, surfaced via web search. Opens LinkedIn; verify before contacting.')); }
-  const links = el('div','contact-links'); const query = encodeURIComponent(`${job.company} ${job.area} ${job.locations[0].city}`); links.append(externalLink(`Search ${job.company} people in ${job.locations[0].city} ↗`,`https://www.linkedin.com/search/results/people/?keywords=${query}`),externalLink(`Search recruiting contacts at ${job.company} ↗`,`https://www.linkedin.com/search/results/people/?keywords=${encodeURIComponent(job.company + ' recruiter')}`)); contacts.append(links,el('p','field-note','Search suggestions only—not verified employee recommendations. LinkedIn may require sign-in. No profiles are retrieved or contacted.')); detail.append(contacts);
+  if (companyPeople.length) { const peopleList = el('div','people-list'); for (const person of companyPeople) { const link = document.createElement('a'); link.className = 'person-card'; link.href = person.linkedin; link.target = '_blank'; link.rel = 'noopener noreferrer'; link.setAttribute('aria-label', `Open the LinkedIn profile for ${person.name}`); link.append(el('span','person-avatar', initials(person.name))); const info = el('span','person-info'); info.append(el('strong','person-name',person.name), el('span','person-role', person.role + (person.location ? ' · ' + person.location : ''))); if (person.category) info.append(el('span',`person-badge ${person.category}`, person.category === 'recruiter' ? 'Recruiter' : person.category === 'executive' ? 'Leadership' : person.category)); link.append(info); peopleList.append(link); } contacts.append(peopleList,el('p','field-note','Publicly listed, surfaced via web search. Opens LinkedIn; verify before contacting.')); }
+  else contacts.append(el('p','field-note','No publicly listed contacts for this company in the snapshot yet.')); detail.append(contacts);
   const about = el('section','detail-section'); about.append(el('h3','','About the role'),el('p','',job.description || 'Open the official advert for the complete description.')); if (job.skills.length) { const skills = el('div','company-tags'); for (const skill of job.skills) skills.append(el('span','tag',skill)); about.append(el('h3','','Terms detected in the advert'),skills); } detail.append(about,el('p','field-note',`Source: ${job.source} employer board. Verify the current advert and submit it yourself. Hired never applies on your behalf.`));
 }
 function clearMarkers() { for (const marker of markers.splice(0)) marker.remove(); }
@@ -292,4 +301,20 @@ async function loadPeople() {
     for (const person of (payload.people || [])) { const key = String(person.company || '').toLocaleLowerCase('en'); if (!peopleByCompany.has(key)) peopleByCompany.set(key, []); peopleByCompany.get(key).push(person); }
   } catch {}
 }
-$('retry').addEventListener('click',loadJobs); initializeMap(); loadJobs(); loadPeople();
+function showOnboarding(force) {
+  if (!force && localStorage.getItem(PREFS_KEY)) return;
+  const overlay = el('div','onboard-overlay');
+  const card = el('div','onboard-card');
+  card.append(el('h2','','Tailor your search'), el('p','onboard-sub','Choose your sectors and preferences — roles will be ranked to match.'));
+  const chips = el('div','chip-row');
+  for (const sector of ['finance','business','engineering']) { const chip = el('button',`onboard-chip${prefs.sectors.includes(sector) ? ' active' : ''}`, sector[0].toUpperCase() + sector.slice(1)); chip.type = 'button'; chip.addEventListener('click', () => { chip.classList.toggle('active'); const i = prefs.sectors.indexOf(sector); if (i >= 0) prefs.sectors.splice(i, 1); else prefs.sectors.push(sector); }); chips.append(chip); }
+  const kw = el('input','onboard-input'); kw.placeholder = 'Keywords (e.g. trading, mechanical, machine learning)'; kw.value = prefs.keywords || '';
+  const loc = el('input','onboard-input'); loc.placeholder = 'Location (e.g. Paris or France)'; loc.value = prefs.location || '';
+  const type = el('select','onboard-input'); type.append(new Option('Any company',''), new Option('Startups','Startup'), new Option('Public companies','Public'), new Option('Private companies','Private')); type.value = prefs.companyType || '';
+  const save = el('button','button primary','Start exploring'); save.type = 'button'; save.addEventListener('click', () => { prefs.sectors = [...prefs.sectors]; prefs.keywords = kw.value.trim(); prefs.location = loc.value.trim(); prefs.companyType = type.value; savePrefs(); overlay.remove(); applyFilters(true); });
+  const skip = el('button','button','Skip for now'); skip.type = 'button'; skip.addEventListener('click', () => { savePrefs(); overlay.remove(); });
+  const actions = el('div','onboard-actions'); actions.append(save, skip);
+  card.append(chips, el('label','onboard-label','Keywords'), kw, el('label','onboard-label','Location'), loc, el('label','onboard-label','Company type'), type, actions);
+  overlay.append(card); document.body.append(overlay);
+}
+$('retry').addEventListener('click',loadJobs); initializeMap(); loadJobs(); loadPeople(); if (!isMapPage()) showOnboarding();

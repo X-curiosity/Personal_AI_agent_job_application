@@ -32,6 +32,15 @@ uv sync --no-editable --reinstall-package tau-job-application && ./run.sh
 
 `scripts/register_job_sources.py` auto-detects ATS boards from the catalogue (`--regions`, `--only-startups`); `scripts/export_public_jobs.py --limit N` rebuilds the snapshot; `scripts/submit_job.py` adds an employer submission; `.github/workflows/refresh-jobs.yml` refreshes daily at 06:00 UTC.
 
+## Preferences & onboarding
+
+A first-visit onboarding collects sectors (finance / business / engineering), free-text keywords, location, and company type, stored in `localStorage` and applied as a persistent filter (`applyPrefs`). A "Preferences" button reopens it. Jobs carry a `sector` derived from their area. People-to-contact cards show a category badge (Recruiter / Leadership) and open LinkedIn; the search links were removed.
+
+## Agent harness & API key
+
+- The folder agent is **deterministic**: registry → folder criteria → discover → score (evidence coverage) → rank → project PDF / contact. No LLM required.
+- An optional LLM layer (to interpret free-text intent, draft projects/messages) can be plugged in via an API key or subscription; it sits on top of the deterministic harness and never authorizes sending. Credentials stay in env/config, never in the repo. See [docs/IMPLEMENTATION_PLAN.md](docs/IMPLEMENTATION_PLAN.md).
+
 ## Authentication
 
 Private features (save jobs, CV folders, reviewed applications) need an account. The hosted scaffold already implements **passwordless email + LinkedIn OIDC** sign-in (`hosted_auth.py`, `hosted_ui.py`) but is **not live** — it needs LinkedIn OIDC app credentials, email delivery, and deployment. LinkedIn sign-in is identity only; it grants **no** people-search, messaging, or profile-photo access (LinkedIn restricts those). The public site stays account-free for browsing and local matching.

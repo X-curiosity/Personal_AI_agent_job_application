@@ -1,16 +1,18 @@
 {
   "schemaVersion": 1,
   "verifiedAt": "2026-10-31",
-  "note": "Publicly-listed contacts surfaced via web search; roles and companies are as shown in public search results and should be re-verified before contacting.",
+  "note": "Publicly-listed contacts surfaced via web search; roles and companies are as shown in public search results and should be re-verified before contacting. Profile URLs for executives are inferred from public posts.",
   "people": [
-    {"name": "Sarah Morris", "role": "Talent Acquisition Partner", "company": "Cloudflare", "linkedin": "https://www.linkedin.com/in/sarah-morris-88873630", "location": ""},
-    {"name": "Todd Ciampa", "role": "Global Talent Acquisition Leader", "company": "Cloudflare", "linkedin": "https://www.linkedin.com/in/toddciampa", "location": ""},
-    {"name": "Tae Otsubo", "role": "Senior Talent Acquisition, APJC", "company": "Cloudflare", "linkedin": "https://jp.linkedin.com/in/taekootsubo", "location": "APJC"},
-    {"name": "Rosemary J. F.", "role": "VP of Talent", "company": "Cloudflare", "linkedin": "https://www.linkedin.com/in/rosemaryfantozzi", "location": ""},
-    {"name": "James Budnik", "role": "Talent Acquisition", "company": "Mistral AI", "linkedin": "https://uk.linkedin.com/in/jb-mistral", "location": "UK"},
-    {"name": "Luke Thompson", "role": "Talent Acquisition", "company": "Mistral AI", "linkedin": "https://uk.linkedin.com/in/lukethompsonhiring", "location": "UK"},
-    {"name": "Johanna Fleming", "role": "Talent Acquisition Leader", "company": "Figma", "linkedin": "https://www.linkedin.com/in/johanna-fleming", "location": ""},
-    {"name": "Matthew Lewis", "role": "Recruiting Lead, Product Engineering & Data Science", "company": "Figma", "linkedin": "https://www.linkedin.com/in/matthewpincinlewis", "location": ""},
-    {"name": "Michael Jaffe", "role": "Senior Recruiter", "company": "Figma", "linkedin": "https://www.linkedin.com/in/jaffemike", "location": ""}
+    {"name": "Sarah Morris", "role": "Talent Acquisition Partner", "category": "recruiter", "company": "Cloudflare", "linkedin": "https://www.linkedin.com/in/sarah-morris-88873630", "location": ""},
+    {"name": "Todd Ciampa", "role": "Global Talent Acquisition Leader", "category": "recruiter", "company": "Cloudflare", "linkedin": "https://www.linkedin.com/in/toddciampa", "location": ""},
+    {"name": "Tae Otsubo", "role": "Senior Talent Acquisition, APJC", "category": "recruiter", "company": "Cloudflare", "linkedin": "https://jp.linkedin.com/in/taekootsubo", "location": "APJC"},
+    {"name": "Rosemary J. F.", "role": "VP of Talent", "category": "recruiter", "company": "Cloudflare", "linkedin": "https://www.linkedin.com/in/rosemaryfantozzi", "location": ""},
+    {"name": "James Budnik", "role": "Talent Acquisition", "category": "recruiter", "company": "Mistral AI", "linkedin": "https://uk.linkedin.com/in/jb-mistral", "location": "UK"},
+    {"name": "Luke Thompson", "role": "Talent Acquisition", "category": "recruiter", "company": "Mistral AI", "linkedin": "https://uk.linkedin.com/in/lukethompsonhiring", "location": "UK"},
+    {"name": "Johanna Fleming", "role": "Talent Acquisition Leader", "category": "recruiter", "company": "Figma", "linkedin": "https://www.linkedin.com/in/johanna-fleming", "location": ""},
+    {"name": "Matthew Lewis", "role": "Recruiting Lead, Product Engineering & Data Science", "category": "recruiter", "company": "Figma", "linkedin": "https://www.linkedin.com/in/matthewpincinlewis", "location": ""},
+    {"name": "Michael Jaffe", "role": "Senior Recruiter", "category": "recruiter", "company": "Figma", "linkedin": "https://www.linkedin.com/in/jaffemike", "location": ""},
+    {"name": "Josh Clemm", "role": "VP of Engineering, AI", "category": "executive", "company": "Figma", "linkedin": "https://www.linkedin.com/in/joshclemm", "location": ""},
+    {"name": "Abhishek Mathur", "role": "VP of Engineering", "category": "executive", "company": "Figma", "linkedin": "https://www.linkedin.com/in/abhimathur", "location": ""}
   ]
 }
