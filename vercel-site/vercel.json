@@ -1,7 +1,8 @@
 {
   "rewrites": [
     {"source": "/map", "destination": "/index.html"},
-    {"source": "/map/:path*", "destination": "/index.html"}
+    {"source": "/map/:path*", "destination": "/index.html"},
+    {"source": "/job/:path*", "destination": "/index.html"}
   ],
   "headers": [
     {

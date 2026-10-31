@@ -24,19 +24,22 @@ function applyPrefs(list) {
 }
 const pathCity = () => { try { return location.pathname.startsWith('/map/') ? citySlug(decodeURIComponent(location.pathname.split('/')[2] || '')) : ''; } catch { return ''; } };
 const isMapPage = () => location.pathname === '/map' || location.pathname.startsWith('/map/');
+const pathJob = () => { try { return location.pathname.startsWith('/job/') ? location.pathname.split('/')[2] : ''; } catch { return ''; } };
 const markers = [], controls = {q:$('search'), area:$('area'), type:$('type'), location:$('location'), hiring:$('hiring')};
 function samePlace(value) { return state.cityRoute ? citySlug(value) === state.cityRoute : value === state.location; }
 function sameCountry(value) { return !state.country || value === state.country; }
 function updateURL(replace = false) {
   const map = state.view === 'map';
   let path;
-  if (map) {
+  if (state.job && !map) {
+    path = `/job/${state.job}`;
+  } else if (map) {
     const route = state.cityRoute || (knownCities.has(citySlug(state.location)) ? citySlug(state.location) : '');
     path = route ? `/map/${route}` : '/map';
   } else {
     path = '/';
   }
-  const query = stateQuery({...state, view: '', location: map && state.cityRoute ? '' : state.location, country: map && state.cityRoute && (knownCityCountries.get(state.cityRoute) || []).length <= 1 ? '' : state.country});
+  const query = stateQuery({...state, view: '', job: '', company: '', location: map && state.cityRoute ? '' : state.location, country: map && state.cityRoute && (knownCityCountries.get(state.cityRoute) || []).length <= 1 ? '' : state.country});
   const url = `${path}${query ? '?' + query : ''}`;
   if (url !== location.pathname + location.search) history[replace ? 'replaceState' : 'pushState'](null, '', url);
 }
@@ -52,7 +55,7 @@ $('filters').addEventListener('submit', e => { e.preventDefault(); applyFilters(
 controls.q.addEventListener('input', () => { clearTimeout(searchTimer); searchTimer = setTimeout(() => applyFilters(true,true),180); });
 for (const key of ['area','type','location','hiring']) controls[key].addEventListener('change', () => applyFilters(true));
 $('filters').addEventListener('reset', e => { e.preventDefault(); state = {...readState(''),view:state.view}; state.cityRoute = ''; restoreControls(); page = 0; updateURL(); render(); fitResults(); });
-window.addEventListener('popstate', () => { state = readState(location.search); state.view = isMapPage() ? 'map' : 'jobs'; applyPathCity(); restoreControls(); render(); const view = state.view; document.querySelector('.explorer-body').dataset.view = view; $('nav-jobs').setAttribute('aria-current',view === 'jobs' ? 'page' : 'false'); $('nav-map').setAttribute('aria-current',view === 'map' ? 'page' : 'false'); });
+window.addEventListener('popstate', () => { state = readState(location.search); state.view = isMapPage() ? 'map' : 'jobs'; state.job = pathJob(); applyPathCity(); restoreControls(); render(); const view = state.view; document.querySelector('.explorer-body').dataset.view = view; $('nav-jobs').setAttribute('aria-current',view === 'jobs' ? 'page' : 'false'); $('nav-map').setAttribute('aria-current',view === 'map' ? 'page' : 'false'); });
 $('previous').addEventListener('click', () => { page--; renderList(); $('jobs-heading').focus(); });
 $('next').addEventListener('click', () => { page++; renderList(); $('jobs-heading').focus(); });
 $('fit-map').addEventListener('click', fitResults);
@@ -113,11 +116,11 @@ function render() {
   const inArea = areaCitySelected();
   $('result-count').textContent = state.view === 'map' ? `${inArea ? `${filteredCompanies.length} companies in this area` : `${filteredCompanies.length} companies`} · ${filtered.length} open roles in snapshot` : `${filtered.length.toLocaleString()} ${filtered.length === 1 ? 'role' : 'roles'} · ${new Set(filtered.flatMap(j => j.locations.map(p => p.city))).size.toLocaleString()} mapped places`;
   $('empty-state').textContent = state.view === 'map' ? 'No companies match these filters.' : 'No roles match. Try a broader search or clear a filter.';
-  if (state.job && !filtered.some(j => j.id === state.job)) state.job = '';
+  if (state.job && !jobs.some(j => j.id === state.job)) state.job = '';
   if (state.company && !companies.some(company => company.id === state.company)) state.company = '';
   renderList(); renderPins();
   if (state.company) renderCompanyDetail(companies.find(company => company.id === state.company));
-  else renderDetail(filtered.find(j => j.id === state.job));
+  else renderDetail(jobs.find(j => j.id === state.job));
 }
 function directoryForMap() {
   const query = state.q.toLocaleLowerCase('en');
@@ -173,12 +176,12 @@ function renderCompanyDetail(company) {
   for (const job of roles) { const button = el('button','button',`${job.title} →`); button.type = 'button'; button.addEventListener('click',() => selectJob(job)); roleSection.append(button); }
   detail.append(roleSection,el('p','field-note',`Directory facts imported ${dateLabel(company.observedAt)}. Company presence is not proof of a current vacancy.`));
 }
-function selectJob(job) { state.job = job.id; state.company = ''; setView('jobs'); renderList(); renderDetail(job); $('detail-title').focus({preventScroll:true}); }
+function selectJob(job) { state.job = job.id; state.company = ''; setView('jobs'); $('detail-title').focus({preventScroll:true}); }
 function renderDetail(job) {
   document.querySelector('.explorer-body').classList.toggle('has-detail',Boolean(job));
   const detail = $('job-detail'); detail.replaceChildren(); if (!job) { const wrap = el('div','detail-placeholder'); wrap.append(el('span','','✳'),el('h2','','Choose a role. See the whole picture.'),el('p','','Review the job, its locations, skill overlap and contact-search options.')); detail.append(wrap); return; }
   const top = el('div','detail-top'), headingWrap = el('div'), title = el('h2','',job.title); title.id = 'detail-title'; title.tabIndex = -1; headingWrap.append(title,el('p','detail-subtitle',`${job.company} · ${job.companyType} · ${job.area}`)); top.append(companyMark(job),headingWrap); detail.append(top);
-  const actions = el('div','detail-actions'); actions.append(externalLink('View official role ↗',job.url,true)); if (matchMedia('(max-width:700px)').matches) { const back = el('button','button','← All jobs'); back.type = 'button'; back.addEventListener('click',() => { state.job=''; state.company=''; updateURL(); document.querySelector('.explorer-body').dataset.view='jobs'; renderDetail(); renderList(); }); actions.append(back); } detail.append(actions);
+  const actions = el('div','detail-actions'); const back = el('button','button','← All jobs'); back.type = 'button'; back.addEventListener('click',() => { state.job=''; state.company=''; updateURL(); render(); }); actions.append(back,externalLink('View official role ↗',job.url,true)); detail.append(actions);
   const overview = el('section','detail-section'); overview.append(el('h3','','Role locations')); const facts = el('div','detail-facts'); for (const place of job.locations) facts.append(el('span','tag',`${place.label} (${place.precision === 'city' ? 'city centre' : 'country estimate'})`)); overview.append(facts); if (job.workplace) overview.append(el('p','field-note',`Workplace: ${job.workplace}`)); if (job.sourceTimestamp) overview.append(el('p','field-note',`Employer-board ${job.sourceTimestampKind || 'timestamp'}: ${dateLabel(job.sourceTimestamp)}. This may not be the original posting date.`)); detail.append(overview);
   const match = el('section','detail-section'); match.append(el('h3','','Match your CV'));
   const drop = el('div','cv-dropzone',`Drop your CV here (.txt / .md) to match against ${job.skills.length} detected terms — or paste skills below`); drop.tabIndex = 0; drop.setAttribute('role','button');
@@ -283,6 +286,7 @@ async function loadJobs() {
     if (!response.ok) throw new Error('Snapshot unavailable');
     const payload = await response.json(); jobs = readJobs(payload); indexJobs();
     if (isMapPage()) state.view = 'map';
+    state.job = pathJob();
     registerCities(jobs.flatMap(job => job.locations));
     knownAreas = [...new Set(jobs.map(j => j.area))].sort(); addOptions('area',knownAreas); addOptions('location',jobs.flatMap(j => j.locations.flatMap(p => [p.city,p.country])));
     applyPathCity(); restoreControls();
