@@ -13,14 +13,14 @@ function companyMark(job) {
 }
 const dateLabel = value => { const date = new Date(value); return Number.isNaN(date.valueOf()) ? 'Date unavailable' : date.toLocaleDateString('en', {year:'numeric',month:'short',day:'numeric',timeZone:'UTC'}); };
 let jobs = [], filtered = [], companies = [], filteredCompanies = [], state = readState(location.search), page = 0, loading = false, map, mapReady = false, pendingFit = false;
-let knownCities = new Map(), knownCityCountries = new Map(), jobsByCompany = new Map(), peopleByCompany = new Map();
+let knownCities = new Map(), knownCityCountries = new Map(), jobsByCompany = new Map(), peopleByCompany = new Map(), knownAreas = [];
 const PREFS_KEY = 'hired-prefs';
-function loadPrefs() { try { const p = JSON.parse(localStorage.getItem(PREFS_KEY)); if (p && typeof p === 'object') return Object.assign({sectors:[],keywords:'',location:'',companyType:''}, p); } catch {} return {sectors:[],keywords:'',location:'',companyType:''}; }
+function loadPrefs() { try { const p = JSON.parse(localStorage.getItem(PREFS_KEY)); if (p && typeof p === 'object') return Object.assign({sectors:[],keywords:'',location:'',companyType:'',area:'',hiring:''}, p); } catch {} return {sectors:[],keywords:'',location:'',companyType:'',area:'',hiring:''}; }
 let prefs = loadPrefs();
 function savePrefs() { try { localStorage.setItem(PREFS_KEY, JSON.stringify(prefs)); } catch {} }
 function applyPrefs(list) {
   const kw = (prefs.keywords || '').toLocaleLowerCase('en'), loc = (prefs.location || '').toLocaleLowerCase('en');
-  return list.filter(job => (!prefs.sectors.length || prefs.sectors.includes(job.sector)) && (!kw || [job.title, job.company, ...job.skills, ...job.locations.map(p => p.label)].join(' ').toLocaleLowerCase('en').includes(kw)) && (!prefs.companyType || job.companyType === prefs.companyType) && (!loc || job.locations.some(p => (p.label || '').toLocaleLowerCase('en').includes(loc))));
+  return list.filter(job => (!prefs.sectors.length || prefs.sectors.includes(job.sector)) && (!prefs.area || job.area === prefs.area) && (!kw || [job.title, job.company, ...job.skills, ...job.locations.map(p => p.label)].join(' ').toLocaleLowerCase('en').includes(kw)) && (!prefs.companyType || job.companyType === prefs.companyType) && (!loc || job.locations.some(p => (p.label || '').toLocaleLowerCase('en').includes(loc))));
 }
 const pathCity = () => { try { return location.pathname.startsWith('/map/') ? citySlug(decodeURIComponent(location.pathname.split('/')[2] || '')) : ''; } catch { return ''; } };
 const isMapPage = () => location.pathname === '/map' || location.pathname.startsWith('/map/');
@@ -67,7 +67,7 @@ function hiringStatus(company) {
   if (company.hiringSignal === 'directory_flag') return {key:'flag', label:'Lists hiring', tone:'flag'};
   return {key:'none', label:'No open roles', tone:'none'};
 }
-function hiringMatch(company) { return !state.hiring || hiringStatus(company).key === state.hiring; }
+function hiringMatch(company) { const hiring = state.hiring || prefs.hiring; return !hiring || hiringStatus(company).key === hiring; }
 function filterDirectory() {
   if (state.view !== 'map') { filteredCompanies = []; return; }
   const query = state.q.toLocaleLowerCase('en');
@@ -284,13 +284,14 @@ async function loadJobs() {
     const payload = await response.json(); jobs = readJobs(payload); indexJobs();
     if (isMapPage()) state.view = 'map';
     registerCities(jobs.flatMap(job => job.locations));
-    addOptions('area',jobs.map(j => j.area)); addOptions('location',jobs.flatMap(j => j.locations.flatMap(p => [p.city,p.country])));
+    knownAreas = [...new Set(jobs.map(j => j.area))].sort(); addOptions('area',knownAreas); addOptions('location',jobs.flatMap(j => j.locations.flatMap(p => [p.city,p.country])));
     applyPathCity(); restoreControls();
     $('job-total').textContent = `${jobs.length} roles from ${new Set(jobs.map(j => j.company)).size} companies`;
     $('snapshot-date').textContent = `Public-board snapshot exported ${dateLabel(payload.exportedAt)}`;
     loading = false; document.querySelector('.explorer-body').dataset.view = state.view === 'map' ? 'map' : 'jobs';
     render(); fitResults();
     if (state.view === 'map' || pathCity()) loadCompanies();
+    if (!isMapPage()) showOnboarding();
   } catch { loading = false; $('load-error').hidden = false; $('result-count').textContent = 'Vacancy snapshot unavailable'; }
 }
 async function loadPeople() {
@@ -309,12 +310,14 @@ function showOnboarding(force) {
   const chips = el('div','chip-row');
   for (const sector of ['finance','business','engineering']) { const chip = el('button',`onboard-chip${prefs.sectors.includes(sector) ? ' active' : ''}`, sector[0].toUpperCase() + sector.slice(1)); chip.type = 'button'; chip.addEventListener('click', () => { chip.classList.toggle('active'); const i = prefs.sectors.indexOf(sector); if (i >= 0) prefs.sectors.splice(i, 1); else prefs.sectors.push(sector); }); chips.append(chip); }
   const kw = el('input','onboard-input'); kw.placeholder = 'Keywords (e.g. trading, mechanical, machine learning)'; kw.value = prefs.keywords || '';
+  const area = el('select','onboard-input'); area.append(new Option('Any role area','')); for (const a of knownAreas) area.add(new Option(a, a)); area.value = prefs.area || '';
   const loc = el('input','onboard-input'); loc.placeholder = 'Location (e.g. Paris or France)'; loc.value = prefs.location || '';
   const type = el('select','onboard-input'); type.append(new Option('Any company',''), new Option('Startups','Startup'), new Option('Public companies','Public'), new Option('Private companies','Private')); type.value = prefs.companyType || '';
-  const save = el('button','button primary','Start exploring'); save.type = 'button'; save.addEventListener('click', () => { prefs.sectors = [...prefs.sectors]; prefs.keywords = kw.value.trim(); prefs.location = loc.value.trim(); prefs.companyType = type.value; savePrefs(); overlay.remove(); applyFilters(true); });
+  const hiring = el('select','onboard-input'); hiring.append(new Option('Any hiring status',''), new Option('Hiring now','hiring'), new Option('Lists hiring','flag'), new Option('No open roles','none')); hiring.value = prefs.hiring || '';
+  const save = el('button','button primary','Start exploring'); save.type = 'button'; save.addEventListener('click', () => { prefs.sectors = [...prefs.sectors]; prefs.keywords = kw.value.trim(); prefs.area = area.value; prefs.location = loc.value.trim(); prefs.companyType = type.value; prefs.hiring = hiring.value; savePrefs(); overlay.remove(); applyFilters(true); });
   const skip = el('button','button','Skip for now'); skip.type = 'button'; skip.addEventListener('click', () => { savePrefs(); overlay.remove(); });
   const actions = el('div','onboard-actions'); actions.append(save, skip);
-  card.append(chips, el('label','onboard-label','Keywords'), kw, el('label','onboard-label','Location'), loc, el('label','onboard-label','Company type'), type, actions);
+  card.append(chips, el('label','onboard-label','Keywords'), kw, el('label','onboard-label','Role area'), area, el('label','onboard-label','Location'), loc, el('label','onboard-label','Company type'), type, el('label','onboard-label','Recruiting status'), hiring, actions);
   overlay.append(card); document.body.append(overlay);
 }
-$('retry').addEventListener('click',loadJobs); initializeMap(); loadJobs(); loadPeople(); if (!isMapPage()) showOnboarding();
+$('retry').addEventListener('click',loadJobs); initializeMap(); loadJobs(); loadPeople();
