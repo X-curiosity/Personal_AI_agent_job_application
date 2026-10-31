@@ -124,7 +124,7 @@ function renderCompanyList() {
   for (const company of filteredCompanies.slice(page*PAGE_SIZE,(page+1)*PAGE_SIZE)) {
     const roles = companyJobs(company), li = el('li','company-row'), button = el('button','job-button'); button.type = 'button';
     button.setAttribute('aria-label',`View ${company.name}, ${roles.length} open roles`);
-    const content = el('span','job-summary'); content.append(el('span','job-title',company.name),el('span','job-company',`${company.location || company.locationLabel} · ${company.industry}`),el('span','job-location',company.summary || 'Public company directory record'));
+    const flag = countryFlag(company.country); const content = el('span','job-summary'); content.append(el('span','job-title',company.name),el('span','job-company',`${flag ? flag + ' ' : ''}${company.location || company.locationLabel} · ${company.industry}`),el('span','job-location',company.summary || 'Public company directory record'));
     const status = hiringStatus(company), openCount = openRolesFor(company).length, tags = el('span','company-tags'); tags.append(el('span','tag',company.type === 'startup' ? (company.fundingStage || 'Startup') : company.type === 'public' ? 'Public company' : 'Private company'),el('span',`hiring-badge ${status.tone}`,status.key === 'hiring' ? `● ${status.label} · ${openCount} open role${openCount === 1 ? '' : 's'}` : `○ ${status.label}`)); content.append(tags);
     button.append(companyMark({company:company.name,logo:company.logo}),content,el('span','row-arrow','→')); button.addEventListener('click',() => selectCompany(company)); li.append(button); fragment.append(li);
   }
@@ -140,7 +140,7 @@ function renderList() {
     const li = el('li','company-row'), button = el('button',`job-button${state.job === job.id ? ' is-selected' : ''}`);
     button.type = 'button'; button.setAttribute('aria-label',`View ${job.title} at ${job.company}`);
     const content = el('span','job-summary'); content.append(el('span','job-title',job.title),el('span','job-company',`${job.company} · ${job.companyType}`));
-    const tags = el('span','company-tags'); tags.append(el('span','tag',job.area)); if (job.employment) tags.append(el('span','tag',job.employment)); content.append(tags,el('span','job-location',job.locations.map(p => p.label).join(' · ')));
+    const tags = el('span','company-tags'); tags.append(el('span','tag',job.area)); if (job.employment) tags.append(el('span','tag',job.employment)); content.append(tags,el('span','job-location',job.locations.map(p => `${countryFlag(p.country) ? countryFlag(p.country) + ' ' : ''}${p.label}`).join(' · ')));
     button.append(companyMark(job),content,el('span','row-arrow','→')); button.addEventListener('click',() => selectJob(job)); li.append(button); fragment.append(li);
   }
   $('job-list').replaceChildren(fragment); $('pagination').hidden = filtered.length <= PAGE_SIZE; $('page-label').textContent = `${page+1} / ${pages}`; $('previous').disabled = page === 0; $('next').disabled = page === pages-1;
@@ -181,7 +181,7 @@ function addAreaMarker(group, level) {
   const card = el('div','area-map-card');
   const thumb = el('span','area-map-thumb');
   if (group.logo) { const image = el('img','company-logo'); image.src = '/' + group.logo; image.alt = ''; thumb.append(image); } else { const flag = level === 'country' ? countryFlag(group.key) : ''; thumb.textContent = flag || initials(group.key); if (flag) thumb.classList.add('flag'); }
-  card.append(thumb,el('span','area-map-title',group.label || group.key),el('span','area-map-count',`${group.companies.length} companies · ${group.jobs} roles`));
+  const titleFlag = level === 'city' ? countryFlag(group.country) : ''; card.append(thumb,el('span','area-map-title',`${titleFlag ? titleFlag + ' ' : ''}${group.label || group.key}`),el('span','area-map-count',`${group.companies.length} companies · ${group.jobs} roles`));
   card.tabIndex = 0; card.setAttribute('role','button'); card.setAttribute('aria-label',`${group.key}, ${group.companies.length} companies and ${group.jobs} roles`);
   const choose = () => {
     if (level === 'country') map.jumpTo({center:[group.longitude,group.latitude],zoom:5});

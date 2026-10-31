@@ -3,6 +3,11 @@ from unittest.mock import patch
 from scripts.export_public_jobs import export, extract_skills, role_area
 
 
+class _EmptyStore:
+    def list(self, enabled_only=False):
+        return []
+
+
 def _opening(identifier, location, title="Machine Learning Engineer"):
     return {
         "source_id": identifier, "title": title, "location": location,
@@ -18,7 +23,8 @@ def test_export_keeps_vacancy_locations_and_excludes_unresolved_places():
         _opening("two", "New York, United States"),
         _opening("three", "Remote"),
     ]
-    with patch("scripts.export_public_jobs.fetch_public_board_openings", return_value=rows):
+    with patch("tau_job_application.job_sources.JobSourceStore", return_value=_EmptyStore()), \
+         patch("scripts.export_public_jobs.fetch_public_board_openings", return_value=rows):
         payload = export(limit=9)
     assert len(payload["jobs"]) == 3  # one valid opening per reviewed source
     job = payload["jobs"][0]
@@ -29,7 +35,8 @@ def test_export_keeps_vacancy_locations_and_excludes_unresolved_places():
 
 
 def test_export_reports_source_errors_without_blocking_other_boards():
-    with patch("scripts.export_public_jobs.fetch_public_board_openings", side_effect=[RuntimeError("offline"), [_opening("one", "Berlin, Germany")], [_opening("two", "London, United Kingdom")]]):
+    with patch("tau_job_application.job_sources.JobSourceStore", return_value=_EmptyStore()), \
+         patch("scripts.export_public_jobs.fetch_public_board_openings", side_effect=[RuntimeError("offline"), [_opening("one", "Berlin, Germany")], [_opening("two", "London, United Kingdom")]]):
         payload = export(limit=9)
     assert len(payload["jobs"]) == 2
     assert len(payload["errors"]) == 1

@@ -12,6 +12,7 @@ import argparse
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import json
 from pathlib import Path
+import re
 import sys
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -21,12 +22,23 @@ from tau_job_application.job_sources import JobSource, JobSourceStore, detect_co
 from tau_job_application.role_folders import _project_root  # noqa: E402
 
 
+def _related(name: str, identifier: str) -> bool:
+    """Guard against partner/other-company links: the board identifier must
+    share a >=3-char slug token with the company name."""
+    a = re.sub(r"[^a-z0-9]", "", str(name).casefold())
+    b = re.sub(r"[^a-z0-9]", "", str(identifier).casefold())
+    if not a or not b:
+        return False
+    return (len(a) >= 3 and a in b) or (len(b) >= 3 and b in a)
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--limit", type=int, default=100, help="maximum companies to scan")
     parser.add_argument("--workers", type=int, default=6)
     parser.add_argument("--database", type=Path, default=_project_root() / ".job_assistant" / "assistant.sqlite")
     parser.add_argument("--only-startups", action="store_true", help="only scan companies typed as startups")
+    parser.add_argument("--europe", action="store_true", help="only scan companies with a European country")
     args = parser.parse_args()
 
     catalogue = json.loads((_project_root() / "vercel-site" / "data" / "companies.json").read_text(encoding="utf-8"))
@@ -34,6 +46,9 @@ def main() -> None:
                  and str(c.get("website") or "").startswith("https://")]
     if args.only_startups:
         companies = [c for c in companies if c.get("type") == "startup"]
+    if args.europe:
+        eu = {"united kingdom", "uk", "england", "germany", "france", "netherlands", "switzerland", "sweden", "denmark", "norway", "finland", "ireland", "spain", "portugal", "italy", "austria", "belgium", "luxembourg", "poland", "czech republic", "czechia", "slovakia", "hungary", "romania", "bulgaria", "greece", "estonia", "latvia", "lithuania", "croatia", "slovenia", "iceland"}
+        companies = [c for c in companies if (c.get("country") or "").casefold() in eu]
     companies = companies[: args.limit]
 
     store = JobSourceStore(args.database)
@@ -50,6 +65,8 @@ def main() -> None:
         for future in as_completed(future_map):
             company = future_map[future]
             for found in future.result():
+                if not _related(company["name"], found["board_identifier"]):
+                    continue
                 store.register(JobSource(
                     company=company["name"], source=found["source"], board_identifier=found["board_identifier"],
                     board_url=found["board_url"], company_type=company.get("type") or "unknown",

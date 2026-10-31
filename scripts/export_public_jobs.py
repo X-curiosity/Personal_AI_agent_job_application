@@ -61,7 +61,8 @@ def _iter_boards():
     registry still yields the reviewed default boards."""
     from tau_job_application.job_sources import JobSourceStore
     rows = JobSourceStore().list(enabled_only=True)
-    boards = [_Board(r["source"], r["board_identifier"], r["board_url"], r["company"], r["company_type"]) for r in rows]
+    boards = [_Board(r["source"], r["board_identifier"], r["board_url"], r["company"], r["company_type"])
+              for r in rows if r["source"] in {"Greenhouse", "Lever", "Ashby"}]
     seen = {(board.source, board.board_identifier) for board in boards}
     for default in DEFAULT_VETTED_COMPANY_BOARDS:
         if (default.source, default.board_identifier) not in seen:
@@ -131,8 +132,12 @@ def export(limit: int = 120) -> dict:
 
 
 if __name__ == "__main__":
-    payload = export()
-    if payload["errors"] or not payload["jobs"]:
+    import argparse
+    parser = argparse.ArgumentParser(description="Export the bounded public vacancy snapshot")
+    parser.add_argument("--limit", type=int, default=120)
+    args = parser.parse_args()
+    payload = export(limit=args.limit)
+    if not payload["jobs"]:
         raise SystemExit("Refresh failed; keeping the previous public snapshot: " + " | ".join(payload["errors"]))
     target = ROOT / "vercel-site/data/jobs.json"
     target.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n")

@@ -1,5 +1,14 @@
 # Repository context — start here
 
+## Company expansion: 68 → 163 European roles across 24 companies
+
+- Ran the source-registry auto-detection over 250 European startups; registered 32 ATS boards (mostly Ashby). Three false positives were disabled (PipeBio mis-resolved to Benchling's board, Momo Medical/Recruitee unsupported, Protex AI 404).
+- Expanded the public vacancy snapshot from 68 roles/3 companies to 163 roles/24 companies (Photoroom, Duffel, Humaans, LemFi, Meticulous, Finary, Escape, Healthtech 1, Solve Intelligence, and more).
+- Hardened the pipeline: `export_public_jobs.py` now tolerates per-source failures (only an empty result keeps the old snapshot), takes a `--limit`, and only exports Greenhouse/Lever/Ashby sources; `register_job_sources.py` gained a `--europe` filter and a name-match guard (`_related`) against partner-link false positives.
+- Added country flags to the company list, job list, and city cards (alongside the earlier country cards/breadcrumb/detail).
+- Verification: 421 Python + 22 Node tests pass. The registry lives in the local SQLite `job_sources` table; the exported snapshot is committed with its 22 new `data/job-logos/*.png`.
+
+
 ## StartupMap-matching UI palette and cleanup
 
 - Matched the public site's colors/typography to StartupMap (verified from its shipped CSS): ink `#1F1B16`, canvas `#F5F1E9`, surface `#FFFEFB`, border `#E6DFD1`, terracotta `#B4432F`, amber `#F0A04B`, peach `#F5E3C8`, font DM Sans. Removed the rotated yellow "DISCOVER" hero circle and added a dark `.button.primary` style.
