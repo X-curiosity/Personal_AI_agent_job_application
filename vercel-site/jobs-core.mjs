@@ -8,14 +8,16 @@ export function safeURL(value) {
   } catch { return null; }
 }
 export function readJobs(payload) {
-  if (payload?.schemaVersion !== 1 || !Array.isArray(payload.jobs) || payload.jobs.length > 500) throw new Error('Unsupported vacancy snapshot');
+  if (payload?.schemaVersion !== 1 || !Array.isArray(payload.jobs) || payload.jobs.length > 5000) throw new Error('Unsupported vacancy snapshot');
   const ids = new Set();
   return payload.jobs.map(raw => {
     if (!raw || !/^job_[a-f0-9]{20}$/.test(raw.id || '') || ids.has(raw.id) || !clean(raw.title) || !clean(raw.company) || !safeURL(raw.url)) throw new Error('Invalid vacancy');
     ids.add(raw.id);
     const locations = Array.isArray(raw.locations) ? raw.locations.slice(0, 20).filter(p => clean(p.label) && Number.isFinite(p.latitude) && Number.isFinite(p.longitude) && Math.abs(p.latitude) <= 85 && Math.abs(p.longitude) <= 180 && ['city', 'country'].includes(p.precision)).map(p => ({label: clean(p.label), city: clean(p.city, 100), country: clean(p.country, 100), latitude: p.latitude, longitude: p.longitude, precision: p.precision})) : [];
     if (!locations.length) throw new Error('Vacancy has no disclosed job location');
-    return {id: raw.id, title: clean(raw.title), company: clean(raw.company), companyType: clean(raw.companyType, 60), logo: /^data\/job-logos\/[a-f0-9]{12}\.(png|jpg|webp|gif|ico)$/.test(raw.logo || '') ? raw.logo : null, url: safeURL(raw.url), boardUrl: safeURL(raw.boardUrl), source: clean(raw.source, 50), area: clean(raw.area, 80) || 'Other', skills: Array.isArray(raw.skills) ? raw.skills.slice(0, 20).map(s => clean(s, 60)).filter(Boolean) : [], description: clean(raw.description, 4000), locations, workplace: clean(raw.workplace, 60), employment: clean(raw.employment, 60), sourceTimestamp: clean(raw.sourceTimestamp, 60), sourceTimestampKind: ['published', 'created', 'updated'].includes(raw.sourceTimestampKind) ? raw.sourceTimestampKind : null};
+    const type = clean(raw.companyType, 60);
+    const typeLower = type.toLowerCase();
+    return {id: raw.id, title: clean(raw.title), company: clean(raw.company), companyType: typeLower === 'startup' ? 'Startup' : typeLower === 'public' ? 'Public' : typeLower === 'private' ? 'Private' : type, logo: /^data\/job-logos\/[a-f0-9]{12}\.(png|jpg|webp|gif|ico)$/.test(raw.logo || '') ? raw.logo : null, url: safeURL(raw.url), boardUrl: safeURL(raw.boardUrl), source: clean(raw.source, 50), area: clean(raw.area, 80) || 'Other', skills: Array.isArray(raw.skills) ? raw.skills.slice(0, 20).map(s => clean(s, 60)).filter(Boolean) : [], description: clean(raw.description, 4000), locations, workplace: clean(raw.workplace, 60), employment: clean(raw.employment, 60), sourceTimestamp: clean(raw.sourceTimestamp, 60), sourceTimestampKind: ['published', 'created', 'updated'].includes(raw.sourceTimestampKind) ? raw.sourceTimestampKind : null};
   });
 }
 export function filterJobs(jobs, filters) {

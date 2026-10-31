@@ -16,7 +16,7 @@ from pypdf import PdfReader
 from tau_job_application.job_skills import extract_skills
 from tau_job_application.parsing import infer_profile_links
 
-MAX_JOBS = 500
+MAX_JOBS = 5000
 
 
 @dataclass(frozen=True)

@@ -13,7 +13,7 @@
 ## Current numbers
 
 - **10,247 companies** (global directory), 8,800+ self-hosted logos.
-- **~454 roles across ~67 companies** from ~99 auto-detected ATS boards + feed + employer submissions.
+- **~1,066 roles across ~203 companies** from ~256 auto-detected ATS boards + feed + employer submissions (startups, private, and public companies).
 - Coverage is bounded by which employers expose a public ATS API — see [docs/INGESTION_BOTTLENECKS.md](docs/INGESTION_BOTTLENECKS.md).
 
 ## Run / test

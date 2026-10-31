@@ -35,9 +35,11 @@ def _related(name: str, identifier: str) -> bool:
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--limit", type=int, default=100, help="maximum companies to scan")
+    parser.add_argument("--offset", type=int, default=0, help="skip this many companies first")
     parser.add_argument("--workers", type=int, default=6)
     parser.add_argument("--database", type=Path, default=_project_root() / ".job_assistant" / "assistant.sqlite")
     parser.add_argument("--only-startups", action="store_true", help="only scan companies typed as startups")
+    parser.add_argument("--type", dest="company_type", default="", choices=["startup", "public", "private"], help="only scan this company type")
     parser.add_argument("--europe", action="store_true", help="only scan companies with a European country")
     parser.add_argument("--regions", default="", help="comma-separated regions: Europe,United States,Asia,Africa,Americas,Oceania")
     args = parser.parse_args()
@@ -47,6 +49,8 @@ def main() -> None:
                  and str(c.get("website") or "").startswith("https://")]
     if args.only_startups:
         companies = [c for c in companies if c.get("type") == "startup"]
+    if args.company_type:
+        companies = [c for c in companies if c.get("type") == args.company_type]
     if args.europe:
         eu = {"united kingdom", "uk", "england", "germany", "france", "netherlands", "switzerland", "sweden", "denmark", "norway", "finland", "ireland", "spain", "portugal", "italy", "austria", "belgium", "luxembourg", "poland", "czech republic", "czechia", "slovakia", "hungary", "romania", "bulgaria", "greece", "estonia", "latvia", "lithuania", "croatia", "slovenia", "iceland"}
         companies = [c for c in companies if (c.get("country") or "").casefold() in eu]
@@ -54,7 +58,7 @@ def main() -> None:
         from tau_job_application.role_folders import region_for_country
         wanted = {r.strip().casefold() for r in args.regions.split(",") if r.strip()}
         companies = [c for c in companies if region_for_country(c.get("country") or "").casefold() in wanted]
-    companies = companies[: args.limit]
+    companies = companies[args.offset : args.offset + args.limit]
 
     store = JobSourceStore(args.database)
     registered = 0
