@@ -174,7 +174,7 @@ def export(limit: int = 120) -> dict:
 if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser(description="Export the bounded public vacancy snapshot")
-    parser.add_argument("--limit", type=int, default=120)
+    parser.add_argument("--limit", type=int, default=5000)
     args = parser.parse_args()
     payload = export(limit=args.limit)
     if not payload["jobs"]:
