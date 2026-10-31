@@ -109,12 +109,14 @@ export function buildCityRoutes(records) {
 }
 
 export function directoryGroups(companies, jobs, level) {
+  const byCompany = new Map();
+  for (const job of jobs) { const key = job.company.toLocaleLowerCase('en'); if (!byCompany.has(key)) byCompany.set(key, []); byCompany.get(key).push(job); }
   const groups = new Map();
   for (const company of companies) {
     if (!Number.isFinite(company.latitude) || !Number.isFinite(company.longitude)) continue;
     const companyName = company.name.toLocaleLowerCase('en');
     const directoryKey = level === 'country' ? (company.country === 'England' ? 'United Kingdom' : company.country) : `${company.locationLabel}::${company.country}`;
-    const companyJobs = jobs.filter(job => job.company.toLocaleLowerCase('en') === companyName);
+    const companyJobs = byCompany.get(companyName) || [];
     const jobKeys = companyJobs.flatMap(job => job.locations || []).map(place => level === 'country' ? (place.country === 'England' ? 'United Kingdom' : place.country) : `${place.city}::${place.country}`).filter(Boolean);
     const keys = new Set([directoryKey, ...jobKeys].filter(Boolean));
     for (const key of keys) {

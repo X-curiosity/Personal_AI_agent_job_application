@@ -13,7 +13,7 @@ function companyMark(job) {
 }
 const dateLabel = value => { const date = new Date(value); return Number.isNaN(date.valueOf()) ? 'Date unavailable' : date.toLocaleDateString('en', {year:'numeric',month:'short',day:'numeric',timeZone:'UTC'}); };
 let jobs = [], filtered = [], companies = [], filteredCompanies = [], state = readState(location.search), page = 0, loading = false, map, mapReady = false, pendingFit = false;
-let knownCities = new Map(), knownCityCountries = new Map();
+let knownCities = new Map(), knownCityCountries = new Map(), jobsByCompany = new Map(), peopleByCompany = new Map();
 const pathCity = () => { try { return location.pathname.startsWith('/map/') ? citySlug(decodeURIComponent(location.pathname.split('/')[2] || '')) : ''; } catch { return ''; } };
 const isMapPage = () => location.pathname === '/map' || location.pathname.startsWith('/map/');
 const markers = [], controls = {q:$('search'), area:$('area'), type:$('type'), location:$('location'), hiring:$('hiring')};
@@ -50,8 +50,9 @@ $('next').addEventListener('click', () => { page++; renderList(); $('jobs-headin
 $('fit-map').addEventListener('click', fitResults);
 $('back-jobs').addEventListener('click', () => setView('jobs'));
 function areaCitySelected() { return state.view === 'map' && knownCities.has(citySlug(state.location)); }
-function companyJobs(company) { return filtered.filter(job => job.company.toLocaleLowerCase('en') === company.name.toLocaleLowerCase('en') && (!state.location || job.locations.some(place => samePlace(place.city) && sameCountry(place.country)))); }
-function openRolesFor(company) { return jobs.filter(job => job.company.toLocaleLowerCase('en') === company.name.toLocaleLowerCase('en')); }
+function indexJobs() { jobsByCompany = new Map(); for (const job of jobs) { const key = job.company.toLocaleLowerCase('en'); (jobsByCompany.get(key) || jobsByCompany.set(key, []).get(key)).push(job); } }
+function openRolesFor(company) { return jobsByCompany.get(company.name.toLocaleLowerCase('en')) || []; }
+function companyJobs(company) { return openRolesFor(company).filter(job => !state.location || job.locations.some(place => samePlace(place.city) && sameCountry(place.country))); }
 function hiringStatus(company) {
   if (openRolesFor(company).length) return {key:'hiring', label:'Hiring now', tone:'hiring'};
   if (company.hiringSignal === 'directory_flag') return {key:'flag', label:'Lists hiring', tone:'flag'};
@@ -170,8 +171,19 @@ function renderDetail(job) {
   const top = el('div','detail-top'), headingWrap = el('div'), title = el('h2','',job.title); title.id = 'detail-title'; title.tabIndex = -1; headingWrap.append(title,el('p','detail-subtitle',`${job.company} · ${job.companyType} · ${job.area}`)); top.append(companyMark(job),headingWrap); detail.append(top);
   const actions = el('div','detail-actions'); actions.append(externalLink('View official role ↗',job.url,true)); if (matchMedia('(max-width:700px)').matches) { const back = el('button','button','← All jobs'); back.type = 'button'; back.addEventListener('click',() => { state.job=''; state.company=''; updateURL(); document.querySelector('.explorer-body').dataset.view='jobs'; renderDetail(); renderList(); }); actions.append(back); } detail.append(actions);
   const overview = el('section','detail-section'); overview.append(el('h3','','Role locations')); const facts = el('div','detail-facts'); for (const place of job.locations) facts.append(el('span','tag',`${place.label} (${place.precision === 'city' ? 'city centre' : 'country estimate'})`)); overview.append(facts); if (job.workplace) overview.append(el('p','field-note',`Workplace: ${job.workplace}`)); if (job.sourceTimestamp) overview.append(el('p','field-note',`Employer-board ${job.sourceTimestampKind || 'timestamp'}: ${dateLabel(job.sourceTimestamp)}. This may not be the original posting date.`)); detail.append(overview);
-  const match = el('section','detail-section'); match.append(el('h3','','Skills from your CV, GitHub or portfolio')); const label = el('label','','Type skills to compare (for example: Python, SQL, Docker)'); label.htmlFor = 'skill-profile'; const input = el('textarea'); input.id = 'skill-profile'; input.maxLength = 1800; input.placeholder = 'Python, SQL, Docker'; const result = el('div','match-result','Add skills to see exact overlap with terms found in this advert. No score is calculated without your input.'); input.addEventListener('input',() => { const matched = matchSkills(job,input.value); result.textContent = matched.length ? `${matched.length} exact term${matched.length === 1 ? '' : 's'} overlap: ${matched.join(', ')}. This is not a hiring probability; review the full context yourself.` : 'No exact overlap with the extracted terms yet. Missing terms are not proof that you lack relevant experience.'; }); match.append(label,input,el('p','field-note','Runs only in this page. Nothing is saved or uploaded. For CV and evidence analysis, use the private local app.'),result); detail.append(match);
-  const contacts = el('section','detail-section'); contacts.append(el('h3','','People to contact on LinkedIn')); const links = el('div','contact-links'); const query = encodeURIComponent(`${job.company} ${job.area} ${job.locations[0].city}`); links.append(externalLink(`Search ${job.company} people in ${job.locations[0].city} ↗`,`https://www.linkedin.com/search/results/people/?keywords=${query}`),externalLink(`Search recruiting contacts at ${job.company} ↗`,`https://www.linkedin.com/search/results/people/?keywords=${encodeURIComponent(job.company + ' recruiter')}`)); contacts.append(links,el('p','field-note','Search suggestions only—not verified employee recommendations. LinkedIn may require sign-in. No profiles are retrieved or contacted.')); detail.append(contacts);
+  const match = el('section','detail-section'); match.append(el('h3','','Match your CV'));
+  const drop = el('div','cv-dropzone',`Drop your CV here (.txt / .md) to match against ${job.skills.length} detected terms — or paste skills below`); drop.tabIndex = 0; drop.setAttribute('role','button');
+  const input = el('textarea'); input.id = 'skill-profile'; input.maxLength = 1800; input.placeholder = 'Python, SQL, Docker';
+  const result = el('div','match-result','Drop or paste skills to see exact overlap with terms found in this advert.');
+  const runMatch = () => { const matched = matchSkills(job,input.value); result.textContent = matched.length ? `${matched.length} exact term${matched.length === 1 ? '' : 's'} overlap: ${matched.join(', ')}. This is not a hiring probability; review the full context yourself.` : 'No exact overlap with the extracted terms yet. Missing terms are not proof that you lack relevant experience.'; };
+  input.addEventListener('input',runMatch);
+  drop.addEventListener('dragover', e => { e.preventDefault(); drop.classList.add('drag'); }); drop.addEventListener('dragleave', () => drop.classList.remove('drag'));
+  drop.addEventListener('drop', e => { e.preventDefault(); drop.classList.remove('drag'); const file = e.dataTransfer.files && e.dataTransfer.files[0]; if (!file) return; if (/\.(txt|md)$/i.test(file.name)) { file.text().then(text => { input.value = text.slice(0,1800); runMatch(); drop.textContent = `Matched against ${file.name} — runs only in this page.`; }); } else { drop.textContent = 'PDF/DOCX CV matching runs in the local app (Prepare privately) — nothing is uploaded here.'; } });
+  match.append(drop,el('p','field-note','Runs only in this page. Nothing is saved or uploaded. For full PDF/DOCX CV analysis, use the private local app.'),input,result); detail.append(match);
+  const contacts = el('section','detail-section'); contacts.append(el('h3','','People to contact'));
+  const companyPeople = peopleByCompany.get(job.company.toLocaleLowerCase('en')) || [];
+  if (companyPeople.length) { const peopleList = el('div','contact-links'); for (const person of companyPeople) peopleList.append(externalLink(`${person.name} — ${person.role}${person.location ? ' · ' + person.location : ''} ↗`,person.linkedin)); contacts.append(peopleList,el('p','field-note','Publicly listed, surfaced via web search. Verify the person and role before contacting.')); }
+  const links = el('div','contact-links'); const query = encodeURIComponent(`${job.company} ${job.area} ${job.locations[0].city}`); links.append(externalLink(`Search ${job.company} people in ${job.locations[0].city} ↗`,`https://www.linkedin.com/search/results/people/?keywords=${query}`),externalLink(`Search recruiting contacts at ${job.company} ↗`,`https://www.linkedin.com/search/results/people/?keywords=${encodeURIComponent(job.company + ' recruiter')}`)); contacts.append(links,el('p','field-note','Search suggestions only—not verified employee recommendations. LinkedIn may require sign-in. No profiles are retrieved or contacted.')); detail.append(contacts);
   const about = el('section','detail-section'); about.append(el('h3','','About the role'),el('p','',job.description || 'Open the official advert for the complete description.')); if (job.skills.length) { const skills = el('div','company-tags'); for (const skill of job.skills) skills.append(el('span','tag',skill)); about.append(el('h3','','Terms detected in the advert'),skills); } detail.append(about,el('p','field-note',`Source: ${job.source} employer board. Verify the current advert and submit it yourself. Hired never applies on your behalf.`));
 }
 function clearMarkers() { for (const marker of markers.splice(0)) marker.remove(); }
@@ -260,7 +272,7 @@ async function loadJobs() {
   try {
     const response = await fetch('/data/jobs.json',{credentials:'omit',signal:AbortSignal.timeout(15000)});
     if (!response.ok) throw new Error('Snapshot unavailable');
-    const payload = await response.json(); jobs = readJobs(payload);
+    const payload = await response.json(); jobs = readJobs(payload); indexJobs();
     if (isMapPage()) state.view = 'map';
     registerCities(jobs.flatMap(job => job.locations));
     addOptions('area',jobs.map(j => j.area)); addOptions('location',jobs.flatMap(j => j.locations.flatMap(p => [p.city,p.country])));
@@ -272,4 +284,12 @@ async function loadJobs() {
     if (state.view === 'map' || pathCity()) loadCompanies();
   } catch { loading = false; $('load-error').hidden = false; $('result-count').textContent = 'Vacancy snapshot unavailable'; }
 }
-$('retry').addEventListener('click',loadJobs); initializeMap(); loadJobs();
+async function loadPeople() {
+  try {
+    const response = await fetch('/data/people.json',{credentials:'omit',signal:AbortSignal.timeout(10000)});
+    if (!response.ok) return;
+    const payload = await response.json(); peopleByCompany = new Map();
+    for (const person of (payload.people || [])) { const key = String(person.company || '').toLocaleLowerCase('en'); if (!peopleByCompany.has(key)) peopleByCompany.set(key, []); peopleByCompany.get(key).push(person); }
+  } catch {}
+}
+$('retry').addEventListener('click',loadJobs); initializeMap(); loadJobs(); loadPeople();
