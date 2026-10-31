@@ -1,5 +1,13 @@
 # Repository context — start here
 
+## Regional job intake: feed connector + employer submissions
+
+- Added a "Feed" source type to the registry (`fetch_feed_openings` in job_sources.py) that ingests public RSS/Atom/JSON job feeds with SSRF-safe bounded fetching and a country fallback for entries without a location. This is the connector path for regional job boards that expose feeds.
+- Added the employer self-serve first step: `job_submissions.py` (validated, URL-deduplicated inbox at `vercel-site/data/submitted_jobs.json`) plus `scripts/submit_job.py` CLI. The export merges validated submissions into the snapshot (`_job_from_submission`).
+- `_fetch_openings` routes Feed sources; `_iter_boards` now accepts Greenhouse/Lever/Ashby/Feed. `submitted_jobs.json` is whitelisted in .gitignore.
+- Verification: 424 Python tests (4 new: RSS/Atom/JSON parsing, submission validation/dedupe) + 22 Node tests pass. The feed connector is unit-tested; no live feed was fetched in this session. No sample submission is committed.
+
+
 ## Global job coverage
 
 - Removed the Europe-only filter from `export_public_jobs.py`; the public vacancy snapshot is now global. Updated site copy (title/meta/notes) and the "European roles" counters to be region-neutral.

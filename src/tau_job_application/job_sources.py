@@ -12,18 +12,20 @@ from dataclasses import dataclass
 from datetime import UTC, datetime
 from html import unescape
 from ipaddress import ip_address
+import json
 from pathlib import Path
 import re
 import socket
 import sqlite3
 from urllib.parse import urljoin, urlparse
 from urllib.request import Request, urlopen
+from xml.etree import ElementTree
 
 from tau_job_application.sources import fetch_public_board_openings
 
 USER_AGENT = "hired-job-sources/0.1 (public career-page detection)"
 MAX_DETECT_BYTES = 2_000_000
-SUPPORTED_SOURCES = ("Greenhouse", "Lever", "Ashby", "Workable", "Recruitee")
+SUPPORTED_SOURCES = ("Greenhouse", "Lever", "Ashby", "Workable", "Recruitee", "Feed")
 
 # ATS board URL patterns. The captured group is the board identifier.
 _ATS_PATTERNS = (
@@ -125,6 +127,70 @@ def detect_company_ats(website: str, *, careers_url: str = "", fetcher=fetch_pub
         except Exception:
             continue
     return list(results.values())
+
+
+def _feed_entry(title, url, description, location, published):
+    return {
+        "title": (title or "").strip()[:300],
+        "url": url.strip(),
+        "description": (description or "").strip()[:4000],
+        "location": (location or "").strip()[:300],
+        "source_id": re.sub(r"[^a-z0-9]", "", str(url or title or "").casefold())[:40] or "feed-item",
+        "source": "Feed",
+        "source_timestamp": published or None,
+        "source_timestamp_kind": "published" if published else None,
+    }
+
+
+def _xml_text(node, tag):
+    child = node.find("{*}" + tag) if node is not None else None
+    return (child.text or "").strip() if child is not None and child.text else ""
+
+
+def _parse_feed(text: str, default_country: str) -> list[dict]:
+    stripped = text.lstrip()
+    openings: list[dict] = []
+    if stripped.startswith("{") or stripped.startswith("["):
+        data = json.loads(stripped)
+        items = data.get("items", []) if isinstance(data, dict) else data
+        for item in items[:200] if isinstance(items, list) else []:
+            if not isinstance(item, dict):
+                continue
+            title = item.get("title") or item.get("name") or ""
+            url = item.get("url") or item.get("link") or ""
+            if not str(url).startswith("https://"):
+                continue
+            openings.append(_feed_entry(title, url, item.get("content_text") or item.get("summary") or item.get("description") or "",
+                                        item.get("location") or item.get("city") or default_country, item.get("date_published")))
+        return openings
+    root = ElementTree.fromstring(stripped)
+    for item in root.iter():
+        tag = item.tag.rsplit("}", 1)[-1].casefold()
+        if tag not in {"item", "entry"}:
+            continue
+        title = _xml_text(item, "title")
+        link = _xml_text(item, "link")
+        if not link:  # Atom link is an attribute
+            link_node = item.find("{*}link")
+            link = (link_node.get("href") or "") if link_node is not None else ""
+        if not str(link).startswith("https://"):
+            continue
+        openings.append(_feed_entry(title, link, _xml_text(item, "description") or _xml_text(item, "summary") or _xml_text(item, "content"),
+                                    _xml_text(item, "location") or default_country, _xml_text(item, "pubDate") or _xml_text(item, "published")))
+    return openings
+
+
+def fetch_feed_openings(feed_url: str, *, default_country: str = "") -> list[dict]:
+    """Ingest openings from a public RSS/Atom/JSON job feed (regional boards).
+
+    Bounded and SSRF-safe; entries without a location fall back to the
+    caller-supplied country so the export can still place them at country level.
+    """
+    text = fetch_public_text(feed_url, max_bytes=5_000_000)
+    openings = _parse_feed(text, default_country)
+    if not openings:
+        raise ValueError("Feed contained no parseable job entries")
+    return openings
 
 
 class JobSourceStore:

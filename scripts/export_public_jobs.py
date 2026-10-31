@@ -51,9 +51,42 @@ class _Company:
 
 
 class _Board:
-    def __init__(self, source: str, identifier: str, url: str, name: str, company_type: str) -> None:
+    def __init__(self, source: str, identifier: str, url: str, name: str, company_type: str, region_hint: str = "") -> None:
         self.source, self.board_identifier, self.board_url = source, identifier, url
         self.company = _Company(name, company_type)
+        self.region_hint = region_hint
+
+
+def _fetch_openings(board):
+    if board.source == "Feed":
+        from tau_job_application.job_sources import fetch_feed_openings
+        return fetch_feed_openings(board.board_identifier, default_country=board.region_hint or "")
+    return fetch_public_board_openings(board.source, board.board_identifier, company=board.company.name)
+
+
+def _job_from_submission(submission: dict) -> dict:
+    """Convert one validated employer submission into the snapshot job shape."""
+    locations = []
+    for raw in re.split(r"\s*[•;|]\s*", submission["location"]):
+        point = geocode_location(raw)
+        if not point:
+            continue
+        locations.append({"label": raw.strip(), "city": point.label, "country": raw.strip().split(",")[-1].strip(),
+                           "latitude": point.latitude, "longitude": point.longitude, "precision": point.precision})
+    if not locations:
+        raise ValueError(f"Unresolvable location: {submission['location']}")
+    description = re.sub(r"\s+", " ", submission["description"]).strip()
+    description = re.sub(r"\b[\w.+-]+@[\w.-]+\.[A-Za-z]{2,}\b", "[email in original advert]", description)[:4000]
+    skills = extract_skills(f"{submission['title']} {description}")
+    identity = f"{submission['company']}|{submission['source_id']}"
+    return {
+        "id": "job_" + hashlib.sha256(identity.encode()).hexdigest()[:20], "logo": "",
+        "title": submission["title"], "company": submission["company"], "companyType": "unknown",
+        "url": submission["url"], "source": submission["source"], "boardUrl": "",
+        "area": role_area(submission["title"]), "skills": skills, "description": description,
+        "locations": locations, "workplace": None, "employment": None,
+        "sourceTimestamp": submission["source_timestamp"], "sourceTimestampKind": submission["source_timestamp_kind"],
+    }
 
 
 def _iter_boards():
@@ -61,8 +94,8 @@ def _iter_boards():
     registry still yields the reviewed default boards."""
     from tau_job_application.job_sources import JobSourceStore
     rows = JobSourceStore().list(enabled_only=True)
-    boards = [_Board(r["source"], r["board_identifier"], r["board_url"], r["company"], r["company_type"])
-              for r in rows if r["source"] in {"Greenhouse", "Lever", "Ashby"}]
+    boards = [_Board(r["source"], r["board_identifier"], r["board_url"], r["company"], r["company_type"], r["region_hint"])
+              for r in rows if r["source"] in {"Greenhouse", "Lever", "Ashby", "Feed"}]
     seen = {(board.source, board.board_identifier) for board in boards}
     for default in DEFAULT_VETTED_COMPANY_BOARDS:
         if (default.source, default.board_identifier) not in seen:
@@ -77,7 +110,7 @@ def export(limit: int = 120) -> dict:
     boards = _iter_boards()
     for board in boards:
         try:
-            openings = fetch_public_board_openings(board.source, board.board_identifier, company=board.company.name)
+            openings = _fetch_openings(board)
         except Exception as exc:  # retain source failure without exporting stale claims as live
             errors.append(f"{board.company.name}: {exc}")
             continue
@@ -115,6 +148,14 @@ def export(limit: int = 120) -> dict:
                 "locations": locations, "workplace": opening.get("workplace_type"), "employment": opening.get("employment_type"),
                 "sourceTimestamp": opening.get("source_timestamp"), "sourceTimestampKind": opening.get("source_timestamp_kind"),
             })
+    # Employer/operator submissions (reviewed inbox)
+    try:
+        from tau_job_application.job_submissions import load_submissions
+        for submission in load_submissions():
+            jobs.append(_job_from_submission(submission))
+    except Exception as exc:
+        errors.append(f"submissions: {exc}")
+
     jobs.sort(key=lambda job: (job["sourceTimestamp"] or "", job["company"], job["title"]), reverse=True)
     # Keep the bounded preview diverse instead of letting the newest board fill it.
     per_company = max(1, limit // max(1, len(boards)))
