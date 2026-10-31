@@ -1,5 +1,12 @@
 # Repository context — start here
 
+## Map zoom hierarchy and full-page jobs
+
+- Reworked map precision: the map now starts on a globe (zoom 2.5) showing country cards with per-country company/role counts (e.g. United States 4,705, United Kingdom 451 · 112 roles, Spain 250, Germany …), then zooms to city cards within a country, then individual company pins at city/street level. Raised `maxZoom` 10 → 18, city-card click zoom 8 → 11, and bounds fit `maxZoom` 7 → 12.
+- Made the jobs/map explorer taller and fuller (height 820px, max-height 92vh, wider 420px list column).
+- Verified in headless Chromium: globe shows 36 country cards with counts, and zoom 12 over Paris renders individual pins. 421 Python + 22 Node tests pass.
+
+
 ## Company expansion: 68 → 163 European roles across 24 companies
 
 - Ran the source-registry auto-detection over 250 European startups; registered 32 ATS boards (mostly Ashby). Three false positives were disabled (PipeBio mis-resolved to Benchling's board, Momo Medical/Recruitee unsupported, Protex AI 404).

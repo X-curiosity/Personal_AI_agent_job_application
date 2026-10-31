@@ -185,7 +185,7 @@ function addAreaMarker(group, level) {
   card.tabIndex = 0; card.setAttribute('role','button'); card.setAttribute('aria-label',`${group.key}, ${group.companies.length} companies and ${group.jobs} roles`);
   const choose = () => {
     if (level === 'country') map.jumpTo({center:[group.longitude,group.latitude],zoom:5});
-    else { selectArea(group.label || group.key,group.country); map.jumpTo({center:[group.longitude,group.latitude],zoom:8}); }
+    else { selectArea(group.label || group.key,group.country); map.jumpTo({center:[group.longitude,group.latitude],zoom:11}); }
   };
   card.addEventListener('click',choose);
   card.addEventListener('keydown',event => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); choose(); } });
@@ -219,14 +219,14 @@ function renderPins() {
 }
 function fitResults() {
   if (!map || !mapReady) { pendingFit = true; return; } pendingFit = false; map.resize(); const points = currentMapPoints(directoryForMap()).map(point => point.location); if (!points.length) return;
-  const lngs = points.map(p => p.longitude), lats = points.map(p => p.latitude); const camera = map.cameraForBounds([[Math.min(...lngs),Math.min(...lats)],[Math.max(...lngs),Math.max(...lats)]],{padding:70,maxZoom:7}); if (camera) map.jumpTo({center:camera.center,zoom:Math.max(2.8,camera.zoom)});
+  const lngs = points.map(p => p.longitude), lats = points.map(p => p.latitude); const camera = map.cameraForBounds([[Math.min(...lngs),Math.min(...lats)],[Math.max(...lngs),Math.max(...lats)]],{padding:70,maxZoom:12}); if (camera) map.jumpTo({center:camera.center,zoom:Math.max(2.8,camera.zoom)});
 }
 async function initializeMap() {
   try {
     if (!globalThis.maplibregl) throw new Error('Map unavailable');
     let style = 'https://tiles.openfreemap.org/styles/positron';
     try { const response = await fetch(style,{credentials:'omit',signal:AbortSignal.timeout(8000)}); if (!response.ok) throw new Error('Style unavailable'); } catch { const response = await fetch('/data/world.geojson'); const world = await response.json(); style = {version:8,sources:{world:{type:'geojson',data:world}},layers:[{id:'bg',type:'background',paint:{'background-color':'#eee9df'}},{id:'land',type:'fill',source:'world',paint:{'fill-color':'#fff7e9','fill-outline-color':'#d7c7b2'}}]}; }
-    map = new maplibregl.Map({container:'map',style,center:[12,51],zoom:3.4,minZoom:2,maxZoom:10,scrollZoom:false,attributionControl:{compact:true},fadeDuration:matchMedia('(prefers-reduced-motion:reduce)').matches ? 0 : 250}); globalThis.__hiredMap = map; map.addControl(new maplibregl.NavigationControl({showCompass:false}),'top-right'); map.on('load',() => { mapReady = true; renderPins(); if (pendingFit) fitResults(); }); map.on('moveend',renderPins); map.on('idle',() => { if (!$('job-list').children.length) renderPins(); }); map.on('error',() => { $('map-status').hidden = false; $('map-status').textContent = 'Some map tiles failed. The job list still works.'; });
+    map = new maplibregl.Map({container:'map',style,center:[12,51],zoom:2.5,minZoom:2,maxZoom:18,scrollZoom:false,attributionControl:{compact:true},fadeDuration:matchMedia('(prefers-reduced-motion:reduce)').matches ? 0 : 250}); globalThis.__hiredMap = map; map.addControl(new maplibregl.NavigationControl({showCompass:false}),'top-right'); map.on('load',() => { mapReady = true; renderPins(); if (pendingFit) fitResults(); }); map.on('moveend',renderPins); map.on('idle',() => { if (!$('job-list').children.length) renderPins(); }); map.on('error',() => { $('map-status').hidden = false; $('map-status').textContent = 'Some map tiles failed. The job list still works.'; });
   } catch { $('map-status').hidden = false; $('map-status').textContent = 'Map unavailable. All roles remain in Jobs.'; $('fit-map').disabled = true; }
 }
 let companiesLoading = false, companiesLoaded = false;
