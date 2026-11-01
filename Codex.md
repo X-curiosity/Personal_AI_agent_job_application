@@ -13,8 +13,13 @@
 ## Current numbers
 
 - **10,247 companies** (global directory), 8,800+ self-hosted logos.
-- **~1,066 roles across ~203 companies** from ~256 auto-detected ATS boards + feed + employer submissions (startups, private, and public companies).
-- Coverage is bounded by which employers expose a public ATS API — see [docs/IMPLEMENTATION_PLAN.md](docs/IMPLEMENTATION_PLAN.md).
+- **1,860 roles across 212 companies** in five focused sectors (engineering, finance, sales, operations, people & HR) from ~266 ATS boards + feed + employer submissions.
+- Coverage is bounded by which employers expose a public ATS API (Greenhouse / Lever / Ashby / Workable / Recruitee) — most big banks/PE/consulting use Workday/SuccessFactors with no feed. See [docs/IMPLEMENTATION_PLAN.md](docs/IMPLEMENTATION_PLAN.md).
+
+## Map & performance
+
+- Map uses **MapLibre (Mapbox-compatible) + OpenFreeMap (OSM)**, with an OSM raster fallback; a Mapbox token (`globalThis.HIRED_MAPBOX_TOKEN`) upgrades to Mapbox GL JS + Mapbox styles. Reverse-engineered reference: startupmap.one runs **Mapbox + Supabase** and pulls roles "daily from company career pages" (ATS feeds) — the same approach as `job_sources.py`.
+- Data is **minified** (jobs ~5.7 MB, companies ~8.1 MB) and served with **Cache-Control** (logos immutable; data/JS/CSS revalidate hourly).
 
 ## Run / test
 
@@ -30,11 +35,11 @@ uv sync --no-editable --reinstall-package tau-job-application && ./run.sh
 
 ## Job sources
 
-`scripts/register_job_sources.py` auto-detects ATS boards from the catalogue (`--regions`, `--only-startups`); `scripts/export_public_jobs.py --limit N` rebuilds the snapshot; `scripts/submit_job.py` adds an employer submission; `.github/workflows/refresh-jobs.yml` refreshes daily at 06:00 UTC.
+`scripts/register_job_sources.py` auto-detects ATS boards from the catalogue (`--regions`, `--only-startups`); `scripts/register_top_firms.py` detects boards for curated consulting/banking/PE/VC/trading firms (and correctly attributes fund portfolio-company boards); `scripts/export_public_jobs.py --limit N` rebuilds the snapshot (sector-scoped, minified); `scripts/submit_job.py` adds an employer submission; `.github/workflows/refresh-jobs.yml` refreshes daily at 06:00 UTC.
 
 ## Preferences & onboarding
 
-A first-visit onboarding collects sectors (finance / business / engineering), free-text keywords, location, and company type, stored in `localStorage` and applied as a persistent filter (`applyPrefs`). A "Preferences" button reopens it. Jobs carry a `sector` derived from their area. People-to-contact cards show a category badge (Recruiter / Leadership) and open LinkedIn; the search links were removed.
+A first-visit onboarding collects sectors (engineering / finance / sales / operations / people & HR), free-text keywords, location, and company type, stored in `localStorage` and applied as a persistent filter (`applyPrefs`). A "Preferences" button reopens it. Jobs carry a `sector` derived from their area (Design/Product/Data & AI fold into engineering; Legal is excluded). Each role has its own page/URL (`/job/<id>`). People-to-contact cards show a category badge (Recruiter / Leadership) and open LinkedIn; the search links were removed.
 
 ## Agent harness & API key
 
