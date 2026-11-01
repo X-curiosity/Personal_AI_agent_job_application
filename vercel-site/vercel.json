@@ -28,7 +28,7 @@
     {
       "source": "/(.*)",
       "headers": [
-        {"key": "Content-Security-Policy", "value": "default-src 'self'; script-src 'self' https://api.mapbox.com; style-src 'self' 'unsafe-inline' https://api.mapbox.com; img-src 'self' data: blob: https://tiles.openfreemap.org https://tile.openstreetmap.org https://api.mapbox.com; connect-src 'self' https://tiles.openfreemap.org https://tile.openstreetmap.org https://api.mapbox.com https://events.mapbox.com; worker-src blob:; child-src blob:; font-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'"},
+        {"key": "Content-Security-Policy", "value": "default-src 'self'; script-src 'self' https://api.mapbox.com; style-src 'self' 'unsafe-inline' https://api.mapbox.com; img-src 'self' data: blob: https://tiles.openfreemap.org https://tile.openstreetmap.org https://api.mapbox.com https://server.arcgisonline.com; connect-src 'self' https://tiles.openfreemap.org https://tile.openstreetmap.org https://api.mapbox.com https://events.mapbox.com https://server.arcgisonline.com; worker-src blob:; child-src blob:; font-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'"},
         {"key": "Referrer-Policy", "value": "no-referrer"},
         {"key": "X-Content-Type-Options", "value": "nosniff"},
         {"key": "Permissions-Policy", "value": "geolocation=(), camera=(), microphone=()"}

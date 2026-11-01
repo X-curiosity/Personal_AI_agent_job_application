@@ -248,7 +248,24 @@ function renderPins() {
 }
 function fitResults() {
   if (!map || !mapReady) { pendingFit = true; return; } pendingFit = false; map.resize(); const points = currentMapPoints(directoryForMap()).map(point => point.location); if (!points.length) return;
-  const lngs = points.map(p => p.longitude), lats = points.map(p => p.latitude); const camera = map.cameraForBounds([[Math.min(...lngs),Math.min(...lats)],[Math.max(...lngs),Math.max(...lats)]],{padding:70,maxZoom:12}); if (camera) map.jumpTo({center:camera.center,zoom:Math.max(2.8,camera.zoom)});
+  const lngs = points.map(p => p.longitude), lats = points.map(p => p.latitude); const camera = map.cameraForBounds([[Math.min(...lngs),Math.min(...lats)],[Math.max(...lngs),Math.max(...lats)]],{padding:70,maxZoom:12}); if (camera) map.jumpTo({center:camera.center,zoom:Math.max(2.0,camera.zoom)});
+}
+const SATELLITE_TILES = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}';
+let mapMode = '';
+function syncMapMode() {
+  if (!map || !mapReady) return;
+  if (globalThis.HIRED_MAPBOX_TOKEN) return; // Mapbox styles render their own native globe
+  const globe = map.getZoom() < 4;
+  const mode = globe ? 'globe' : 'flat';
+  if (mapMode === mode) return;
+  mapMode = mode;
+  try { map.setProjection({type: globe ? 'globe' : 'mercator'}); } catch {}
+  try { map.setSky(globe ? {'sky-color':'#8ec3e0','horizon-color':'#cfe3f5','fog-color':'#dbe9f5','fog-ground-blend':0.15,'horizon-fog-blend':0.15,'sky-horizon-blend':0.5,'atmosphere-blend':0.12} : null); } catch {}
+  if (!map.getSource('satellite')) {
+    map.addSource('satellite',{type:'raster',tiles:[SATELLITE_TILES],tileSize:256,maxzoom:18,attribution:'Imagery © Esri, Maxar, Earthstar Geographics'});
+    map.addLayer({id:'satellite',type:'raster',source:'satellite'});
+  }
+  if (map.getLayer('satellite')) map.setLayoutProperty('satellite','visibility',globe ? 'visible' : 'none');
 }
 async function initializeMap() {
   try {
@@ -276,7 +293,7 @@ async function initializeMap() {
       try { const response = await fetch(style,{credentials:'omit',signal:AbortSignal.timeout(8000)}); if (!response.ok) throw new Error('Style unavailable'); }
       catch { style = {version:8,sources:{osm:{type:'raster',tiles:['https://tile.openstreetmap.org/{z}/{x}/{y}.png'],tileSize:256,attribution:'&copy; OpenStreetMap contributors',maxzoom:19}},layers:[{id:'osm',type:'raster',source:'osm'}]}; } // OSM raster fallback
     }
-    map = new maplibregl.Map({container:'map',style,center:[12,51],zoom:2.5,minZoom:2,maxZoom:18,scrollZoom:false,attributionControl:{compact:true},fadeDuration:matchMedia('(prefers-reduced-motion:reduce)').matches ? 0 : 250}); globalThis.__hiredMap = map; map.addControl(new maplibregl.NavigationControl({showCompass:false}),'top-right'); map.on('load',() => { mapReady = true; renderPins(); if (pendingFit) fitResults(); }); map.on('moveend',renderPins); map.on('idle',() => { if (!$('job-list').children.length) renderPins(); }); map.on('error',() => { $('map-status').hidden = false; $('map-status').textContent = 'Some map tiles failed. The job list still works.'; });
+    map = new maplibregl.Map({container:'map',style,center:[12,51],zoom:1.2,minZoom:0.5,maxZoom:18,scrollZoom:false,attributionControl:{compact:true},fadeDuration:matchMedia('(prefers-reduced-motion:reduce)').matches ? 0 : 250}); globalThis.__hiredMap = map; map.addControl(new maplibregl.NavigationControl({showCompass:false}),'top-right'); map.on('load',() => { mapReady = true; syncMapMode(); renderPins(); if (pendingFit) fitResults(); }); map.on('zoom',syncMapMode); map.on('moveend',renderPins); map.on('idle',() => { if (!$('job-list').children.length) renderPins(); }); map.on('error',() => { $('map-status').hidden = false; $('map-status').textContent = 'Some map tiles failed. The job list still works.'; });
   } catch { $('map-status').hidden = false; $('map-status').textContent = 'Map unavailable. All roles remain in Jobs.'; $('fit-map').disabled = true; }
 }
 let companiesLoading = false, companiesLoaded = false;
