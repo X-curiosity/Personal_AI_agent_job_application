@@ -528,7 +528,7 @@ def export_catalog(db_path: Path, output_path: Path, *, exported_at: str | None 
     for company in data["companies"]:
         company.pop("_logo_payload", None)
     output_path.parent.mkdir(parents=True, exist_ok=True)
-    output_path.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    output_path.write_text(json.dumps(data, ensure_ascii=False, separators=(',', ':')) + "\n", encoding="utf-8")
     return data
 
 

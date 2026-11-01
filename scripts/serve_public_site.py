@@ -10,7 +10,7 @@ ROOT = Path(__file__).resolve().parents[1] / "vercel-site"
 
 class Handler(SimpleHTTPRequestHandler):
     def do_GET(self):
-        if self.path.startswith("/map/"):
+        if self.path.startswith("/map/") or self.path.startswith("/job/"):
             self.path = "/index.html"
         super().do_GET()
 

@@ -50,9 +50,11 @@ test('country flags map names to emoji with a safe fallback',()=>{
  assert.equal(countryFlag('Not a country'),'');
 });
 
-test('sectors map areas to finance, business, engineering',()=>{
+test('sectors map areas to the five focused families',()=>{
  assert.equal(sectorFor('Finance'),'finance'); assert.equal(sectorFor('Engineering'),'engineering');
- assert.equal(sectorFor('Data & AI'),'engineering'); assert.equal(sectorFor('Sales'),'business');
+ assert.equal(sectorFor('Data & AI'),'engineering'); assert.equal(sectorFor('Sales'),'sales');
+ assert.equal(sectorFor('People & HR'),'people-hr'); assert.equal(sectorFor('Operations'),'operations');
+ assert.equal(sectorFor('Legal'),'other');
  const [job]=read([fixture]); assert.equal(job.sector,'engineering');
 });
 

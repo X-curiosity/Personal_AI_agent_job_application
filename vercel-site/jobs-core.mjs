@@ -9,9 +9,12 @@ export function safeURL(value) {
 }
 export function sectorFor(area) {
   const value = String(area || '').toLocaleLowerCase('en');
+  if (value.includes('people') || value.includes('hr')) return 'people-hr';
+  if (value.includes('sales')) return 'sales';
+  if (value.includes('operation')) return 'operations';
   if (value.includes('finance') || value.includes('account')) return 'finance';
-  if (value.includes('engineer') || value.includes('data') || value.includes('ai') || value.includes('design') || value.includes('hardware') || value.includes('security')) return 'engineering';
-  return 'business';
+  if (value.includes('engineer') || value.includes('data') || value.includes('ai') || value.includes('design') || value.includes('product') || value.includes('hardware') || value.includes('security')) return 'engineering';
+  return 'other';
 }
 
 export function readJobs(payload) {

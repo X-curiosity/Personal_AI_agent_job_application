@@ -36,6 +36,21 @@ def role_area(title: str) -> str:
     return next((name for name, words in groups if any(word in text for word in words)), "Operations")
 
 
+# Sector scope: only these role families are kept. Design/Product/AI map to
+# engineering (the user's tech-company focus); "legal" is intentionally absent
+# so those roles are dropped rather than shown.
+SECTOR_BY_AREA = {
+    "data & ai": "engineering",
+    "product": "engineering",
+    "engineering": "engineering",
+    "design": "engineering",
+    "finance": "finance",
+    "sales": "sales",
+    "people & hr": "people-hr",
+    "operations": "operations",
+}
+
+
 def company_logos() -> dict[str, str]:
     path = ROOT / "vercel-site/data/companies.json"
     try:
@@ -126,7 +141,9 @@ def export(limit: int = 120) -> dict:
                 continue
             description = re.sub(r"[ \t\r]+", " ", opening.get("description") or "").strip()
             description = re.sub(r"\n{3,}", "\n\n", description)
-            description = re.sub(r"\b[\w.+-]+@[\w.-]+\.[A-Za-z]{2,}\b", "[email in original advert]", description)[:6000]
+            description = re.sub(r"\b[\w.+-]+@[\w.-]+\.[A-Za-z]{2,}\b", "[email in original advert]", description)[:2500]
+            if not description.strip():
+                continue  # no readable advert body to show
             skills = extract_skills(f"{opening['title']} {description}")
             identity = f"{board.company.name}|{opening['source_id']}"
             logo = logos.get(board.company.name.casefold(), "")
@@ -141,12 +158,16 @@ def export(limit: int = 120) -> dict:
                     logo = target_relative
                 else:
                     logo = ""
+            area = role_area(opening["title"])
+            sector = SECTOR_BY_AREA.get(area.casefold())
+            if sector is None:
+                continue  # outside the focused sector scope (engineering/finance/sales/operations/people)
             jobs.append({
                 "id": "job_" + hashlib.sha256(identity.encode()).hexdigest()[:20],
                 "logo": logo,
                 "title": opening["title"], "company": board.company.name, "companyType": board.company.company_type,
                 "url": opening["url"], "source": opening["source"], "boardUrl": board.board_url,
-                "area": role_area(opening["title"]), "skills": skills, "description": description,
+                "area": area, "sector": sector, "skills": skills, "description": description,
                 "locations": locations, "workplace": opening.get("workplace_type"), "employment": opening.get("employment_type"),
                 "sourceTimestamp": opening.get("source_timestamp"), "sourceTimestampKind": opening.get("source_timestamp_kind"),
             })
@@ -180,5 +201,5 @@ if __name__ == "__main__":
     if not payload["jobs"]:
         raise SystemExit("Refresh failed; keeping the previous public snapshot: " + " | ".join(payload["errors"]))
     target = ROOT / "vercel-site/data/jobs.json"
-    target.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n")
+    target.write_text(json.dumps(payload, ensure_ascii=False, separators=(',', ':')) + "\n")
     print(f"Exported {len(payload['jobs'])} global vacancies to {target}; source errors: {len(payload['errors'])}")

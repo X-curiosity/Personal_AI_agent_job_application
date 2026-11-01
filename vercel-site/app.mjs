@@ -252,9 +252,30 @@ function fitResults() {
 }
 async function initializeMap() {
   try {
+    // Mapbox (when a token is configured) with OpenStreetMap as the free fallback.
+    const token = globalThis.HIRED_MAPBOX_TOKEN || '';
+    if (token && !globalThis.mapboxgl) {
+      await new Promise((resolve, reject) => {
+        const s = document.createElement('script');
+        s.src = 'https://api.mapbox.com/mapbox-gl-js/v3.6.0/mapbox-gl.js';
+        s.onload = resolve; s.onerror = () => reject(new Error('Mapbox SDK failed'));
+        document.head.appendChild(s);
+      });
+      const link = document.createElement('link');
+      link.rel = 'stylesheet'; link.href = 'https://api.mapbox.com/mapbox-gl-js/v3.6.0/mapbox-gl.css';
+      document.head.appendChild(link);
+      globalThis.mapboxgl.accessToken = token;
+      globalThis.maplibregl = globalThis.mapboxgl; // Mapbox GL v3 keeps the maplibre-compatible Marker/Map API
+    }
     if (!globalThis.maplibregl) throw new Error('Map unavailable');
-    let style = 'https://tiles.openfreemap.org/styles/positron';
-    try { const response = await fetch(style,{credentials:'omit',signal:AbortSignal.timeout(8000)}); if (!response.ok) throw new Error('Style unavailable'); } catch { const response = await fetch('/data/world.geojson'); const world = await response.json(); style = {version:8,sources:{world:{type:'geojson',data:world}},layers:[{id:'bg',type:'background',paint:{'background-color':'#eee9df'}},{id:'land',type:'fill',source:'world',paint:{'fill-color':'#fff7e9','fill-outline-color':'#d7c7b2'}}]}; }
+    let style;
+    if (token) {
+      style = 'mapbox://styles/mapbox/light-v11';
+    } else {
+      style = 'https://tiles.openfreemap.org/styles/positron'; // OSM vector tiles, no key
+      try { const response = await fetch(style,{credentials:'omit',signal:AbortSignal.timeout(8000)}); if (!response.ok) throw new Error('Style unavailable'); }
+      catch { style = {version:8,sources:{osm:{type:'raster',tiles:['https://tile.openstreetmap.org/{z}/{x}/{y}.png'],tileSize:256,attribution:'&copy; OpenStreetMap contributors',maxzoom:19}},layers:[{id:'osm',type:'raster',source:'osm'}]}; } // OSM raster fallback
+    }
     map = new maplibregl.Map({container:'map',style,center:[12,51],zoom:2.5,minZoom:2,maxZoom:18,scrollZoom:false,attributionControl:{compact:true},fadeDuration:matchMedia('(prefers-reduced-motion:reduce)').matches ? 0 : 250}); globalThis.__hiredMap = map; map.addControl(new maplibregl.NavigationControl({showCompass:false}),'top-right'); map.on('load',() => { mapReady = true; renderPins(); if (pendingFit) fitResults(); }); map.on('moveend',renderPins); map.on('idle',() => { if (!$('job-list').children.length) renderPins(); }); map.on('error',() => { $('map-status').hidden = false; $('map-status').textContent = 'Some map tiles failed. The job list still works.'; });
   } catch { $('map-status').hidden = false; $('map-status').textContent = 'Map unavailable. All roles remain in Jobs.'; $('fit-map').disabled = true; }
 }
@@ -312,7 +333,7 @@ function showOnboarding(force) {
   const card = el('div','onboard-card');
   card.append(el('h2','','Tailor your search'), el('p','onboard-sub','Choose your sectors and preferences — roles will be ranked to match.'));
   const chips = el('div','chip-row');
-  for (const sector of ['finance','business','engineering']) { const chip = el('button',`onboard-chip${prefs.sectors.includes(sector) ? ' active' : ''}`, sector[0].toUpperCase() + sector.slice(1)); chip.type = 'button'; chip.addEventListener('click', () => { chip.classList.toggle('active'); const i = prefs.sectors.indexOf(sector); if (i >= 0) prefs.sectors.splice(i, 1); else prefs.sectors.push(sector); }); chips.append(chip); }
+  for (const sector of ['engineering','finance','sales','operations','people-hr']) { const label = {engineering:'Engineering', finance:'Finance', sales:'Sales', operations:'Operations', 'people-hr':'People & HR'}[sector]; const chip = el('button',`onboard-chip${prefs.sectors.includes(sector) ? ' active' : ''}`, label); chip.type = 'button'; chip.addEventListener('click', () => { chip.classList.toggle('active'); const i = prefs.sectors.indexOf(sector); if (i >= 0) prefs.sectors.splice(i, 1); else prefs.sectors.push(sector); }); chips.append(chip); }
   const kw = el('input','onboard-input'); kw.placeholder = 'Keywords (e.g. trading, mechanical, machine learning)'; kw.value = prefs.keywords || '';
   const area = el('select','onboard-input'); area.append(new Option('Any role area','')); for (const a of knownAreas) area.add(new Option(a, a)); area.value = prefs.area || '';
   const loc = el('input','onboard-input'); loc.placeholder = 'Location (e.g. Paris or France)'; loc.value = prefs.location || '';
