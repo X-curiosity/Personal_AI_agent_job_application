@@ -1,5 +1,0 @@
-.vercel
-.env*
-data/wikidata_hq.json
-vendor/* 2*
-vendor/* 3*

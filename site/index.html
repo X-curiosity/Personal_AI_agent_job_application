@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Hired — global startup & job map</title>
+  <meta name="description" content="A free map of companies hiring right now, with live roles pulled from public career feeds." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/vendor/maplibre-gl.css">
+  <link rel="stylesheet" href="/styles.css">
+  <script defer src="/vendor/maplibre-gl.js"></script>
+  <script type="module" src="/app.js"></script>
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="#/"><span class="brand-mark">H</span> Hired</a>
+    <nav>
+      <button id="nav-jobs" aria-current="page">Jobs</button>
+      <button id="nav-map">Map</button>
+    </nav>
+  </header>
+
+  <main id="main">
+    <!-- Map + list view -->
+    <section id="view-map" class="view">
+      <div id="map"></div>
+      <div class="results-panel" id="results">
+        <div class="panel-head">
+          <h2 id="panel-title">Companies hiring now</h2>
+          <p id="panel-sub" class="muted"></p>
+        </div>
+        <div class="filters" id="filters">
+          <select id="f-city" aria-label="City"></select>
+          <select id="f-sector" aria-label="Sector"></select>
+          <select id="f-stage" aria-label="Stage"></select>
+          <select id="f-hiring" aria-label="Hiring status"></select>
+          <input id="f-search" type="search" placeholder="Search companies…" aria-label="Search">
+        </div>
+        <div id="list" class="list"></div>
+        <p id="empty" class="muted empty" hidden>No companies match those filters.</p>
+      </div>
+    </section>
+
+    <!-- Role detail view -->
+    <section id="view-job" class="view" hidden>
+      <button id="back" class="back">← All jobs</button>
+      <div id="job-detail"></div>
+    </section>
+  </main>
+
+  <div id="load-error" hidden class="load-error">Couldn't load the job snapshot. Try again.</div>
+  <div id="map-status" class="map-status" hidden></div>
+  <footer class="site-footer">
+    <p>Hired — a free map of companies hiring now. Roles are pulled from public company career feeds; a listing is a public vacancy, not an endorsement.</p>
+  </footer>
+</body>
+</html>
