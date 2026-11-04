@@ -1,0 +1,17 @@
+{
+  "remoteName": "origin",
+  "projects": [
+    {
+      "id": "prj_ZCV7mZtxAuCxHl7Di2Gd4PVT74nV",
+      "name": "co-apply-gpt",
+      "directory": "vercel-site",
+      "orgId": "team_9bdwCoZeqJfN18AfXTtgz7BM"
+    },
+    {
+      "id": "prj_DAe6ASyhqHSdFgSJQqnTf9DZSrFS",
+      "name": "synthetic-ats",
+      "directory": "tests/synthetic-ats",
+      "orgId": "team_9bdwCoZeqJfN18AfXTtgz7BM"
+    }
+  ]
+}
