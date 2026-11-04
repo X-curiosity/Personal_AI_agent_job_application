@@ -5,3 +5,5 @@ data/*.sqlite
 data/*.sqlite-*
 .DS_Store
 .vercel
+
+.vercel/

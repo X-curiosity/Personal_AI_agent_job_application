@@ -1,0 +1,9 @@
+{
+  "name": "hired",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Hired — static job & company map (no build step; plain static files)",
+  "scripts": {
+    "build": "echo 'Static site — no build step required'"
+  }
+}
