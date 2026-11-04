@@ -9,15 +9,15 @@ each job is tagged with a `scrape_method` — `ats:<vendor>` (structured public 
 
 - `ingest/` — Python ingestion backend (ATS detection, feed fetchers, role classifier, SQLite store).
 - `scripts/` — `seed.py` (curated seed companies), `export.py` (SQLite → public JSON).
-- `site/` — static frontend (MapLibre globe, company map, role list + filters, per-role pages). Deploy root.
+- `vercel-site/` — static frontend (MapLibre globe, company map, role list + filters, per-role pages). Deploy root.
 
 ## Run
 
 ```bash
 python3 -m venv .venv && .venv/bin/pip install httpx
 .venv/bin/python scripts/seed.py      # fetch live roles from public ATS feeds
-.venv/bin/python scripts/export.py    # write site/data/*.json
-(cd site && python3 -m http.server 8000)   # preview
+.venv/bin/python scripts/export.py    # write vercel-site/data/*.json
+(cd vercel-site && python3 -m http.server 8000)   # preview
 ```
 
 ## Honest limits

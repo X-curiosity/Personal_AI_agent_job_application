@@ -10,7 +10,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from ingest.store import Store
 
 ROOT = Path(__file__).resolve().parents[1]
-SITE_DATA = ROOT / "site" / "data"
+SITE_DATA = ROOT / "vercel-site" / "data"
 
 
 def main() -> None:
