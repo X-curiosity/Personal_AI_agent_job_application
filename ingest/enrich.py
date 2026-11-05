@@ -1,0 +1,115 @@
+"""Company enrichment: fetch official logos and geocode HQ street addresses.
+
+Logos: prefer the company's own site (apple-touch-icon / icon / og:image),
+fall back to the public Google favicon service, and self-host the result.
+
+Geocoding: best-effort via OpenStreetMap Nominatim — only keep a result when it
+resolves to an office/building with a street, so we never show a made-up
+address. Falls back to the caller's city-level location otherwise.
+"""
+from __future__ import annotations
+
+import re
+import time
+from pathlib import Path
+from urllib.parse import urljoin, urlparse
+
+import httpx
+
+UA = "HiredJobs/1.0 (public job directory; contact: repo)"
+HEADERS = {"User-Agent": UA}
+
+_ICON_RE = re.compile(
+    r'<link[^>]+rel=["\'](?:apple-touch-icon|icon|shortcut icon)["\'][^>]*>', re.I)
+_HREF_RE = re.compile(r'href=["\']([^"\']+)["\']', re.I)
+_OG_IMAGE_RE = re.compile(r'<meta[^>]+property=["\']og:image["\'][^>]*>', re.I)
+_CONTENT_RE = re.compile(r'content=["\']([^"\']+)["\']', re.I)
+
+_EXT_BY_TYPE = {"image/png": ".png", "image/jpeg": ".jpg", "image/x-icon": ".ico",
+                "image/vnd.microsoft.icon": ".ico", "image/svg+xml": ".svg", "image/webp": ".webp"}
+
+
+def _extract_logo_urls(html: str, base: str) -> list[str]:
+    urls: list[str] = []
+    for tag in _ICON_RE.findall(html):
+        m = _HREF_RE.search(tag)
+        if m:
+            urls.append(urljoin(base, m.group(1)))
+    for tag in _OG_IMAGE_RE.findall(html):
+        m = _CONTENT_RE.search(tag)
+        if m:
+            urls.append(urljoin(base, m.group(1)))
+    return urls
+
+
+def fetch_logo(website: str, slug: str, dest_dir: Path) -> str:
+    """Download the best available logo for a company; return a relative path
+    under the destination dir (or '' when nothing works)."""
+    dest_dir.mkdir(parents=True, exist_ok=True)
+    domain = urlparse(website).netloc
+    candidates: list[str] = []
+    try:
+        response = httpx.get(website, headers=HEADERS, timeout=12, follow_redirects=True)
+        if response.status_code == 200:
+            candidates = _extract_logo_urls(response.text, website)
+    except Exception:
+        pass
+    candidates.append(f"https://www.google.com/s2/favicons?domain={domain}&sz=128")
+
+    seen: set[str] = set()
+    for url in candidates:
+        if url in seen:
+            continue
+        seen.add(url)
+        try:
+            response = httpx.get(url, headers=HEADERS, timeout=12, follow_redirects=True)
+            if response.status_code != 200 or not response.content or len(response.content) < 120:
+                continue
+            ext = _EXT_BY_TYPE.get((response.headers.get("content-type") or "").split(";")[0].strip(), ".png")
+            if ext == ".svg" and b"<svg" not in response.content[:200].lower():
+                ext = ".png"
+            path = dest_dir / f"{slug}{ext}"
+            path.write_bytes(response.content)
+            return f"data/logos/{slug}{ext}"
+        except Exception:
+            continue
+    return ""
+
+
+def geocode_hq(name: str, city: str, country: str = "") -> dict | None:
+    """Resolve a company HQ to a street address via Nominatim (best-effort).
+
+    Returns {'address', 'latitude', 'longitude'} only when a street-level office
+    is found; otherwise None (caller keeps city-level coordinates).
+    """
+    query = f"{name} {city}".strip()
+    try:
+        response = httpx.get(
+            "https://nominatim.openstreetmap.org/search",
+            params={"q": query, "format": "json", "limit": 1, "addressdetails": 1},
+            headers=HEADERS, timeout=12,
+        )
+        if response.status_code != 200:
+            return None
+        data = response.json()
+    except Exception:
+        return None
+    if not data:
+        return None
+    hit = data[0]
+    # Require an actual office/building, never a street/place/park that merely
+    # shares the name (e.g. "Mercury Street", a "Linear" park).
+    if hit.get("class") not in ("office", "building"):
+        return None
+    addr = hit.get("address") or {}
+    street = ", ".join(filter(None, [addr.get("house_number"), addr.get("road")]))
+    # Only accept a result that actually has street detail and looks like a place/building.
+    if not street:
+        return None
+    city_name = addr.get("city") or addr.get("town") or addr.get("municipality") or city
+    country_name = addr.get("country") or country
+    return {
+        "address": f"{street}, {city_name}, {country_name}".strip(", "),
+        "latitude": float(hit["lat"]),
+        "longitude": float(hit["lon"]),
+    }

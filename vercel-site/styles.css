@@ -72,7 +72,7 @@ nav button[aria-current="page"] { background: var(--ink); color: var(--paper); }
 }
 .company-card:hover { border-color: var(--line); background: var(--paper); }
 .logo { width: 42px; height: 42px; border-radius: 10px; object-fit: contain; flex: none; background: #fff; border: 1px solid var(--line); }
-.logo-fallback { display: grid; place-items: center; width: 42px; height: 42px; border-radius: 10px; background: #f0e9dc; color: var(--ink-soft); font-weight: 700; flex: none; }
+.logo-fallback { display: grid; place-items: center; width: 42px; height: 42px; border-radius: 10px; background: #f0e9dc; color: var(--ink-soft); font-weight: 700; flex: none; } .logo-wrap { position: relative; width: 42px; height: 42px; flex: none; } .logo-wrap .logo-fallback { position: absolute; inset: 0; } .logo-wrap .logo { position: absolute; inset: 0; z-index: 1; }
 .co-info { min-width: 0; flex: 1; }
 .co-name { font-weight: 600; font-size: 14px; }
 .co-meta { font-size: 12px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -95,7 +95,7 @@ nav button[aria-current="page"] { background: var(--ink); color: var(--paper); }
 }
 .back:hover { background: var(--paper); }
 .job-head { display: flex; gap: 16px; align-items: center; margin-bottom: 8px; }
-.job-head .logo, .job-head .logo-fallback { width: 56px; height: 56px; }
+.job-head .logo, .job-head .logo-fallback, .job-head .logo-wrap { width: 56px; height: 56px; }
 .job-title { font-size: 34px; line-height: 1.15; }
 .job-co { font-size: 16px; color: var(--muted); margin-top: 6px; }
 .job-meta { display: flex; flex-wrap: wrap; gap: 8px; margin: 16px 0; }

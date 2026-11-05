@@ -118,7 +118,7 @@ function companyCard(c) {
   el.className = 'company-card';
   const n = companyJobs(c.startup_id).length;
   el.innerHTML = `
-    <span class="logo-fallback">${(c.name[0] || '?').toUpperCase()}</span>
+    ${logoHTML(c)}
     <div class="co-info">
       <div class="co-name">${esc(c.name)}</div>
       <div class="co-meta">${esc(c.office_city || c.country || '')}${c.stage ? ` · <span class="stage-badge">${esc(c.stage)}</span>` : ''}</div>
@@ -137,9 +137,9 @@ function renderCompany(id) {
   const d = $('job-detail');
   d.textContent = '';
   d.innerHTML = `<button class="back" id="back-company">← All companies</button>
-    <div class="job-head"><span class="logo-fallback">${(c.name[0] || '?').toUpperCase()}</span>
+    <div class="job-head">${logoHTML(c)}
       <div><h1 class="job-title">${esc(c.name)}</h1>
-      <div class="job-co">${esc(c.office_city || '')}${c.country ? ', ' + esc(c.country) : ''}</div></div></div>
+      <div class="job-co">${esc(c.address || c.office_city || '')}</div></div></div>
     <div class="job-meta">${c.stage ? `<span class="tag">${esc(c.stage)}</span>` : ''}<span class="tag">${esc(c.domain_primary || '')}</span><span class="tag">${list.length} open roles</span></div>`;
   $('back-company').addEventListener('click', () => { location.hash = '#/'; });
   const wrap = document.createElement('div');
@@ -169,7 +169,7 @@ function renderJob(id) {
   const d = $('job-detail');
   d.textContent = '';
   d.innerHTML = `<button class="back" id="back-job">← All jobs</button>
-    <div class="job-head"><span class="logo-fallback">${(c?.name?.[0] || '?').toUpperCase()}</span>
+    <div class="job-head">${logoHTML(c)}
       <div><h1 class="job-title">${esc(job.job_title)}</h1>
       <div class="job-co"><a href="#/company/${job.startup_id}">${esc(c?.name || job.startup_id)}</a>${job.location_display ? ' · ' + esc(job.location_display) : ''}</div></div></div>
     <div class="job-meta">${(job.type || []).map(t => `<span class="tag">${esc(t)}</span>`).join('')}${job.scrape_method ? `<span class="tag">${esc(job.scrape_method)}</span>` : ''}</div>
@@ -181,6 +181,13 @@ function renderJob(id) {
 
 function esc(s) {
   return String(s ?? '').replace(/[&<>"']/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
+}
+function logoHTML(c) {
+  const letter = esc((c?.name?.[0] || '?').toUpperCase());
+  if (c?.logo_url) {
+    return `<span class="logo-wrap"><span class="logo-fallback">${letter}</span><img class="logo" src="${esc(c.logo_url)}" alt="" loading="lazy" onerror="this.remove()"></span>`;
+  }
+  return `<span class="logo-fallback">${letter}</span>`;
 }
 
 // --- map ------------------------------------------------------------------

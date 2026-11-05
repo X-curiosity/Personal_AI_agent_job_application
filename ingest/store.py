@@ -15,6 +15,7 @@ CREATE TABLE IF NOT EXISTS startups (
     latitude REAL,
     longitude REAL,
     office_city TEXT NOT NULL DEFAULT '',
+    address TEXT NOT NULL DEFAULT '',
     country TEXT NOT NULL DEFAULT '',
     domain_primary TEXT NOT NULL DEFAULT '',
     stage TEXT NOT NULL DEFAULT '',
@@ -58,6 +59,10 @@ class Store:
         self.path.parent.mkdir(parents=True, exist_ok=True)
         with self._connect() as con:
             con.executescript(SCHEMA)
+            # lightweight migration for columns added after initial creation
+            cols = {r[1] for r in con.execute("PRAGMA table_info(startups)").fetchall()}
+            if "address" not in cols:
+                con.execute("ALTER TABLE startups ADD COLUMN address TEXT NOT NULL DEFAULT ''")
 
     def _connect(self) -> sqlite3.Connection:
         con = sqlite3.connect(self.path)
@@ -68,15 +73,16 @@ class Store:
     def upsert_startup(self, row: dict) -> None:
         with self._connect() as con:
             con.execute(
-                """INSERT INTO startups (startup_id, name, website, logo_url, latitude, longitude, office_city,
+                """INSERT INTO startups (startup_id, name, website, logo_url, latitude, longitude, office_city, address,
                    country, domain_primary, stage, hiring_status, team_size_min, team_size_max, year_founded,
                    accelerators, last_funding_amount, claimed, why_interesting)
-                   VALUES (:startup_id, :name, :website, :logo_url, :latitude, :longitude, :office_city, :country,
+                   VALUES (:startup_id, :name, :website, :logo_url, :latitude, :longitude, :office_city, :address, :country,
                    :domain_primary, :stage, :hiring_status, :team_size_min, :team_size_max, :year_founded,
                    :accelerators, :last_funding_amount, :claimed, :why_interesting)
                    ON CONFLICT(startup_id) DO UPDATE SET
                    name=excluded.name, website=excluded.website, logo_url=excluded.logo_url,
                    latitude=excluded.latitude, longitude=excluded.longitude, office_city=excluded.office_city,
+                   address=excluded.address,
                    country=excluded.country, domain_primary=excluded.domain_primary, stage=excluded.stage,
                    hiring_status=excluded.hiring_status, team_size_min=excluded.team_size_min,
                    team_size_max=excluded.team_size_max, year_founded=excluded.year_founded,

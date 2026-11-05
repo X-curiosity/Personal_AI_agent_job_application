@@ -45,6 +45,7 @@ def main() -> None:
             "latitude": row.get("latitude"),
             "longitude": row.get("longitude"),
             "office_city": row.get("office_city", ""),
+            "address": "",
             "country": row["country"],
             "domain_primary": row["domain"],
             "stage": row["stage"],
