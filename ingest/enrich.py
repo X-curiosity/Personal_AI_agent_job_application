@@ -19,11 +19,9 @@ import httpx
 UA = "HiredJobs/1.0 (public job directory; contact: repo)"
 HEADERS = {"User-Agent": UA}
 
-_ICON_RE = re.compile(
-    r'<link[^>]+rel=["\'](?:apple-touch-icon|icon|shortcut icon)["\'][^>]*>', re.I)
+_APPLE_RE = re.compile(r'<link[^>]+rel=["\']apple-touch-icon["\'][^>]*>', re.I)
+_FAVICON_RE = re.compile(r'<link[^>]+rel=["\'](?:icon|shortcut icon)["\'][^>]*>', re.I)
 _HREF_RE = re.compile(r'href=["\']([^"\']+)["\']', re.I)
-_OG_IMAGE_RE = re.compile(r'<meta[^>]+property=["\']og:image["\'][^>]*>', re.I)
-_CONTENT_RE = re.compile(r'content=["\']([^"\']+)["\']', re.I)
 
 _EXT_BY_TYPE = {"image/png": ".png", "image/jpeg": ".jpg", "image/x-icon": ".ico",
                 "image/vnd.microsoft.icon": ".ico", "image/svg+xml": ".svg", "image/webp": ".webp"}
@@ -31,29 +29,68 @@ _EXT_BY_TYPE = {"image/png": ".png", "image/jpeg": ".jpg", "image/x-icon": ".ico
 
 def _extract_logo_urls(html: str, base: str) -> list[str]:
     urls: list[str] = []
-    for tag in _ICON_RE.findall(html):
+    # apple-touch-icon (180px logo) first, then plain favicon. No og:image
+    # (that's a social share card, not a logo).
+    for tag in _APPLE_RE.findall(html):
         m = _HREF_RE.search(tag)
         if m:
             urls.append(urljoin(base, m.group(1)))
-    for tag in _OG_IMAGE_RE.findall(html):
-        m = _CONTENT_RE.search(tag)
+    for tag in _FAVICON_RE.findall(html):
+        m = _HREF_RE.search(tag)
         if m:
             urls.append(urljoin(base, m.group(1)))
     return urls
 
 
-def fetch_logo(website: str, slug: str, dest_dir: Path) -> str:
+def _is_company_article(title: str, name: str) -> bool:
+    """True when the Wikipedia article is about the company, not a homonym
+    (e.g. reject 'Mercury (planet)' when looking for Mercury the company)."""
+    t = title.strip(); n = name.strip()
+    if t.casefold() == n.casefold():
+        return True
+    m = re.match(rf"{re.escape(n)}\s*\(([^)]*)\)", t, re.I)
+    return bool(m and re.search(r"company|software|corporation|financial|bank|startup|app|firm|brand|tech", m.group(1), re.I))
+
+
+def _wikipedia_logo(name: str) -> str:
+    """Official logo from the company's Wikipedia article (infobox image)."""
+    try:
+        response = httpx.get(
+            "https://en.wikipedia.org/w/api.php",
+            params={"action": "query", "generator": "search", "gsrsearch": name, "gsrlimit": "1",
+                    "prop": "pageimages", "pithumbsize": "512", "format": "json", "redirects": "1"},
+            headers=HEADERS, timeout=12, follow_redirects=True,
+        )
+        if response.status_code != 200:
+            return ""
+        pages = response.json().get("query", {}).get("pages", {})
+        for page in pages.values():
+            if not _is_company_article(page.get("title", ""), name):
+                continue
+            src = (page.get("thumbnail") or {}).get("source")
+            if src:
+                return src
+    except Exception:
+        pass
+    return ""
+
+
+def fetch_logo(website: str, slug: str, dest_dir: Path, name: str = "") -> str:
     """Download the best available logo for a company; return a relative path
     under the destination dir (or '' when nothing works)."""
     dest_dir.mkdir(parents=True, exist_ok=True)
     domain = urlparse(website).netloc
-    candidates: list[str] = []
+    candidates: list[str] = [f"https://{domain}/apple-touch-icon.png"]
     try:
         response = httpx.get(website, headers=HEADERS, timeout=12, follow_redirects=True)
         if response.status_code == 200:
-            candidates = _extract_logo_urls(response.text, website)
+            candidates += _extract_logo_urls(response.text, website)
     except Exception:
         pass
+    if name:
+        wiki = _wikipedia_logo(name)
+        if wiki:
+            candidates.append(wiki)
     candidates.append(f"https://www.google.com/s2/favicons?domain={domain}&sz=128")
 
     seen: set[str] = set()
@@ -65,7 +102,10 @@ def fetch_logo(website: str, slug: str, dest_dir: Path) -> str:
             response = httpx.get(url, headers=HEADERS, timeout=12, follow_redirects=True)
             if response.status_code != 200 or not response.content or len(response.content) < 120:
                 continue
-            ext = _EXT_BY_TYPE.get((response.headers.get("content-type") or "").split(";")[0].strip(), ".png")
+            content_type = (response.headers.get("content-type") or "").split(";")[0].strip().lower()
+            if not content_type.startswith("image/"):
+                continue  # ignore HTML error pages
+            ext = _EXT_BY_TYPE.get(content_type, ".png")
             if ext == ".svg" and b"<svg" not in response.content[:200].lower():
                 ext = ".png"
             path = dest_dir / f"{slug}{ext}"

@@ -24,9 +24,7 @@ def main() -> None:
     print(f"Enriching {len(startups)} companies…")
     for i, s in enumerate(startups, 1):
         slug = s["startup_id"]
-        logo = s.get("logo_url") or ""
-        if not logo:
-            logo = fetch_logo(s["website"], slug, LOGO_DIR)
+        logo = fetch_logo(s["website"], slug, LOGO_DIR, name=s["name"])
         geo = geocode_hq(s["name"], s["office_city"], s["country"])
         address = ""
         lat, lng = s["latitude"], s["longitude"]
