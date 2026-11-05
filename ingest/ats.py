@@ -11,10 +11,12 @@ polite `httpx` fallback for career pages without a known feed.
 """
 from __future__ import annotations
 
+import html
 import json
 import re
 from dataclasses import dataclass, field
 from urllib.parse import urljoin, urlparse
+from xml.etree import ElementTree
 
 try:
     import httpx
@@ -108,6 +110,11 @@ def _get(url: str, *, params: dict | None = None, timeout: float = 12) -> str:
 
 def _parse_json(text: str):
     return json.loads(text)
+
+
+def _xml_text(node, tag: str) -> str:
+    child = node.find(tag) if node is not None else None
+    return (child.text or "").strip() if child is not None and child.text else ""
 
 
 def fetch_greenhouse(board: str) -> list[Opening]:
@@ -230,6 +237,42 @@ def fetch_smartrecruiters(company: str) -> list[Opening]:
     return [o for o in out if o.title and o.url]
 
 
+def fetch_personio(board: str) -> list[Opening]:
+    """Personio job board via its public XML feed (includes descriptions)."""
+    text = _get(f"https://{board}.jobs.personio.de/xml")
+    root = ElementTree.fromstring(text)
+    out = []
+    for pos in root.iter("position"):
+        jid = _xml_text(pos, "id")
+        name = _xml_text(pos, "name")
+        office = _xml_text(pos, "office")
+        parts = [_xml_text(jd, "value") for jd in pos.iter("jobDescription")]
+        out.append(Opening(
+            title=name,
+            url=f"https://{board}.jobs.personio.com/job/{jid}",
+            location=office,
+            description=_html_to_text("\n\n".join(p for p in parts if p)),
+            scrape_method="ats:personio",
+        ))
+    return [o for o in out if o.title and o.url]
+
+
+def fetch_teamtailor(board: str) -> list[Opening]:
+    """Teamtailor careers page (SSR) — parse the rendered job links."""
+    text = _get(f"https://{board}.teamtailor.com/jobs")
+    out: list[Opening] = []
+    seen: set[str] = set()
+    for m in re.finditer(r'<a[^>]+href="([^"]*/jobs/\d+-[^"]+)"[^>]*>(.*?)</a>', text, re.S):
+        url = urljoin(f"https://{board}.teamtailor.com/", m.group(1))
+        if url in seen:
+            continue
+        seen.add(url)
+        title = html.unescape(re.sub(r"<[^>]+>", "", m.group(2))).strip()
+        if title:
+            out.append(Opening(title=title, url=url, location="", description="", scrape_method="ats:teamtailor"))
+    return out
+
+
 # Vendors with a clean public JSON/feed API.
 FETCHERS = {
     "greenhouse": fetch_greenhouse,
@@ -239,11 +282,13 @@ FETCHERS = {
     "recruitee": fetch_recruitee,
     "breezy": fetch_breezy,
     "smartrecruiters": fetch_smartrecruiters,
+    "personio": fetch_personio,
+    "teamtailor": fetch_teamtailor,
 }
 
 # Vendors we can detect but whose feed requires HTML scraping (tagged `httpx`),
 # mirroring startupmap's own split.
-HTTPX_VENDORS = {"teamtailor", "personio", "wttj", "hibob", "join", "dover", "kula"}
+HTTPX_VENDORS = {"wttj", "hibob", "join", "dover", "kula"}
 
 
 def fetch_board(vendor: str, identifier: str) -> list[Opening]:
