@@ -20,11 +20,11 @@ from ingest.pipeline import _jobs_id, _slug, _to_job_row
 from ingest.store import Store
 
 SUPABASE_URL = os.environ.get("SUPABASE_URL", "")
-SERVICE_KEY = os.environ.get("SUPABASE_SERVICE_ROLE_KEY", "")
+SECRET_KEY = os.environ.get("SUPABASE_SECRET_KEY", "")
 
 
 def _headers() -> dict:
-    return {"apikey": SERVICE_KEY, "Authorization": f"Bearer {SERVICE_KEY}"}
+    return {"apikey": SECRET_KEY, "Authorization": f"Bearer {SECRET_KEY}"}
 
 
 def list_pending() -> list[dict]:
@@ -67,8 +67,8 @@ def approve(sub: dict, store: Store) -> None:
 
 
 def main() -> None:
-    if not SUPABASE_URL or not SERVICE_KEY:
-        print("Missing env vars. Set SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY, then retry.")
+    if not SUPABASE_URL or not SECRET_KEY:
+        print("Missing env vars. Set SUPABASE_URL and SUPABASE_SECRET_KEY, then retry.")
         return
     store = Store()
     pending = list_pending()

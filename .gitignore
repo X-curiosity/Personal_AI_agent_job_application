@@ -9,3 +9,5 @@ data/*.sqlite-*
 .vercel/
 
 .job_assistant/
+
+.env

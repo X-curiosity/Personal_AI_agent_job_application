@@ -28,8 +28,8 @@ serverless function `vercel-site/api/submit.js`, which stores rows in the Supaba
 
 To enable:
 1. Apply `supabase/migrations/job_submissions.sql` to your Supabase project.
-2. In Vercel, set `SUPABASE_URL` and `SUPABASE_ANON_KEY` on the project.
-3. Locally, set `SUPABASE_URL` + `SUPABASE_SERVICE_ROLE_KEY`, then review with:
+2. In Vercel, set `SUPABASE_URL` and `SUPABASE_SECRET_KEY` on the project.
+3. Locally, set `SUPABASE_URL` + `SUPABASE_SECRET_KEY`, then review with:
    `scripts/review_submissions.py` (approve/reject) followed by `scripts/export.py`.
 
 ## Honest limits
