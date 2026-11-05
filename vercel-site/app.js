@@ -1,7 +1,6 @@
 // Hired — global startup & job map. Static frontend over /data/startups.json + /data/jobs.json.
 
 const $ = (id) => document.getElementById(id);
-const SATELLITE_TILES = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}';
 
 let startups = [];
 let jobs = [];
@@ -215,12 +214,9 @@ function syncMode() {
   if (mapMode === mode) return;
   mapMode = mode;
   try { map.setProjection({ type: globe ? 'globe' : 'mercator' }); } catch {}
-  try { map.setSky(globe ? { 'sky-color': '#8ec3e0', 'horizon-color': '#cfe3f5', 'fog-color': '#dbe9f5', 'fog-ground-blend': 0.15, 'horizon-fog-blend': 0.15, 'sky-horizon-blend': 0.5, 'atmosphere-blend': 0.12 } : null); } catch {}
-  if (!map.getSource('satellite')) {
-    map.addSource('satellite', { type: 'raster', tiles: [SATELLITE_TILES], tileSize: 256, maxzoom: 18, attribution: 'Imagery © Esri, Maxar, Earthstar Geographics' });
-    map.addLayer({ id: 'satellite', type: 'raster', source: 'satellite' });
-  }
-  map.setLayoutProperty('satellite', 'visibility', globe ? 'visible' : 'none');
+  // Same paper-toned atmosphere as the positron basemap, so the globe reads as
+  // the same map colours at every zoom (no satellite imagery).
+  try { map.setSky(globe ? { 'sky-color': '#e9e2d4', 'horizon-color': '#ddd3c2', 'fog-color': '#fffaf3', 'fog-ground-blend': 0.12, 'horizon-fog-blend': 0.15, 'sky-horizon-blend': 0.35, 'atmosphere-blend': 0.08 } : null); } catch {}
 }
 
 function renderMarkers() {

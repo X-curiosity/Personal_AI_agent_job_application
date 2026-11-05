@@ -25,9 +25,12 @@ def main() -> None:
         s["accelerators"] = json.loads(s["accelerators"] or "[]")
     (SITE_DATA / "startups.json").write_text(json.dumps(startups, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
 
-    # jobs.json — mirror startupmap's job schema (type[] parsed back to list)
+    # jobs.json — mirror startupmap's job schema (type[] parsed back to list).
+    # Cap descriptions to a preview length so the snapshot stays light; the
+    # full advert lives on the apply link.
     for j in jobs:
         j["type"] = json.loads(j["type"] or "[]")
+        j["description"] = (j.get("description") or "")[:800]
     (SITE_DATA / "jobs.json").write_text(json.dumps(jobs, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
 
     print(f"Exported {len(startups)} startups, {len(jobs)} jobs to {SITE_DATA}")
