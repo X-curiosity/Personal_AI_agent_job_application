@@ -19,6 +19,7 @@
     <nav>
       <button id="nav-jobs" aria-current="page">Jobs</button>
       <button id="nav-map">Map</button>
+      <a class="post-role" href="#/submit">Post a role</a>
     </nav>
   </header>
 
@@ -47,6 +48,28 @@
     <section id="view-job" class="view" hidden>
       <button id="back" class="back">← All jobs</button>
       <div id="job-detail"></div>
+    </section>
+
+    <!-- Employer submission view -->
+    <section id="view-submit" class="view" hidden>
+      <div class="submit-wrap">
+        <h1 class="submit-title">Post a role</h1>
+        <p class="muted">Hiring? Add your open role — it's reviewed by a human before it goes live.</p>
+        <form id="submit-form" class="submit-form">
+          <label>Company name *<input id="s-company" required autocomplete="organization"></label>
+          <label>Company website<input id="s-website" type="url" placeholder="https://"></label>
+          <label>Job title *<input id="s-title" required></label>
+          <label>Location<input id="s-location" placeholder="City or Remote"></label>
+          <label>Apply URL *<input id="s-url" type="url" required placeholder="https://"></label>
+          <label>Employment type
+            <select id="s-employment"><option value="">—</option><option>Full-time</option><option>Part-time</option><option>Contract</option><option>Internship</option></select>
+          </label>
+          <label>Description<textarea id="s-description" rows="6" placeholder="What the role involves…"></textarea></label>
+          <label>Contact email<input id="s-email" type="email" placeholder="you@company.com"></label>
+          <button type="submit" class="apply-btn">Submit for review</button>
+          <p id="submit-status" class="muted" hidden></p>
+        </form>
+      </div>
     </section>
   </main>
 

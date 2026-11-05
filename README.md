@@ -20,6 +20,18 @@ python3 -m venv .venv && .venv/bin/pip install httpx
 (cd vercel-site && python3 -m http.server 8000)   # preview
 ```
 
+## Employer submissions (review queue)
+
+Companies can submit roles at **`#/submit`** ("Post a role"). The form posts to the
+serverless function `vercel-site/api/submit.js`, which stores rows in the Supabase
+`job_submissions` table with `status='pending'`. Nothing goes live until you approve it.
+
+To enable:
+1. Apply `supabase/migrations/job_submissions.sql` to your Supabase project.
+2. In Vercel, set `SUPABASE_URL` and `SUPABASE_ANON_KEY` on the project.
+3. Locally, set `SUPABASE_URL` + `SUPABASE_SERVICE_ROLE_KEY`, then review with:
+   `scripts/review_submissions.py` (approve/reject) followed by `scripts/export.py`.
+
 ## Honest limits
 
 - Only companies that expose a public ATS feed (Greenhouse / Lever / Ashby / Workable / Recruitee / Breezy / SmartRecruiters) are reachable without scraping. Workday / SuccessFactors employers have no public feed.

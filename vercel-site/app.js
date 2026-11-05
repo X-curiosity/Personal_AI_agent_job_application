@@ -92,7 +92,17 @@ function render() {
   const hash = location.hash;
   if (hash.startsWith('#/job/')) return renderJob(hash.slice(6));
   if (hash.startsWith('#/company/')) return renderCompany(hash.slice(10));
+  if (hash === '#/submit') return renderSubmit();
   return renderMapView();
+}
+
+function renderSubmit() {
+  $('view-map').hidden = true;
+  $('view-job').hidden = true;
+  $('view-submit').hidden = false;
+  $('nav-jobs').setAttribute('aria-current', 'false');
+  $('nav-map').setAttribute('aria-current', 'false');
+  $('submit-status').hidden = true;
 }
 
 function renderMapView() {
@@ -254,5 +264,26 @@ $('f-search').addEventListener('input', e => { state.search = e.target.value; re
 $('nav-map').addEventListener('click', () => { location.hash = '#/'; if (map && mapReady) setTimeout(() => map.resize(), 50); });
 $('nav-jobs').addEventListener('click', () => { location.hash = '#/'; });
 window.addEventListener('hashchange', render);
+
+$('submit-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const status = $('submit-status');
+  const payload = {
+    company: $('s-company').value, website: $('s-website').value, title: $('s-title').value,
+    location: $('s-location').value, apply_url: $('s-url').value,
+    employment_type: $('s-employment').value, description: $('s-description').value,
+    contact_email: $('s-email').value,
+  };
+  status.hidden = false;
+  status.textContent = 'Submitting…';
+  try {
+    const r = await fetch('/api/submit', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+    const data = await r.json().catch(() => ({}));
+    status.textContent = r.ok ? (data.message || 'Thanks — your role is pending review.') : (data.error || 'Something went wrong.');
+    if (r.ok) e.target.reset();
+  } catch {
+    status.textContent = 'Could not reach the submission service. Please try again.';
+  }
+});
 
 load();
