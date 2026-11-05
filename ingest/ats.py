@@ -273,6 +273,105 @@ def fetch_teamtailor(board: str) -> list[Opening]:
     return out
 
 
+def fetch_httpx(listing_url: str, method: str = "httpx") -> list[Opening]:
+    """Generic SSR career-page scraper: JSON-LD JobPosting + job anchor links.
+    Used for custom career pages and smaller ATS boards without a clean feed."""
+    try:
+        text = _get(listing_url)
+    except Exception:
+        return []
+    out: list[Opening] = []
+    seen: set[str] = set()
+
+    def add(title: str, url: str, loc: str = "") -> None:
+        if not title or not url or url in seen:
+            return
+        seen.add(url)
+        out.append(Opening(title=title, url=url, location=loc, description="", scrape_method=method))
+
+    for m in re.finditer(r'<script[^>]*type=["\']application/ld\+json["\'][^>]*>(.*?)</script>', text, re.S):
+        try:
+            data = json.loads(m.group(1))
+        except Exception:
+            continue
+        items = data if isinstance(data, list) else [data]
+        for it in items:
+            if not isinstance(it, dict):
+                continue
+            types = it.get("@type") or []
+            if isinstance(types, str):
+                types = [types]
+            if "JobPosting" not in types:
+                continue
+            loc = ""
+            jl = it.get("jobLocation") or {}
+            if isinstance(jl, dict):
+                ad = jl.get("address") or {}
+                loc = ", ".join(filter(None, [ad.get("addressLocality"), ad.get("addressCountry")]))
+            add((it.get("title") or "").strip(), it.get("url") or "", loc)
+
+    for m in re.finditer(r'<a[^>]+href=["\']([^"\']+)["\'][^>]*>(.*?)</a>', text, re.S):
+        href, inner = m.group(1), m.group(2)
+        if not re.search(r'/(jobs?|careers?|positions?|vacanc|open-positions|apply)/', href, re.I):
+            continue
+        title = html.unescape(re.sub(r"<[^>]+>", "", inner)).strip()
+        if not title or len(title) < 4 or len(title) > 120:
+            continue
+        add(title, urljoin(listing_url, href))
+    return out
+
+
+def fetch_wttj(slug: str) -> list[Opening]:
+    return fetch_httpx(f"https://www.welcometothejungle.com/en/companies/{slug}/jobs", "ats:wttj")
+
+
+def fetch_hibob(board: str) -> list[Opening]:
+    return fetch_httpx(f"https://{board}.careers.hibob.com/jobs", "ats:hibob")
+
+
+def fetch_join(slug: str) -> list[Opening]:
+    return fetch_httpx(f"https://join.com/companies/{slug}/jobs", "ats:join")
+
+
+def fetch_dover(org: str) -> list[Opening]:
+    return fetch_httpx(f"https://app.dover.com/apply/{org}/", "ats:dover")
+
+
+def fetch_kula(company: str) -> list[Opening]:
+    return fetch_httpx(f"https://careers.kula.ai/{company}/", "ats:kula")
+
+
+def fetch_playwright(listing_url: str, method: str = "playwright") -> list[Opening]:
+    """Headless-browser scrape for JS-rendered career pages (no SSR content)."""
+    try:
+        from playwright.sync_api import sync_playwright
+    except ImportError:
+        return []
+    out: list[Opening] = []
+    seen: set[str] = set()
+    try:
+        with sync_playwright() as p:
+            browser = p.chromium.launch()
+            page = browser.new_page()
+            page.goto(listing_url, wait_until="domcontentloaded", timeout=25000)
+            page.wait_for_timeout(2500)
+            links = page.eval_on_selector_all("a", "els => els.map(e => ({href: e.href, text: (e.innerText||'').trim()}))")
+            browser.close()
+    except Exception:
+        return out
+    for link in links:
+        href, text = link.get("href") or "", link.get("text") or ""
+        if not re.search(r"/(jobs?|careers?|positions?|vacanc|apply)/", href, re.I):
+            continue
+        if not text or len(text) < 4 or len(text) > 120:
+            continue
+        if href in seen:
+            continue
+        seen.add(href)
+        out.append(Opening(title=text, url=href, location="", description="", scrape_method=method))
+    return out
+
+
 # Vendors with a clean public JSON/feed API.
 FETCHERS = {
     "greenhouse": fetch_greenhouse,
@@ -284,11 +383,16 @@ FETCHERS = {
     "smartrecruiters": fetch_smartrecruiters,
     "personio": fetch_personio,
     "teamtailor": fetch_teamtailor,
+    "wttj": fetch_wttj,
+    "hibob": fetch_hibob,
+    "join": fetch_join,
+    "dover": fetch_dover,
+    "kula": fetch_kula,
 }
 
 # Vendors we can detect but whose feed requires HTML scraping (tagged `httpx`),
 # mirroring startupmap's own split.
-HTTPX_VENDORS = {"wttj", "hibob", "join", "dover", "kula"}
+HTTPX_VENDORS: set[str] = set()
 
 
 def fetch_board(vendor: str, identifier: str) -> list[Opening]:
