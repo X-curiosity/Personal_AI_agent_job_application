@@ -7,3 +7,5 @@ data/*.sqlite-*
 .vercel
 
 .vercel/
+
+.job_assistant/
