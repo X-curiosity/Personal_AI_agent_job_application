@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+import re
 import sys
 from pathlib import Path
 
@@ -11,6 +12,39 @@ from ingest.store import Store
 
 ROOT = Path(__file__).resolve().parents[1]
 SITE_DATA = ROOT / "vercel-site" / "data"
+
+# Skill vocabulary used to summarize role requirements from the description.
+_SKILLS = [
+    "python", "javascript", "typescript", "react", "node", "node.js", "sql", "postgresql", "mysql",
+    "mongodb", "redis", "aws", "gcp", "google cloud", "azure", "docker", "kubernetes", "terraform",
+    "machine learning", "ml", "ai", "data science", "pytorch", "tensorflow", "data engineering",
+    "c++", "java", "golang", "go", "rust", "ruby", "php", "swift", "kotlin", "scala", "matlab",
+    "excel", "tableau", "power bi", "figma", "git", "ci/cd", "linux", "kafka", "graphql", "rest",
+    "microservices", "devops", "cloud", "security", "testing", "qa", "agile", "scrum", "analytics",
+    "computer vision", "nlp", "llm", "blockchain", "embedded", "robotics",
+    "product management", "project management", "sales", "marketing", "seo", "growth",
+    "business development", "finance", "accounting", "compliance", "customer success", "operations",
+    "supply chain", "logistics", "communication", "leadership",
+]
+
+
+def extract_requirements(description: str) -> dict:
+    """Summarize a job description into structured requirements (skills,
+    experience, degrees) instead of serving the raw advert text."""
+    text = (description or "").lower()
+    skills = sorted({s for s in _SKILLS if re.search(rf"(?<![a-z0-9]){re.escape(s)}(?![a-z0-9])", text)})
+    experience = ""
+    years = re.findall(r"(\d+)\+?\s*(?:years?|yrs)", text)
+    if years:
+        experience = f"{min(int(y) for y in years)}+ years"
+    degrees: list[str] = []
+    if re.search(r"\bphd\b|doctorate", text):
+        degrees.append("PhD")
+    if re.search(r"master", text):
+        degrees.append("Master's")
+    if re.search(r"bachelor|undergraduate", text):
+        degrees.append("Bachelor's")
+    return {"skills": skills[:15], "experience": experience, "degrees": degrees[:3]}
 
 
 def main() -> None:
@@ -43,7 +77,9 @@ def main() -> None:
     # full advert lives on the apply link.
     for j in jobs:
         j["type"] = json.loads(j["type"] or "[]")
-        j["description"] = (j.get("description") or "")[:800]
+        full = j.get("description") or ""
+        j["requirements"] = extract_requirements(full)  # run on the full advert
+        j["description"] = full[:800]  # cap only what's shown
     (SITE_DATA / "jobs.json").write_text(json.dumps(jobs, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
 
     print(f"Exported {len(startups)} startups, {len(jobs)} jobs to {SITE_DATA}")

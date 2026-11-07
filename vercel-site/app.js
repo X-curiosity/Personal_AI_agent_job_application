@@ -40,17 +40,17 @@ async function load() {
 
 // --- filters --------------------------------------------------------------
 
-const STAGE_LABELS = { pre_seed: 'Pre-seed', seed: 'Seed', series_a: 'Series A', series_b: 'Series B', series_c: 'Series C', series_d: 'Series D', series_e: 'Series E', bootstrapped: 'Bootstrapped', growth: 'Growth' };
+const STAGE_LABELS = { pre_seed: 'Pre-seed', seed: 'Seed', series_a: 'Series A', series_b: 'Series B', series_c: 'Series C', series_d: 'Series D', series_e: 'Series E', series_f: 'Series F', bootstrapped: 'Bootstrapped', growth: 'Growth' };
+const FUNDING_STAGES = ['pre_seed', 'seed', 'series_a', 'series_b', 'series_c', 'series_d', 'series_e', 'series_f', 'bootstrapped', 'growth'];
 function stageLabel(s) { return STAGE_LABELS[s] || (s ? s.replace(/_/g, ' ') : ''); }
 
 function populateFilters() {
   const cities = [...new Set(startups.map(c => c.office_city).filter(Boolean))].sort();
   const sectors = [...new Set(startups.map(c => c.domain_primary).filter(Boolean))].sort();
-  const stages = [...new Set(startups.map(c => c.stage).filter(Boolean))].sort();
   fill($('f-city'), cities);
   fill($('f-sector'), sectors);
   fill($('f-type'), ['public', 'private']);
-  fill($('f-stage'), stages);
+  fill($('f-stage'), FUNDING_STAGES);
   fill($('f-hiring'), ['actively_hiring', 'open_to_talent']);
 }
 function fill(sel, values) {
@@ -197,12 +197,21 @@ function renderJob(id) {
   $('view-job').hidden = false;
   const d = $('job-detail');
   d.textContent = '';
+  const req = job.requirements || {};
+  const reqHTML = (req.skills?.length || req.experience || req.degrees?.length)
+    ? `<h3 class="section-title">Requirements</h3>
+       <div class="req-block">
+         ${req.experience ? `<div class="req-item"><strong>Experience</strong> ${esc(req.experience)}</div>` : ''}
+         ${req.degrees?.length ? `<div class="req-item"><strong>Degree</strong> ${req.degrees.map(d => esc(d)).join(', ')}</div>` : ''}
+         ${req.skills?.length ? `<div class="req-skills">${req.skills.map(s => `<span class="tag">${esc(s)}</span>`).join('')}</div>` : ''}
+       </div>` : '';
   d.innerHTML = `<button class="back" id="back-job">← All jobs</button>
     <div class="job-head">${logoHTML(c)}
       <div><h1 class="job-title">${esc(job.job_title)}</h1>
       <div class="job-co"><a href="#/company/${job.startup_id}">${esc(c?.name || job.startup_id)}</a>${job.location_display ? ' · ' + esc(job.location_display) : ''}</div></div></div>
     <div class="job-meta">${(job.type || []).map(t => `<span class="tag">${esc(t)}</span>`).join('')}${job.scrape_method ? `<span class="tag">${esc(job.scrape_method)}</span>` : ''}</div>
     <a class="apply-btn" href="${esc(job.apply_url)}" target="_blank" rel="noopener">Apply on company site ↗</a>
+    ${reqHTML}
     <h3 class="section-title">About the role</h3>
     <div class="job-desc">${job.description ? esc(job.description) : '<span class="muted">No description in the public feed.</span>'}</div>`;
   $('back-job').addEventListener('click', () => { location.hash = '#/'; });

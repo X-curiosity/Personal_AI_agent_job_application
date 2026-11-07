@@ -153,6 +153,10 @@ nav button[aria-current="page"] { background: var(--ink); color: var(--paper); }
 .app-status { border: 1px solid var(--line); border-radius: 8px; padding: 6px 8px; font: inherit; font-size: 13px; background: var(--paper); color: var(--ink); }
 .app-remove { border: 0; background: transparent; color: var(--muted); cursor: pointer; font-size: 15px; padding: 6px; }
 .app-remove:hover { color: var(--accent); }
+.req-block { display: flex; flex-direction: column; gap: 8px; }
+.req-item { font-size: 14px; color: var(--ink-soft); }
+.req-item strong { font-weight: 650; color: var(--ink); margin-right: 6px; }
+.req-skills { display: flex; flex-wrap: wrap; gap: 6px; }
 
 @media (max-width: 760px) {
   .results-panel { left: 0; right: 0; top: auto; bottom: 0; width: auto; height: 48%; border-radius: 16px 16px 0 0; }
