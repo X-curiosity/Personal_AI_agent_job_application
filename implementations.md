@@ -11,9 +11,9 @@ A running report of changes made to Hired (the startup & job map).
 ## 2026-11-08 — Logo storage optimization (PNG + smaller)
 
 - Converted all raster logos (ICO/JPEG/WEBP) to **PNG**, resized to ≤128px, and optimized.
-- Kept the 143 **SVG** logos — they're vector and already the smallest representation (converting to PNG would *increase* storage).
-- Result: `vercel-site/data/logos/` went **6.4 MB → 4.0 MB**; all rasters are PNG, 0 broken images.
-- Files: `scripts/optimize_logos.py`.
+- **Rasterized the 143 SVG logos to PNG** — some SVGs used external refs / fonts / `currentColor` and failed to render in `<img>` tags; PNG guarantees they all render.
+- Result: every logo is now a **128px PNG** (606 files, **3.9 MB**, 0 broken images).
+- Files: `scripts/optimize_logos.py`, `scripts/rasterize_svgs.py`.
 
 ---
 
