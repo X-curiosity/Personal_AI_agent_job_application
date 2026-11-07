@@ -116,6 +116,50 @@ def fetch_logo(website: str, slug: str, dest_dir: Path, name: str = "") -> str:
     return ""
 
 
+def fetch_logo_playwright(website: str, slug: str, dest_dir: Path) -> str:
+    """Fetch a logo from a JS-rendered job board by rendering it headlessly,
+    then downloading the first real logo candidate (icon / og:image / logo img)."""
+    try:
+        from playwright.sync_api import sync_playwright
+    except ImportError:
+        return ""
+    candidates: list[str] = []
+    try:
+        with sync_playwright() as p:
+            browser = p.chromium.launch()
+            page = browser.new_page()
+            page.goto(website, wait_until="domcontentloaded", timeout=25000)
+            page.wait_for_timeout(2500)
+            candidates = page.evaluate("""() => {
+                const urls = [];
+                document.querySelectorAll('link[rel="apple-touch-icon"], link[rel="icon"], link[rel="shortcut icon"]').forEach(l => l.href && urls.push(l.href));
+                document.querySelectorAll('meta[property="og:image"]').forEach(m => m.content && urls.push(m.content));
+                document.querySelectorAll('img[src*="logo"], img.logo, header img, nav img').forEach(i => i.src && urls.push(i.src));
+                return urls;
+            }""")
+            browser.close()
+    except Exception:
+        return ""
+    dest_dir.mkdir(parents=True, exist_ok=True)
+    for url in candidates:
+        if not url.startswith("http"):
+            continue
+        try:
+            r = httpx.get(url, headers=HEADERS, timeout=12, follow_redirects=True)
+            if r.status_code != 200 or not r.content or len(r.content) < 120:
+                continue
+            ct = (r.headers.get("content-type") or "").split(";")[0].strip().lower()
+            if not ct.startswith("image/"):
+                continue
+            ext = _EXT_BY_TYPE.get(ct, ".png")
+            path = dest_dir / f"{slug}{ext}"
+            path.write_bytes(r.content)
+            return f"data/logos/{slug}{ext}"
+        except Exception:
+            continue
+    return ""
+
+
 def geocode_hq(name: str, city: str, country: str = "") -> dict | None:
     """Resolve a company HQ to a street address via Nominatim (best-effort).
 

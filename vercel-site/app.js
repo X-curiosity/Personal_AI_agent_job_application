@@ -229,12 +229,36 @@ function syncMode() {
   try { map.setSky(globe ? { 'sky-color': '#e9e2d4', 'horizon-color': '#ddd3c2', 'fog-color': '#fffaf3', 'fog-ground-blend': 0.12, 'horizon-fog-blend': 0.15, 'sky-horizon-blend': 0.35, 'atmosphere-blend': 0.08 } : null); } catch {}
 }
 
+const COUNTRY_ISO = {
+  'United States':'US','United Kingdom':'GB','Germany':'DE','France':'FR','Netherlands':'NL',
+  'Sweden':'SE','Belgium':'BE','Switzerland':'CH','Spain':'ES','Italy':'IT','Denmark':'DK',
+  'Norway':'NO','Finland':'FI','Ireland':'IE','Austria':'AT','Portugal':'PT','Poland':'PL',
+  'Estonia':'EE','Lithuania':'LT','Czechia':'CZ','Czech Republic':'CZ',
+  'Australia':'AU','Canada':'CA','Singapore':'SG','India':'IN','Israel':'IL','Japan':'JP',
+  'Luxembourg':'LU','Iceland':'IS','Romania':'RO','Greece':'GR','Hungary':'HU','Bulgaria':'BG',
+  'Croatia':'HR','Slovenia':'SI','Slovakia':'SK','Ukraine':'UA','Turkey':'TR',
+  'United Arab Emirates':'AE','Albania':'AL','Argentina':'AR','Brazil':'BR','Chile':'CL',
+  'Colombia':'CO','Cyprus':'CY','Mexico':'MX','New Zealand':'NZ','Pakistan':'PK','Philippines':'PH',
+  'England':'GB','Scotland':'GB','Wales':'GB',
+};
+
+function countryFlag(country) {
+  const iso = COUNTRY_ISO[country];
+  if (!iso) return '';
+  return String.fromCodePoint(...[...iso].map(c => 0x1F1E6 + c.charCodeAt(0) - 65));
+}
+
 function renderMarkers() {
   if (!map || !mapReady) return;
   markers.forEach(m => m.remove());
   markers = [];
   const cos = filteredCompanies().filter(c => c.latitude != null && c.longitude != null);
-  for (const c of cos.slice(0, 400)) {
+  if (!cos.length) return;
+  if (map.getZoom() < 5) {
+    renderCountryFlags(cos);
+    return;
+  }
+  for (const c of cos.slice(0, 500)) {
     const el = document.createElement('div');
     el.className = 'pin';
     el.innerHTML = `<span>${companyJobs(c.startup_id).length}</span>`;
@@ -243,6 +267,36 @@ function renderMarkers() {
     markers.push(new maplibregl.Marker({ element: el, anchor: 'bottom' })
       .setLngLat([c.longitude, c.latitude]).addTo(map));
   }
+}
+
+function renderCountryFlags(cos) {
+  const byCountry = new Map();
+  for (const c of cos) {
+    const key = c.country || 'Remote';
+    if (!countryFlag(key)) continue;
+    if (!byCountry.has(key)) byCountry.set(key, []);
+    byCountry.get(key).push(c);
+  }
+  for (const [country, comps] of byCountry) {
+    const lat = comps.reduce((a, c) => a + c.latitude, 0) / comps.length;
+    const lng = comps.reduce((a, c) => a + c.longitude, 0) / comps.length;
+    const jobs = comps.reduce((a, c) => a + companyJobs(c.startup_id).length, 0);
+    const el = document.createElement('div');
+    el.className = 'flag-marker';
+    el.innerHTML = `<span class="flag">${countryFlag(country)}</span><span class="flag-count">${jobs}</span>`;
+    el.title = `${country} — ${comps.length} companies · ${jobs} roles`;
+    el.addEventListener('click', () => fitCountry(comps));
+    markers.push(new maplibregl.Marker({ element: el, anchor: 'center' })
+      .setLngLat([lng, lat]).addTo(map));
+  }
+}
+
+function fitCountry(comps) {
+  const lngs = comps.map(c => c.longitude), lats = comps.map(c => c.latitude);
+  const cam = map.cameraForBounds(
+    [[Math.min(...lngs), Math.min(...lats)], [Math.max(...lngs), Math.max(...lats)]],
+    { padding: 90, maxZoom: 7 });
+  if (cam) map.flyTo({ center: cam.center, zoom: Math.max(6, cam.zoom) });
 }
 
 function fitMap() {

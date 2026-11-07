@@ -7,7 +7,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from ingest.enrich import fetch_logo
+from ingest.enrich import fetch_logo, fetch_logo_playwright
 from ingest.store import Store
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -18,6 +18,8 @@ def _one(s: dict) -> tuple[str, str]:
     if s.get("logo_url"):
         return s["startup_id"], s["logo_url"]
     logo = fetch_logo(s.get("website") or "", s["startup_id"], LOGO_DIR, name=s.get("name") or "")
+    if not logo and s.get("website"):
+        logo = fetch_logo_playwright(s["website"], s["startup_id"], LOGO_DIR)
     return s["startup_id"], logo
 
 
