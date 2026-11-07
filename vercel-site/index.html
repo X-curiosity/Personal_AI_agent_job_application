@@ -19,13 +19,14 @@
     <nav>
       <button id="nav-jobs" aria-current="page">Jobs</button>
       <button id="nav-map">Map</button>
+      <a class="post-role" href="#/dashboard">Dashboard</a>
       <a class="post-role" href="#/submit">Post a role</a>
     </nav>
   </header>
 
   <main id="main">
     <!-- Map + list view -->
-    <section id="view-map" class="view">
+    <section id="view-map" class="view" data-mode="jobs">
       <div id="map"></div>
       <div class="results-panel" id="results">
         <div class="panel-head">
@@ -35,7 +36,8 @@
         <div class="filters" id="filters">
           <select id="f-city" aria-label="City"></select>
           <select id="f-sector" aria-label="Sector"></select>
-          <select id="f-stage" aria-label="Stage"></select>
+          <select id="f-type" aria-label="Company type"></select>
+          <select id="f-stage" aria-label="Funding stage"></select>
           <select id="f-hiring" aria-label="Hiring status"></select>
           <input id="f-search" type="search" placeholder="Search companies…" aria-label="Search">
         </div>
@@ -69,6 +71,15 @@
           <button type="submit" class="apply-btn">Submit for review</button>
           <p id="submit-status" class="muted" hidden></p>
         </form>
+      </div>
+    </section>
+
+    <!-- Applications dashboard -->
+    <section id="view-dashboard" class="view" hidden>
+      <div class="dash-wrap">
+        <h1 class="submit-title">My applications</h1>
+        <p class="muted">Track the roles you're pursuing and update their status.</p>
+        <div id="dash-list" class="dash-list"></div>
       </div>
     </section>
   </main>

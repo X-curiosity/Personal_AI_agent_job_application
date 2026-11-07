@@ -23,6 +23,19 @@ def main() -> None:
     # startups.json — mirror startupmap's startup schema
     for s in startups:
         s["accelerators"] = json.loads(s["accelerators"] or "[]")
+        # Split the conflated "stage" into company type (public/private) vs
+        # funding stage (seed/series A/… — only meaningful for private companies).
+        stage = s.get("stage") or ""
+        if stage in ("public", "private"):
+            s["company_type"] = stage
+            s["stage"] = ""
+        elif stage == "unknown":
+            s["company_type"] = ""
+            s["stage"] = ""
+        elif stage:
+            s["company_type"] = "private"  # a funding stage implies not yet public
+        else:
+            s["company_type"] = ""
     (SITE_DATA / "startups.json").write_text(json.dumps(startups, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
 
     # jobs.json — mirror startupmap's job schema (type[] parsed back to list).

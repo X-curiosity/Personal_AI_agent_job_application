@@ -10,6 +10,7 @@ create table if not exists public.job_submissions (
   employment_type text not null default '',
   contact_email text not null default '',
   status text not null default 'pending',   -- pending | approved | rejected
+  review_note text not null default '',    -- auto-check comment from the review agent
   created_at timestamptz not null default now()
 );
 

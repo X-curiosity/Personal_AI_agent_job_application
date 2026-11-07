@@ -135,6 +135,25 @@ nav button[aria-current="page"] { background: var(--ink); color: var(--paper); }
 .submit-form input, .submit-form select, .submit-form textarea { border: 1px solid var(--line); border-radius: 8px; background: var(--paper); padding: 10px 12px; font: inherit; font-size: 14px; color: var(--ink); }
 .submit-form textarea { resize: vertical; }
 
+/* Jobs vs Map modes */
+.view[data-mode="jobs"] #map { display: none; }
+.view[data-mode="jobs"] .results-panel { left: 0; right: 0; top: 0; bottom: 0; width: auto; max-width: 880px; margin: 0 auto; border-radius: 0; border: 0; box-shadow: none; }
+.view[data-mode="map"] .results-panel { display: none; }
+
+/* Track button + dashboard */
+.track-btn { display: inline-block; background: var(--paper); color: var(--ink); border: 1px solid var(--line); font-weight: 600; padding: 11px 22px; border-radius: 10px; margin-left: 10px; cursor: pointer; font: inherit; font-size: 14px; }
+.track-btn.tracked { background: #e2f4e0; border-color: #bcddb6; color: #256c2b; }
+.dash-wrap { max-width: 760px; margin: 0 auto; padding: 40px 24px 80px; }
+.dash-list { display: flex; flex-direction: column; gap: 10px; margin-top: 24px; }
+.app-card { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); }
+.app-info { flex: 1; min-width: 0; }
+.app-title { font-weight: 600; color: var(--ink); font-size: 14px; }
+.app-title:hover { text-decoration: underline; }
+.app-co { font-size: 12px; color: var(--muted); }
+.app-status { border: 1px solid var(--line); border-radius: 8px; padding: 6px 8px; font: inherit; font-size: 13px; background: var(--paper); color: var(--ink); }
+.app-remove { border: 0; background: transparent; color: var(--muted); cursor: pointer; font-size: 15px; padding: 6px; }
+.app-remove:hover { color: var(--accent); }
+
 @media (max-width: 760px) {
   .results-panel { left: 0; right: 0; top: auto; bottom: 0; width: auto; height: 48%; border-radius: 16px 16px 0 0; }
   .job-title { font-size: 26px; }

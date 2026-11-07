@@ -11,7 +11,7 @@ let mapReady = false;
 let mapMode = '';
 let markers = [];
 
-const state = { city: '', sector: '', stage: '', hiring: '', search: '' };
+const state = { city: '', sector: '', type: '', stage: '', hiring: '', search: '' };
 
 // --- data ----------------------------------------------------------------
 
@@ -40,19 +40,27 @@ async function load() {
 
 // --- filters --------------------------------------------------------------
 
+const STAGE_LABELS = { pre_seed: 'Pre-seed', seed: 'Seed', series_a: 'Series A', series_b: 'Series B', series_c: 'Series C', series_d: 'Series D', series_e: 'Series E', bootstrapped: 'Bootstrapped', growth: 'Growth' };
+function stageLabel(s) { return STAGE_LABELS[s] || (s ? s.replace(/_/g, ' ') : ''); }
+
 function populateFilters() {
   const cities = [...new Set(startups.map(c => c.office_city).filter(Boolean))].sort();
   const sectors = [...new Set(startups.map(c => c.domain_primary).filter(Boolean))].sort();
   const stages = [...new Set(startups.map(c => c.stage).filter(Boolean))].sort();
   fill($('f-city'), cities);
   fill($('f-sector'), sectors);
+  fill($('f-type'), ['public', 'private']);
   fill($('f-stage'), stages);
   fill($('f-hiring'), ['actively_hiring', 'open_to_talent']);
 }
 function fill(sel, values) {
-  sel.append(new Option(sel.id === 'f-hiring' ? 'Any hiring' : (sel.id === 'f-city' ? 'Any city' : sel.id === 'f-sector' ? 'Any sector' : 'Any stage'), ''));
+  const first = { 'f-hiring': 'Any hiring', 'f-city': 'Any city', 'f-sector': 'Any sector', 'f-stage': 'Any stage', 'f-type': 'Any type' }[sel.id] || 'Any';
+  sel.append(new Option(first, ''));
   for (const v of values) {
-    const label = sel.id === 'f-hiring' ? (v === 'actively_hiring' ? 'Actively hiring' : 'Open to talent') : v;
+    let label = v;
+    if (sel.id === 'f-hiring') label = v === 'actively_hiring' ? 'Actively hiring' : 'Open to talent';
+    else if (sel.id === 'f-stage') label = stageLabel(v);
+    else if (sel.id === 'f-type') label = v === 'public' ? 'Public' : 'Private';
     sel.add(new Option(label, v));
   }
 }
@@ -65,6 +73,7 @@ function filteredCompanies() {
     if (!companyJobs(c.startup_id).length) return false; // only companies with roles
     if (state.city && c.office_city !== state.city) return false;
     if (state.sector && c.domain_primary !== state.sector) return false;
+    if (state.type && c.company_type !== state.type) return false;
     if (state.stage && c.stage !== state.stage) return false;
     if (state.hiring && c.hiring_status !== state.hiring) return false;
     if (q && !(c.name || '').toLowerCase().includes(q)) return false;
@@ -79,6 +88,7 @@ function filteredJobs(companyId) {
     const c = byCompany.get(job.startup_id);
     if (state.city && !(job.location_display || '').includes(state.city)) return false;
     if (state.sector && c && c.domain_primary !== state.sector) return false;
+    if (state.type && c && c.company_type !== state.type) return false;
     if (state.stage && c && c.stage !== state.stage) return false;
     if (state.hiring && c && c.hiring_status !== state.hiring) return false;
     if (q && !(`${job.job_title} ${job.startup_id} ${(job.type || []).join(' ')}`.toLowerCase().includes(q))) return false;
@@ -93,23 +103,29 @@ function render() {
   if (hash.startsWith('#/job/')) return renderJob(hash.slice(6));
   if (hash.startsWith('#/company/')) return renderCompany(hash.slice(10));
   if (hash === '#/submit') return renderSubmit();
-  return renderMapView();
+  if (hash === '#/dashboard') return renderDashboard();
+  if (hash === '#/map') return renderMapView('map');
+  return renderMapView('jobs');
 }
 
 function renderSubmit() {
   $('view-map').hidden = true;
   $('view-job').hidden = true;
   $('view-submit').hidden = false;
+  $('view-dashboard').hidden = true;
   $('nav-jobs').setAttribute('aria-current', 'false');
   $('nav-map').setAttribute('aria-current', 'false');
   $('submit-status').hidden = true;
 }
 
-function renderMapView() {
+function renderMapView(mode = 'jobs') {
   $('view-job').hidden = true;
+  $('view-submit').hidden = true;
+  $('view-dashboard').hidden = true;
   $('view-map').hidden = false;
-  $('nav-jobs').setAttribute('aria-current', 'page');
-  $('nav-map').setAttribute('aria-current', 'false');
+  $('view-map').dataset.mode = mode;
+  $('nav-jobs').setAttribute('aria-current', mode === 'jobs' ? 'page' : 'false');
+  $('nav-map').setAttribute('aria-current', mode === 'map' ? 'page' : 'false');
   const cos = filteredCompanies();
   const totalJobs = cos.reduce((n, c) => n + companyJobs(c.startup_id).length, 0);
   $('panel-title').textContent = 'Companies hiring now';
@@ -119,7 +135,7 @@ function renderMapView() {
   for (const c of cos.slice(0, 200)) list.append(companyCard(c));
   $('empty').hidden = cos.length > 0;
   renderMarkers();
-  if (map && mapReady) fitMap();
+  if (map && mapReady && mode === 'map') { map.resize(); fitMap(); }
 }
 
 function companyCard(c) {
@@ -130,7 +146,7 @@ function companyCard(c) {
     ${logoHTML(c)}
     <div class="co-info">
       <div class="co-name">${esc(c.name)}</div>
-      <div class="co-meta">${esc(c.office_city || c.country || '')}${c.stage ? ` · <span class="stage-badge">${esc(c.stage)}</span>` : ''}</div>
+      <div class="co-meta">${esc(c.office_city || c.country || '')}${c.stage ? ` · <span class="stage-badge">${esc(stageLabel(c.stage))}</span>` : ''}${c.company_type ? ` · <span class="stage-badge">${esc(c.company_type)}</span>` : ''}</div>
     </div>
     <span class="co-count">${n} roles</span>`;
   el.addEventListener('click', () => { location.hash = `#/company/${c.startup_id}`; });
@@ -141,6 +157,8 @@ function renderCompany(id) {
   const c = byCompany.get(id);
   if (!c) { location.hash = '#/'; return; }
   $('view-map').hidden = true;
+  $('view-submit').hidden = true;
+  $('view-dashboard').hidden = true;
   $('view-job').hidden = false;
   const list = filteredJobs(id);
   const d = $('job-detail');
@@ -149,7 +167,7 @@ function renderCompany(id) {
     <div class="job-head">${logoHTML(c)}
       <div><h1 class="job-title">${esc(c.name)}</h1>
       <div class="job-co">${esc(c.address || c.office_city || '')}</div></div></div>
-    <div class="job-meta">${c.stage ? `<span class="tag">${esc(c.stage)}</span>` : ''}<span class="tag">${esc(c.domain_primary || '')}</span><span class="tag">${list.length} open roles</span></div>`;
+    <div class="job-meta">${c.company_type ? `<span class="tag">${esc(c.company_type)}</span>` : ''}${c.stage ? `<span class="tag">${esc(stageLabel(c.stage))}</span>` : ''}<span class="tag">${esc(c.domain_primary || '')}</span><span class="tag">${list.length} open roles</span></div>`;
   $('back-company').addEventListener('click', () => { location.hash = '#/'; });
   const wrap = document.createElement('div');
   wrap.className = 'list';
@@ -174,6 +192,8 @@ function renderJob(id) {
   if (!job) { location.hash = '#/'; return; }
   const c = byCompany.get(job.startup_id);
   $('view-map').hidden = true;
+  $('view-submit').hidden = true;
+  $('view-dashboard').hidden = true;
   $('view-job').hidden = false;
   const d = $('job-detail');
   d.textContent = '';
@@ -186,6 +206,13 @@ function renderJob(id) {
     <h3 class="section-title">About the role</h3>
     <div class="job-desc">${job.description ? esc(job.description) : '<span class="muted">No description in the public feed.</span>'}</div>`;
   $('back-job').addEventListener('click', () => { location.hash = '#/'; });
+  const tracked = getApplications().some(a => a.job_id === job.jobs_id);
+  const track = document.createElement('button');
+  track.type = 'button';
+  track.className = 'track-btn' + (tracked ? ' tracked' : '');
+  track.textContent = tracked ? '✓ Tracked' : 'Track this role';
+  track.addEventListener('click', () => { trackApplication(job); track.textContent = '✓ Tracked'; track.classList.add('tracked'); });
+  d.querySelector('.apply-btn').after(track);
 }
 
 function esc(s) {
@@ -197,6 +224,67 @@ function logoHTML(c) {
     return `<span class="logo-wrap"><span class="logo-fallback">${letter}</span><img class="logo" src="${esc(c.logo_url)}" alt="" loading="lazy" onerror="this.remove()"></span>`;
   }
   return `<span class="logo-fallback">${letter}</span>`;
+}
+
+// --- applications dashboard -------------------------------------------------
+
+const APPS_KEY = 'hired-applications';
+const APP_STATUSES = ['Saved', 'Applied', 'Interview', 'Offer', 'Rejected'];
+
+function getApplications() {
+  try { return JSON.parse(localStorage.getItem(APPS_KEY)) || []; } catch { return []; }
+}
+function saveApplications(apps) { localStorage.setItem(APPS_KEY, JSON.stringify(apps)); }
+function trackApplication(job) {
+  const apps = getApplications();
+  if (!apps.some(a => a.job_id === job.jobs_id)) {
+    apps.unshift({
+      job_id: job.jobs_id, title: job.job_title,
+      company_name: byCompany.get(job.startup_id)?.name || job.startup_id,
+      url: job.apply_url, status: 'Saved', applied_at: new Date().toISOString(),
+    });
+    saveApplications(apps);
+  }
+}
+function updateApplicationStatus(job_id, status) {
+  saveApplications(getApplications().map(a => a.job_id === job_id ? { ...a, status } : a));
+}
+function removeApplication(job_id) {
+  saveApplications(getApplications().filter(a => a.job_id !== job_id));
+}
+
+function renderDashboard() {
+  $('view-map').hidden = true;
+  $('view-job').hidden = true;
+  $('view-submit').hidden = true;
+  $('view-dashboard').hidden = false;
+  $('nav-jobs').setAttribute('aria-current', 'false');
+  $('nav-map').setAttribute('aria-current', 'false');
+  const apps = getApplications();
+  const list = $('dash-list');
+  list.textContent = '';
+  if (!apps.length) {
+    list.innerHTML = '<p class="muted">No tracked applications yet. Open a role and click “Track this role”.</p>';
+    return;
+  }
+  for (const a of apps) {
+    const el = document.createElement('div');
+    el.className = 'app-card';
+    const status = document.createElement('select');
+    status.className = 'app-status';
+    for (const s of APP_STATUSES) status.add(new Option(s, s));
+    status.value = a.status;
+    status.addEventListener('change', () => updateApplicationStatus(a.job_id, status.value));
+    const rm = document.createElement('button');
+    rm.type = 'button'; rm.className = 'app-remove'; rm.textContent = '✕'; rm.title = 'Remove';
+    rm.addEventListener('click', () => { removeApplication(a.job_id); renderDashboard(); });
+    el.innerHTML = `<div class="app-info">
+        <a class="app-title" href="${esc(a.url)}" target="_blank" rel="noopener">${esc(a.title)}</a>
+        <div class="app-co">${esc(a.company_name)}</div>
+      </div>`;
+    el.append(status, rm);
+    list.append(el);
+  }
 }
 
 // --- map ------------------------------------------------------------------
@@ -225,8 +313,11 @@ function syncMode() {
   mapMode = mode;
   try { map.setProjection({ type: globe ? 'globe' : 'mercator' }); } catch {}
   // Same paper-toned atmosphere as the positron basemap, so the globe reads as
-  // the same map colours at every zoom (no satellite imagery).
-  try { map.setSky(globe ? { 'sky-color': '#e9e2d4', 'horizon-color': '#ddd3c2', 'fog-color': '#fffaf3', 'fog-ground-blend': 0.12, 'horizon-fog-blend': 0.15, 'sky-horizon-blend': 0.35, 'atmosphere-blend': 0.08 } : null); } catch {}
+  // the same map colours at every zoom (no satellite imagery). Sky is only
+  // set in globe mode; it doesn't apply to the flat mercator view.
+  if (globe) {
+    try { map.setSky({ 'sky-color': '#e9e2d4', 'horizon-color': '#ddd3c2', 'fog-color': '#fffaf3', 'fog-ground-blend': 0.12, 'horizon-fog-blend': 0.15, 'sky-horizon-blend': 0.35, 'atmosphere-blend': 0.08 }); } catch {}
+  }
 }
 
 const COUNTRY_ISO = {
@@ -311,12 +402,12 @@ function fitMap() {
 
 // --- events ---------------------------------------------------------------
 
-for (const key of ['city', 'sector', 'stage', 'hiring']) {
+for (const key of ['city', 'sector', 'type', 'stage', 'hiring']) {
   $(`f-${key}`).addEventListener('change', e => { state[key] = e.target.value; render(); });
 }
 $('f-search').addEventListener('input', e => { state.search = e.target.value; render(); });
-$('nav-map').addEventListener('click', () => { location.hash = '#/'; if (map && mapReady) setTimeout(() => map.resize(), 50); });
-$('nav-jobs').addEventListener('click', () => { location.hash = '#/'; });
+$('nav-map').addEventListener('click', () => { location.hash = '#/map'; });
+$('nav-jobs').addEventListener('click', () => { location.hash = '#/jobs'; });
 window.addEventListener('hashchange', render);
 
 $('submit-form').addEventListener('submit', async (e) => {

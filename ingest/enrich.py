@@ -80,7 +80,13 @@ def fetch_logo(website: str, slug: str, dest_dir: Path, name: str = "") -> str:
     under the destination dir (or '' when nothing works)."""
     dest_dir.mkdir(parents=True, exist_ok=True)
     domain = urlparse(website).netloc
-    candidates: list[str] = [f"https://{domain}/apple-touch-icon.png"]
+    candidates: list[str] = [
+        f"https://{domain}/apple-touch-icon.png",
+        f"https://{domain}/apple-touch-icon-precomposed.png",
+        f"https://{domain}/logo.png",
+        f"https://{domain}/favicon-128.png",
+        f"https://{domain}/favicon-196.png",
+    ]
     try:
         response = httpx.get(website, headers=HEADERS, timeout=12, follow_redirects=True)
         if response.status_code == 200:
@@ -91,7 +97,8 @@ def fetch_logo(website: str, slug: str, dest_dir: Path, name: str = "") -> str:
         wiki = _wikipedia_logo(name)
         if wiki:
             candidates.append(wiki)
-    candidates.append(f"https://www.google.com/s2/favicons?domain={domain}&sz=128")
+    candidates.append(f"https://unavatar.io/{domain}")
+    candidates.append(f"https://www.google.com/s2/favicons?domain={domain}&sz=256")
 
     seen: set[str] = set()
     for url in candidates:

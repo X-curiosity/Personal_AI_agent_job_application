@@ -28,6 +28,23 @@ module.exports = async function handler(req, res) {
     res.status(400).json({ error: 'Apply URL must be a plain https:// link.' });
     return;
   }
+  // Best-effort verification: fetch the apply URL and record whether the role
+  // actually looks live (this becomes the reviewer's auto-check note).
+  let review_note = '';
+  try {
+    const check = await fetch(applyUrl, { method: 'GET', redirect: 'follow', signal: AbortSignal.timeout(8000) });
+    if (!check.ok) {
+      review_note = `Auto-check: apply URL returned HTTP ${check.status} — likely not a live role.`;
+    } else {
+      const text = (await check.text()).slice(0, 150000);
+      const probe = title.split(/\s+/).filter(w => w.length > 3).slice(0, 3).join(' ');
+      review_note = (probe && text.toLowerCase().includes(probe.toLowerCase()))
+        ? `Auto-check: apply URL live (HTTP ${check.status}) and references "${probe}".`
+        : `Auto-check: apply URL live (HTTP ${check.status}) but "${probe}" was not found on the page — review manually.`;
+    }
+  } catch {
+    review_note = 'Auto-check: could not reach the apply URL — verify it exists before approving.';
+  }
   const row = {
     title,
     company,
@@ -38,6 +55,7 @@ module.exports = async function handler(req, res) {
     employment_type: String(body.employment_type || '').trim().slice(0, 60),
     contact_email: String(body.contact_email || '').trim().slice(0, 200),
     status: 'pending',
+    review_note,
     created_at: new Date().toISOString(),
   };
   const resp = await fetch(`${SUPABASE_URL}/rest/v1/job_submissions`, {

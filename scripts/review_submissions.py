@@ -79,6 +79,9 @@ def main() -> None:
         print(f"\n=== {sub['company']} — {sub['title']}")
         print(f"  location: {sub.get('location') or '-'} | {sub.get('employment_type') or '-'}")
         print(f"  apply:    {sub['apply_url']}")
+        note = sub.get('review_note') or ''
+        if note:
+            print(f"  AI check: {note}")
         print(f"  desc:     {(sub.get('description') or '')[:200]}")
         choice = input("Approve? [y/N/skip] ").strip().lower()
         if choice == "y":
