@@ -8,6 +8,17 @@ A running report of changes made to Hired (the startup & job map).
 
 ---
 
+## 2026-11-07 — Per-role tags: area, experience, workplace, time
+
+- Each role now shows four tags instead of just the area:
+  - **Area** (Engineering, Sales, …) — from `type`.
+  - **Experience** — "1-3 years" (range) or "+3 years" (minimum), derived from the description.
+  - **Workplace** — Remote / Hybrid / On-site.
+  - **Time** — Full-time / Part-time / Internship.
+- Files: `scripts/export.py` (`extract_requirements` now also returns `workplace` + `employment` + a ranged `experience`), `vercel-site/app.js` (`jobTags`).
+
+---
+
 ## 2026-11-07 — Requirements summary, complete funding-stage filter
 
 **Filter — company type vs funding stage**

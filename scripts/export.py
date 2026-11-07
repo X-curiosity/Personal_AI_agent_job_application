@@ -30,13 +30,35 @@ _SKILLS = [
 
 def extract_requirements(description: str) -> dict:
     """Summarize a job description into structured requirements (skills,
-    experience, degrees) instead of serving the raw advert text."""
+    experience range, degree, workplace, employment) instead of the raw text."""
     text = (description or "").lower()
     skills = sorted({s for s in _SKILLS if re.search(rf"(?<![a-z0-9]){re.escape(s)}(?![a-z0-9])", text)})
+    # experience: "1-3 years" (range) or "+3 years" (minimum)
     experience = ""
-    years = re.findall(r"(\d+)\+?\s*(?:years?|yrs)", text)
-    if years:
-        experience = f"{min(int(y) for y in years)}+ years"
+    rng = re.search(r"(\d+)\s*(?:-|–|to)\s*(\d+)\s*(?:years?|yrs)", text)
+    if rng:
+        experience = f"{rng.group(1)}-{rng.group(2)} years"
+    else:
+        yrs = [int(y) for y in re.findall(r"(\d+)\s*(?:years?|yrs)", text) if int(y) <= 15]
+        if yrs:
+            experience = f"+{min(yrs)} years"
+    # workplace
+    workplace = ""
+    if re.search(r"\bremote\b", text):
+        workplace = "Remote"
+    elif re.search(r"\bhybrid\b", text):
+        workplace = "Hybrid"
+    elif re.search(r"on[- ]?site", text):
+        workplace = "On-site"
+    # employment (time)
+    employment = ""
+    if re.search(r"\binternship\b|\bintern\b", text):
+        employment = "Internship"
+    elif re.search(r"part[- ]time", text):
+        employment = "Part-time"
+    elif re.search(r"full[- ]time", text):
+        employment = "Full-time"
+    # degrees
     degrees: list[str] = []
     if re.search(r"\bphd\b|doctorate", text):
         degrees.append("PhD")
@@ -44,7 +66,7 @@ def extract_requirements(description: str) -> dict:
         degrees.append("Master's")
     if re.search(r"bachelor|undergraduate", text):
         degrees.append("Bachelor's")
-    return {"skills": skills[:15], "experience": experience, "degrees": degrees[:3]}
+    return {"skills": skills[:15], "experience": experience, "degrees": degrees[:3], "workplace": workplace, "employment": employment}
 
 
 def main() -> None:

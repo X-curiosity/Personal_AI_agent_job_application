@@ -175,13 +175,18 @@ function renderCompany(id) {
   d.append(wrap);
 }
 
+function jobTags(job) {
+  const r = job.requirements || {};
+  return [...(job.type || []), r.experience, r.workplace, r.employment].filter(Boolean);
+}
+
 function jobCard(job) {
   const el = document.createElement('div');
   el.className = 'company-card';
   el.innerHTML = `
     <div class="co-info">
       <div class="co-name">${esc(job.job_title)}</div>
-      <div class="co-meta">${esc(job.location_display || '')}${(job.type || []).map(t => `<span class="stage-badge">${esc(t)}</span>`).join('')}</div>
+      <div class="co-meta">${esc(job.location_display || '')}${jobTags(job).map(t => `<span class="stage-badge">${esc(t)}</span>`).join('')}</div>
     </div>`;
   el.addEventListener('click', () => { location.hash = `#/job/${job.jobs_id}`; });
   return el;
@@ -209,7 +214,7 @@ function renderJob(id) {
     <div class="job-head">${logoHTML(c)}
       <div><h1 class="job-title">${esc(job.job_title)}</h1>
       <div class="job-co"><a href="#/company/${job.startup_id}">${esc(c?.name || job.startup_id)}</a>${job.location_display ? ' · ' + esc(job.location_display) : ''}</div></div></div>
-    <div class="job-meta">${(job.type || []).map(t => `<span class="tag">${esc(t)}</span>`).join('')}${job.scrape_method ? `<span class="tag">${esc(job.scrape_method)}</span>` : ''}</div>
+    <div class="job-meta">${jobTags(job).map(t => `<span class="tag">${esc(t)}</span>`).join('')}</div>
     <a class="apply-btn" href="${esc(job.apply_url)}" target="_blank" rel="noopener">Apply on company site ↗</a>
     ${reqHTML}
     <h3 class="section-title">About the role</h3>
