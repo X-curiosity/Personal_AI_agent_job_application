@@ -101,6 +101,14 @@ def main() -> None:
         j["type"] = json.loads(j["type"] or "[]")
         full = j.get("description") or ""
         j["requirements"] = extract_requirements(full)  # run on the full advert
+        # Clean the area tags: "Internship" is a time (not an area) and "Other"
+        # is not a real area — drop both so the tags stay precise.
+        types = j["type"]
+        if "Internship" in types:
+            if not j["requirements"].get("employment"):
+                j["requirements"]["employment"] = "Internship"
+            types = [t for t in types if t != "Internship"]
+        j["type"] = [t for t in types if t != "Other"]
         j["description"] = full[:800]  # cap only what's shown
     (SITE_DATA / "jobs.json").write_text(json.dumps(jobs, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
 

@@ -15,7 +15,9 @@ A running report of changes made to Hired (the startup & job map).
   - **Experience** — "1-3 years" (range) or "+3 years" (minimum), derived from the description.
   - **Workplace** — Remote / Hybrid / On-site.
   - **Time** — Full-time / Part-time / Internship.
-- Files: `scripts/export.py` (`extract_requirements` now also returns `workplace` + `employment` + a ranged `experience`), `vercel-site/app.js` (`jobTags`).
+- Removed the ATS (`scrape_method`) from the UI; cleaned the area tag ("Other" and "Internship" are no longer treated as areas — internships map to the **time** tag).
+- Deleted the obsolete `synthetic-ats` Vercel project (its root directory no longer existed, failing every push).
+- Files: `scripts/export.py` (`extract_requirements` + `type` cleanup), `vercel-site/app.js` (`jobTags`).
 
 ---
 
