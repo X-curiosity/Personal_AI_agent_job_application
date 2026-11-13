@@ -42,6 +42,24 @@ def _extract_logo_urls(html: str, base: str) -> list[str]:
     return urls
 
 
+def _extract_header_logos(html: str, base: str) -> list[str]:
+    """The logo shown on the site's own page (header/nav <img> with 'logo' in
+    src/class/alt, or an og:logo meta) — this is the 'presentation page' logo."""
+    urls: list[str] = []
+    for m in re.finditer(r"<img[^>]+>", html, re.I):
+        tag = m.group(0)
+        if not re.search(r"logo", tag, re.I):
+            continue
+        src = re.search(r'src=["\']([^"\']+)["\']', tag, re.I)
+        if src:
+            urls.append(urljoin(base, src.group(1)))
+    for m in re.finditer(r'<meta[^>]+(?:property|name)=["\']og:logo["\'][^>]*>', html, re.I):
+        c = re.search(r'content=["\']([^"\']+)["\']', m.group(0), re.I)
+        if c:
+            urls.append(urljoin(base, c.group(1)))
+    return urls
+
+
 def _is_company_article(title: str, name: str) -> bool:
     """True when the Wikipedia article is about the company, not a homonym
     (e.g. reject 'Mercury (planet)' when looking for Mercury the company)."""
@@ -80,19 +98,21 @@ def fetch_logo(website: str, slug: str, dest_dir: Path, name: str = "") -> str:
     under the destination dir (or '' when nothing works)."""
     dest_dir.mkdir(parents=True, exist_ok=True)
     domain = urlparse(website).netloc
-    candidates: list[str] = [
+    candidates: list[str] = []
+    try:
+        response = httpx.get(website, headers=HEADERS, timeout=12, follow_redirects=True)
+        if response.status_code == 200:
+            candidates += _extract_header_logos(response.text, website)  # 1. header logo
+            candidates += _extract_logo_urls(response.text, website)     # 2. apple-touch-icon + favicon
+    except Exception:
+        pass
+    candidates += [
         f"https://{domain}/apple-touch-icon.png",
         f"https://{domain}/apple-touch-icon-precomposed.png",
         f"https://{domain}/logo.png",
         f"https://{domain}/favicon-128.png",
         f"https://{domain}/favicon-196.png",
     ]
-    try:
-        response = httpx.get(website, headers=HEADERS, timeout=12, follow_redirects=True)
-        if response.status_code == 200:
-            candidates += _extract_logo_urls(response.text, website)
-    except Exception:
-        pass
     if name:
         wiki = _wikipedia_logo(name)
         if wiki:

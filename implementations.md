@@ -8,6 +8,14 @@ A running report of changes made to Hired (the startup & job map).
 
 ---
 
+## 2026-11-08 — Correct logos from company presentation pages
+
+- Resolved 163 companies whose `website` pointed at an ATS board (Teamtailor/Personio/BambooHR/…) and pulled their **real logo from their own homepage** (header `<img>` / `og:logo`).
+- 156 fixed, 7 cleared (no real logo found — they show a letter monogram instead of the wrong board logo).
+- Files: `ingest/enrich.py` (`_extract_header_logos`), `scripts/refetch_real_logos.py`.
+
+---
+
 ## 2026-11-08 — Logo storage optimization (PNG + smaller)
 
 - Converted all raster logos (ICO/JPEG/WEBP) to **PNG**, resized to ≤128px, and optimized.
